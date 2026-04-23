@@ -30,7 +30,7 @@ php artisan migrate --seed
 
 ---
 
-## 🔐 SPRINT 2 — Auth complète
+## ✅ SPRINT 2 — Auth complète
 **Objectif :** Inscription, login, OTP, récupération de compte, tokens Sanctum.
 
 ### Ce que ce sprint crée
@@ -57,7 +57,7 @@ php artisan migrate --seed
 
 ---
 
-## 📦 SPRINT 3 — Core métier offline-first
+## ✅ SPRINT 3 — Core métier offline-first
 **Objectif :** CRUD complet clients/commandes/mesures + endpoint sync batch.
 
 ### Ce que ce sprint crée
@@ -82,7 +82,7 @@ php artisan migrate --seed
 
 ---
 
-## 💳 SPRINT 4 — Paiement provider-agnostic
+## ✅ SPRINT 4 — Paiement provider-agnostic
 **Objectif :** Flux paiement complet FedaPay + activation auto + fallback.
 
 ### Ce que ce sprint crée
