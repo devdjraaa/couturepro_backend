@@ -1,0 +1,354 @@
+{
+  "info": {
+    "name": "CouturePro API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "token", "value": "" },
+    { "key": "telephone", "value": "22900000001" },
+    { "key": "email", "value": "test@couturepro.app" },
+    { "key": "otp_code", "value": "" },
+    { "key": "client_id", "value": "" },
+    { "key": "commande_id", "value": "" },
+    { "key": "vetement_id", "value": "" },
+    { "key": "mesure_id", "value": "" },
+    { "key": "paiement_id", "value": "" },
+    { "key": "demande_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Sprint 2 — Auth",
+      "item": [
+        {
+          "name": "1. Inscription",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 201) {",
+            "  pm.collectionVariables.set('telephone', pm.response.json().telephone);",
+            "  pm.test('Compte créé', () => pm.response.to.have.status(201));",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/inscription",
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Diallo\",\n  \"prenom\": \"Aminata\",\n  \"telephone\": \"22900000001\",\n  \"email\": \"test@couturepro.app\",\n  \"password\": \"secret123!\",\n  \"password_confirmation\": \"secret123!\",\n  \"question_secrete\": \"Ville natale?\",\n  \"reponse_secrete\": \"Cotonou\"\n}" }
+          }
+        },
+        {
+          "name": "2. Vérifier OTP",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 200) {",
+            "  pm.collectionVariables.set('token', pm.response.json().token);",
+            "  pm.test('Token reçu', () => pm.expect(pm.response.json().token).to.not.be.empty);",
+            "  pm.test('Atelier créé', () => pm.expect(pm.response.json().atelier).to.not.be.null);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/verifier-otp",
+            "body": { "mode": "raw", "raw": "{\n  \"telephone\": \"{{telephone}}\",\n  \"code\": \"{{otp_code}}\"\n}" }
+          }
+        },
+        {
+          "name": "3. Login",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 200) {",
+            "  pm.collectionVariables.set('token', pm.response.json().token);",
+            "  pm.test('Login OK', () => pm.response.to.have.status(200));",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"telephone\": \"{{telephone}}\",\n  \"password\": \"secret123!\"\n}" }
+          }
+        },
+        {
+          "name": "4. Me (profil)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/me"
+          }
+        },
+        {
+          "name": "5. Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/logout"
+          }
+        },
+        {
+          "name": "— Récupération : Étape 1 (email)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 200) pm.collectionVariables.set('demande_id', pm.response.json().demande_id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/recuperation/initier",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\"\n}" }
+          }
+        },
+        {
+          "name": "— Récupération : Étape 2 (OTP)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/recuperation/verifier-otp",
+            "body": { "mode": "raw", "raw": "{\n  \"demande_id\": \"{{demande_id}}\",\n  \"code\": \"{{otp_code}}\"\n}" }
+          }
+        },
+        {
+          "name": "— Récupération : Étape 3 (nouveau téléphone)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/recuperation/nouveau-telephone",
+            "body": { "mode": "raw", "raw": "{\n  \"demande_id\": \"{{demande_id}}\",\n  \"telephone_nouveau\": \"22900000099\"\n}" }
+          }
+        },
+        {
+          "name": "— Récupération : Étape 4 (OTP nouveau)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/recuperation/verifier-otp-nouveau",
+            "body": { "mode": "raw", "raw": "{\n  \"demande_id\": \"{{demande_id}}\",\n  \"code\": \"{{otp_code}}\"\n}" }
+          }
+        },
+        {
+          "name": "— Récupération : Étape 5 (nouveau mot de passe)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/auth/recuperation/nouveau-mot-de-passe",
+            "body": { "mode": "raw", "raw": "{\n  \"demande_id\": \"{{demande_id}}\",\n  \"password\": \"nouveauSecret123!\",\n  \"password_confirmation\": \"nouveauSecret123!\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Sprint 3 — Clients",
+      "item": [
+        {
+          "name": "Liste clients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients"
+          }
+        },
+        {
+          "name": "Créer client",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 201) pm.collectionVariables.set('client_id', pm.response.json().id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients",
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Koné\",\n  \"prenom\": \"Fatou\",\n  \"telephone\": \"22900000010\",\n  \"type_profil\": \"femme\"\n}" }
+          }
+        },
+        {
+          "name": "Détail client",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}"
+          }
+        },
+        {
+          "name": "Modifier client",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}",
+            "body": { "mode": "raw", "raw": "{\n  \"telephone\": \"22900000011\"\n}" }
+          }
+        },
+        {
+          "name": "Archiver client",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}/archiver"
+          }
+        },
+        {
+          "name": "Supprimer client",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👗 Sprint 3 — Vêtements",
+      "item": [
+        {
+          "name": "Liste vêtements",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 200) pm.collectionVariables.set('vetement_id', pm.response.json()[0].id);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/vetements"
+          }
+        },
+        {
+          "name": "Créer vêtement",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/vetements",
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Boubou personnalisé\",\n  \"libelles_mesures\": [\"poitrine\", \"taille\", \"hanches\", \"longueur\"]\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Sprint 3 — Commandes",
+      "item": [
+        {
+          "name": "Liste commandes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/commandes"
+          }
+        },
+        {
+          "name": "Créer commande",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 201) pm.collectionVariables.set('commande_id', pm.response.json().id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/commandes",
+            "body": { "mode": "raw", "raw": "{\n  \"client_id\": \"{{client_id}}\",\n  \"vetement_id\": \"{{vetement_id}}\",\n  \"prix\": 25000,\n  \"acompte\": 10000,\n  \"date_livraison_prevue\": \"2026-05-15\",\n  \"note_interne\": \"Tissu fourni par la cliente\"\n}" }
+          }
+        },
+        {
+          "name": "Modifier statut commande",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/commandes/{{commande_id}}",
+            "body": { "mode": "raw", "raw": "{\n  \"statut\": \"termine\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📐 Sprint 3 — Mesures",
+      "item": [
+        {
+          "name": "Mesures d'un client",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}/mesures"
+          }
+        },
+        {
+          "name": "Créer mesure",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 201) pm.collectionVariables.set('mesure_id', pm.response.json().id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/mesures",
+            "body": { "mode": "raw", "raw": "{\n  \"client_id\": \"{{client_id}}\",\n  \"vetement_id\": \"{{vetement_id}}\",\n  \"champs\": {\n    \"poitrine\": 90,\n    \"taille\": 68,\n    \"hanches\": 95,\n    \"longueur\": 145\n  }\n}" }
+          }
+        },
+        {
+          "name": "Modifier mesure",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/mesures/{{mesure_id}}",
+            "body": { "mode": "raw", "raw": "{\n  \"champs\": {\n    \"poitrine\": 92,\n    \"taille\": 70,\n    \"hanches\": 97,\n    \"longueur\": 145\n  }\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 Sprint 3 — Sync",
+      "item": [
+        {
+          "name": "Pull (premier sync)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/sync/pull", "host": ["{{base_url}}"], "path": ["sync", "pull"] }
+          }
+        },
+        {
+          "name": "Pull (différentiel)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/sync/pull?last_pulled_at=2026-04-01T00:00:00Z", "host": ["{{base_url}}"], "path": ["sync", "pull"], "query": [{ "key": "last_pulled_at", "value": "2026-04-01T00:00:00Z" }] }
+          }
+        },
+        {
+          "name": "Push (batch 3 ops)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/sync/push",
+            "body": { "mode": "raw", "raw": "{\n  \"operations\": [\n    {\n      \"table\": \"clients\",\n      \"operation\": \"create\",\n      \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"data\": { \"nom\": \"Traoré\", \"prenom\": \"Kadiatou\", \"type_profil\": \"femme\", \"created_by_role\": \"proprietaire\" }\n    },\n    {\n      \"table\": \"clients\",\n      \"operation\": \"update\",\n      \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"data\": { \"telephone\": \"22900000020\" }\n    },\n    {\n      \"table\": \"clients\",\n      \"operation\": \"delete\",\n      \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"data\": {}\n    }\n  ]\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Sprint 4 — Paiements",
+      "item": [
+        {
+          "name": "Initier paiement (standard mensuel)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "if (pm.response.code === 201) {",
+            "  pm.collectionVariables.set('paiement_id', pm.response.json().paiement_id);",
+            "  pm.test('checkout_url présent', () => pm.expect(pm.response.json().checkout_url).to.not.be.empty);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/paiements/initier",
+            "body": { "mode": "raw", "raw": "{\n  \"niveau_cle\": \"standard_mensuel\",\n  \"provider\": \"fedapay\"\n}" }
+          }
+        },
+        {
+          "name": "Statut paiement",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/paiements/{{paiement_id}}/status"
+          }
+        },
+        {
+          "name": "Webhook FedaPay (simulé)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/webhooks/fedapay",
+            "body": { "mode": "raw", "raw": "{\n  \"v1/transaction\": {\n    \"id\": \"TXN_ID_ICI\",\n    \"status\": \"approved\",\n    \"amount\": 3500,\n    \"currency\": { \"iso\": \"XOF\" }\n  }\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}

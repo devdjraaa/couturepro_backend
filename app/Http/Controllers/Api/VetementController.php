@@ -8,11 +8,14 @@ use App\Http\Requests\Api\UpdateVetementRequest;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\Vetement;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VetementController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);

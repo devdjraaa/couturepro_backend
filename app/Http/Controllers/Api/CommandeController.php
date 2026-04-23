@@ -9,11 +9,14 @@ use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\EquipeMembre;
 use App\Services\AtelierLimitsService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommandeController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(private AtelierLimitsService $limitsService) {}
 
     public function index(Request $request): JsonResponse

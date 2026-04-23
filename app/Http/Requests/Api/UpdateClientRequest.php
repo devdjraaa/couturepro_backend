@@ -14,7 +14,7 @@ class UpdateClientRequest extends FormRequest
             'nom'         => ['sometimes', 'string', 'max:100'],
             'prenom'      => ['sometimes', 'nullable', 'string', 'max:100'],
             'telephone'   => ['sometimes', 'nullable', 'string', 'max:20'],
-            'type_profil' => ['sometimes', 'nullable', 'string', 'in:vip,standard'],
+            'type_profil' => ['sometimes', 'nullable', 'string', 'in:homme,femme,enfant,mixte'],
         ];
     }
 }

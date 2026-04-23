@@ -33,7 +33,7 @@ class RecuperationController extends Controller
             'otp_envoye' => true,
         ]);
 
-        $this->otpService->generer($proprietaire->telephone, 'recuperation', $proprietaire->email);
+        $this->otpService->generer($proprietaire->telephone, 'recuperation_compte', $proprietaire->email);
 
         return response()->json([
             'message'    => 'Code OTP envoyé à votre adresse email.',
@@ -54,7 +54,7 @@ class RecuperationController extends Controller
 
         $proprietaire = Proprietaire::where('email', $demande->email)->first();
 
-        if (!$this->otpService->verifier($proprietaire->telephone, $request->code, 'recuperation')) {
+        if (!$this->otpService->verifier($proprietaire->telephone, $request->code, 'recuperation_compte')) {
             return response()->json(['message' => 'Code OTP invalide ou expiré.'], 422);
         }
 
@@ -83,7 +83,7 @@ class RecuperationController extends Controller
         ]);
 
         // OTP envoyé sur le même email pour confirmer la prise en charge du nouveau numéro
-        $this->otpService->generer($request->telephone_nouveau, 'recuperation_nouveau', $demande->email);
+        $this->otpService->generer($request->telephone_nouveau, 'recuperation_nouveau_telephone', $demande->email);
 
         return response()->json([
             'message'    => 'Code OTP envoyé à votre adresse email pour confirmer le nouveau numéro.',
@@ -102,7 +102,7 @@ class RecuperationController extends Controller
             return response()->json(['message' => 'Demande invalide ou étape incorrecte.'], 422);
         }
 
-        if (!$this->otpService->verifier($demande->telephone_nouveau, $request->code, 'recuperation_nouveau')) {
+        if (!$this->otpService->verifier($demande->telephone_nouveau, $request->code, 'recuperation_nouveau_telephone')) {
             return response()->json(['message' => 'Code OTP invalide ou expiré.'], 422);
         }
 

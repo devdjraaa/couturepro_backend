@@ -53,7 +53,19 @@ class Abonnement extends Model
     // Helper : retourne la config effective (snapshot ou plan direct)
     public function getConfigEffective(): array
     {
-        return $this->config_snapshot ?? $this->niveau?->config ?? [];
+        $snapshot = $this->config_snapshot;
+
+        if (is_string($snapshot)) {
+            $snapshot = json_decode($snapshot, true) ?? [];
+        }
+
+        if (is_array($snapshot) && !empty($snapshot)) {
+            return $snapshot;
+        }
+
+        $config = $this->niveau?->config;
+
+        return is_array($config) ? $config : (json_decode($config, true) ?? []);
     }
 
     public function scopeActif($query)

@@ -14,7 +14,7 @@ class StoreClientRequest extends FormRequest
             'nom'          => ['required', 'string', 'max:100'],
             'prenom'       => ['nullable', 'string', 'max:100'],
             'telephone'    => ['nullable', 'string', 'max:20'],
-            'type_profil'  => ['nullable', 'string', 'in:vip,standard'],
+            'type_profil'  => ['nullable', 'string', 'in:homme,femme,enfant,mixte'],
         ];
     }
 }

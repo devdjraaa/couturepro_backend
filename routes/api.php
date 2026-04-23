@@ -12,6 +12,13 @@ use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\WebhookController;
 use Illuminate\Support\Facades\Route;
 
+// ─── Route d'entrée ─────────────────────────────────────────────────────────
+Route::get('/', fn() => response()->json([
+    'app'     => config('app.name'),
+    'version' => '1.0.0',
+    'status'  => 'ok',
+]));
+
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('inscription',  [ProprietaireAuthController::class, 'inscription']);

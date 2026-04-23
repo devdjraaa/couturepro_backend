@@ -9,11 +9,14 @@ use App\Models\Atelier;
 use App\Models\Client;
 use App\Models\EquipeMembre;
 use App\Services\AtelierLimitsService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(private AtelierLimitsService $limitsService) {}
 
     public function index(Request $request): JsonResponse
@@ -45,7 +48,7 @@ class ClientController extends Controller
             'nom'             => $request->nom,
             'prenom'          => $request->prenom,
             'telephone'       => $request->telephone,
-            'type_profil'     => $request->type_profil ?? 'standard',
+            'type_profil'     => $request->type_profil ?? 'mixte',
             'created_by'      => $user->id,
             'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
         ]);

@@ -7,9 +7,9 @@ use App\Http\Requests\Api\StoreMesureRequest;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\Mesure;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class MesureController extends Controller
 {

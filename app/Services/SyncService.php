@@ -40,7 +40,14 @@ class SyncService
         $data = [];
 
         foreach ($this->modelMap as $table => $model) {
-            $query = $model::withTrashed()->where('atelier_id', $atelier->id);
+            $usesSoftDeletes = in_array(
+                \Illuminate\Database\Eloquent\SoftDeletes::class,
+                class_uses_recursive($model)
+            );
+
+            $query = $usesSoftDeletes
+                ? $model::withTrashed()->where('atelier_id', $atelier->id)
+                : $model::where('atelier_id', $atelier->id);
 
             if ($since) {
                 $query->where('updated_at', '>', $since);
@@ -48,7 +55,7 @@ class SyncService
 
             $data[$table] = $query->get()->map(fn($r) => array_merge(
                 $r->toArray(),
-                ['_deleted' => !is_null($r->deleted_at)]
+                ['_deleted' => $usesSoftDeletes && !is_null($r->deleted_at)]
             ));
         }
 
@@ -83,7 +90,7 @@ class SyncService
         try {
             switch ($operation) {
                 case 'create':
-                    $record = $modelClass::create(array_merge($data, ['id' => $id]));
+                    $record = $modelClass::forceCreate(array_merge($data, ['id' => $id]));
                     return ['id' => $record->id, 'status' => 'created'];
 
                 case 'update':

@@ -40,7 +40,7 @@ class ProprietaireAuthController extends Controller
             'reponse_secrete'  => $request->reponse_secrete,
         ]);
 
-        $this->otpService->generer($proprietaire->telephone, 'inscription', $proprietaire->email);
+        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
 
         return response()->json([
             'message'    => 'Compte créé. Un code OTP a été envoyé au ' . $proprietaire->telephone,
@@ -58,7 +58,7 @@ class ProprietaireAuthController extends Controller
             return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
         }
 
-        if (!$this->otpService->verifier($request->telephone, $request->code, 'inscription')) {
+        if (!$this->otpService->verifier($request->telephone, $request->code, 'verification_inscription')) {
             return response()->json(['message' => 'Code OTP invalide ou expiré.'], 422);
         }
 
