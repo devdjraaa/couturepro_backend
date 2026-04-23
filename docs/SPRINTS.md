@@ -109,7 +109,7 @@ php artisan migrate --seed
 
 ---
 
-## 🛡️ SPRINT 5 — Espace Admin
+## ✅ SPRINT 5 — Espace Admin
 **Objectif :** Panel admin fonctionnel avec permissions granulaires.
 
 ### Ce que ce sprint crée
@@ -169,9 +169,9 @@ php artisan migrate --seed
 
 ```
 Sprint 1  │████████│ DB structure + models         → migrate --seed ✅
-Sprint 2  │████████│ Auth + OTP + tokens            → login fonctionne
-Sprint 3  │████████│ CRUD métier + sync batch       → offline ready
-Sprint 4  │████████│ Paiement + webhook             → FedaPay live
-Sprint 5  │████████│ Panel admin complet            → admin opérationnel
+Sprint 2  │████████│ Auth + OTP + tokens            → login fonctionnel✅
+Sprint 3  │████████│ CRUD métier + sync batch       → offline ready✅
+Sprint 4  │████████│ Paiement + webhook             → FedaPay live ✅
+Sprint 5  │████████│ Panel admin complet            → admin opérationnel ✅
 Sprint 6  │████████│ WatermelonDB frontend          → app 100% offline
 ```
