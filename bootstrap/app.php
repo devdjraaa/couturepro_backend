@@ -2,6 +2,7 @@
 
 use App\Console\Commands\CheckPendingPayments;
 use App\Console\Commands\ExpireStalePayments;
+use App\Console\Commands\ProcessBonusExpiry;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command(ExpireStalePayments::class)->hourly();
         $schedule->command(CheckPendingPayments::class)->everyFifteenMinutes();
+        $schedule->command(ProcessBonusExpiry::class)->hourly();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
