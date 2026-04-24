@@ -41,7 +41,7 @@ class TicketController extends Controller
 
     public function assigner(Request $request, TicketSupport $ticket): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'assigned_to' => ['required', 'uuid', 'exists:admins,id'],
@@ -59,7 +59,7 @@ class TicketController extends Controller
 
     public function repondre(Request $request, TicketSupport $ticket): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'contenu'         => ['required', 'string', 'max:5000'],
@@ -84,7 +84,7 @@ class TicketController extends Controller
 
     public function fermer(Request $request, TicketSupport $ticket): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         if ($ticket->statut === 'ferme') {
             return response()->json(['message' => 'Ticket déjà fermé.'], 422);
@@ -102,7 +102,7 @@ class TicketController extends Controller
 
     public function rouvrir(Request $request, TicketSupport $ticket): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         if ($ticket->statut !== 'ferme') {
             return response()->json(['message' => "Le ticket n'est pas fermé."], 422);

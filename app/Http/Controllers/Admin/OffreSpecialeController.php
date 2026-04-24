@@ -25,7 +25,7 @@ class OffreSpecialeController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'atelier_id'      => ['required', 'uuid', 'exists:ateliers,id'],
@@ -53,7 +53,7 @@ class OffreSpecialeController extends Controller
 
     public function update(Request $request, OffreSpeciale $offre): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'label'           => ['sometimes', 'string', 'max:150'],
@@ -74,7 +74,7 @@ class OffreSpecialeController extends Controller
 
     public function destroy(Request $request, OffreSpeciale $offre): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $this->audit($admin, 'offre.delete', 'offre_speciale', $offre->id, ['label' => $offre->label], $request->ip());
 

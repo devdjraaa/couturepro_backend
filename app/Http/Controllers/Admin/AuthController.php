@@ -44,7 +44,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
         $this->audit($admin, 'admin.logout', 'admin', $admin->id, [], $request->ip());
 
         $admin->currentAccessToken()->delete();
@@ -54,7 +54,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         return response()->json($admin->only(['id', 'nom', 'prenom', 'email', 'role', 'permissions', 'derniere_connexion_at']));
     }

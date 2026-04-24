@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
+use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\PaiementController;
 use App\Http\Controllers\Api\SyncController;
@@ -72,6 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Sync
     Route::post('sync/push', [SyncController::class, 'push']);
     Route::get('sync/pull',  [SyncController::class, 'pull']);
+
+    // Fidélité
+    Route::get('fidelite',           [FideliteController::class, 'show']);
+    Route::post('fidelite/convertir', [FideliteController::class, 'convertir']);
 
     // Paiements
     Route::post('paiements/initier',        [PaiementController::class, 'initier']);

@@ -15,7 +15,7 @@ class NotificationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'titre'      => ['required', 'string', 'max:150'],

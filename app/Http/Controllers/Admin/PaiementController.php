@@ -29,7 +29,7 @@ class PaiementController extends Controller
 
     public function valider(Request $request, Paiement $paiement): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         if (! in_array($paiement->statut, ['pending', 'failed'])) {
             return response()->json(['message' => 'Ce paiement ne peut pas être validé manuellement.'], 422);
@@ -49,7 +49,7 @@ class PaiementController extends Controller
 
     public function rembourser(Request $request, Paiement $paiement): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         if ($paiement->statut !== 'completed') {
             return response()->json(['message' => 'Seul un paiement complété peut être remboursé.'], 422);

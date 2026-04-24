@@ -24,7 +24,7 @@ class ListeNoireController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'type'   => ['required', 'in:telephone,email,ip'],
@@ -49,7 +49,7 @@ class ListeNoireController extends Controller
 
     public function destroy(Request $request, ListeNoire $listeNoire): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $this->audit($admin, 'blacklist.retirer', 'liste_noire', $listeNoire->id, [
             'type'   => $listeNoire->type,

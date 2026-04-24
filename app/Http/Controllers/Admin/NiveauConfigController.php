@@ -32,7 +32,7 @@ class NiveauConfigController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'cle'                          => ['required', 'string', 'max:50', 'unique:niveaux_config,cle'],
@@ -57,7 +57,7 @@ class NiveauConfigController extends Controller
 
     public function update(Request $request, NiveauConfig $plan): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'label'                        => ['sometimes', 'string', 'max:100'],
@@ -80,7 +80,7 @@ class NiveauConfigController extends Controller
 
     public function toggle(Request $request, NiveauConfig $plan): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $plan->update([
             'is_actif'   => ! $plan->is_actif,

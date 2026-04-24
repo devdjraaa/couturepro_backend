@@ -34,6 +34,7 @@ class AtelierController extends Controller
             'abonnement.niveau',
             'equipesMembres',
             'quotaMoisCourant',
+            'pointsFidelite',
         ]);
 
         return response()->json($atelier);
@@ -45,8 +46,7 @@ class AtelierController extends Controller
             return response()->json(['message' => 'Atelier déjà gelé.'], 422);
         }
 
-        $admin = auth('admin')->user();
-        $admin->hasPermission('ateliers.freeze') || abort(403, 'Permission insuffisante.');
+        $admin = $this->adminUser();
 
         $ancienStatut = $atelier->statut;
         $atelier->update(['statut' => 'gele']);
@@ -64,8 +64,7 @@ class AtelierController extends Controller
             return response()->json(['message' => "L'atelier n'est pas gelé."], 422);
         }
 
-        $admin = auth('admin')->user();
-        $admin->hasPermission('ateliers.freeze') || abort(403, 'Permission insuffisante.');
+        $admin = $this->adminUser();
 
         $abonnement  = $atelier->abonnement;
         $nouveauStatut = ($abonnement && $abonnement->statut === 'actif') ? 'actif' : 'expire';

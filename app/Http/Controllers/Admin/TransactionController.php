@@ -29,7 +29,7 @@ class TransactionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         $data = $request->validate([
             'atelier_id' => ['required', 'uuid', 'exists:ateliers,id'],
@@ -61,7 +61,7 @@ class TransactionController extends Controller
 
     public function cancel(Request $request, TransactionAbonnement $transaction): JsonResponse
     {
-        $admin = auth('admin')->user();
+        $admin = $this->adminUser();
 
         if ($transaction->statut !== 'disponible') {
             return response()->json(['message' => 'Seule une transaction disponible peut être annulée.'], 422);

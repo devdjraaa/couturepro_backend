@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\FideliteController;
 use App\Http\Controllers\Admin\ListeNoireController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\NiveauConfigController;
@@ -81,6 +82,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // Audit log
     Route::middleware('admin.permission:audit.view')->get('audit', [AuditLogController::class, 'index']);
+
+    // Fidélité
+    Route::middleware('admin.permission:fidelite.view')->get('ateliers/{atelier}/fidelite', [FideliteController::class, 'show']);
+    Route::middleware('admin.permission:fidelite.adjust')->post('ateliers/{atelier}/fidelite/ajuster', [FideliteController::class, 'ajuster']);
 
     // Notifications
     Route::middleware('admin.permission:notifications.broadcast')->post('notifications', [NotificationController::class, 'store']);

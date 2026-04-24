@@ -7,6 +7,13 @@ use App\Models\AdminAuditLog;
 
 trait LogsAdminAction
 {
+    protected function adminUser(): Admin
+    {
+        /** @var Admin $admin */
+        $admin = auth('admin')->user();
+        return $admin;
+    }
+
     protected function audit(Admin $admin, string $action, string $entiteType, ?string $entiteId = null, array $details = [], ?string $ip = null): void
     {
         AdminAuditLog::create([

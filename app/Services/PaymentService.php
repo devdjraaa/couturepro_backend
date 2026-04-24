@@ -9,6 +9,7 @@ use App\Models\NiveauConfig;
 use App\Models\Paiement;
 use App\Models\TransactionAbonnement;
 use App\Services\Payment\FedaPayProvider;
+use App\Services\PointsFideliteService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -156,6 +157,17 @@ class PaymentService
         }
 
         $atelier?->update(['statut' => 'actif']);
+
+        // Step 5 blueprint : créditer pts_activation
+        $ptsActivation = (int) ($configSnapshot['pts_activation'] ?? 0);
+        if ($ptsActivation > 0) {
+            app(PointsFideliteService::class)->creditPoints(
+                $atelierId,
+                'abonnement_activation',
+                $ptsActivation,
+                "Activation abonnement {$niveauCle}",
+            );
+        }
     }
 
     private function resolveProvider(string $provider): PaymentProviderContract
