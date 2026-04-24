@@ -119,6 +119,12 @@ class PaymentService
         $niveau      = NiveauConfig::where('cle', $niveauCle)->first();
         $abonnement  = Abonnement::where('atelier_id', $atelierId)->first();
 
+        // Normalise le config (peut être double-encodé depuis le seeder)
+        $configSnapshot = $niveau?->config;
+        if (is_string($configSnapshot)) {
+            $configSnapshot = json_decode($configSnapshot, true);
+        }
+
         $debut       = now();
         $expiration  = now()->addDays($dureeJours);
 
@@ -135,7 +141,7 @@ class PaymentService
                 'jours_restants'       => $dureeJours,
                 'timestamp_debut'      => $debut,
                 'timestamp_expiration' => $expiration,
-                'config_snapshot'      => $niveau?->config,
+                'config_snapshot'      => $configSnapshot,
             ]);
         } else {
             Abonnement::create([
@@ -145,7 +151,7 @@ class PaymentService
                 'jours_restants'       => $dureeJours,
                 'timestamp_debut'      => $debut,
                 'timestamp_expiration' => $expiration,
-                'config_snapshot'      => $niveau?->config,
+                'config_snapshot'      => $configSnapshot,
             ]);
         }
 

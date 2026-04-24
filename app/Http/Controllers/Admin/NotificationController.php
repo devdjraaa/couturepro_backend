@@ -20,7 +20,7 @@ class NotificationController extends Controller
         $data = $request->validate([
             'titre'      => ['required', 'string', 'max:150'],
             'contenu'    => ['required', 'string'],
-            'type'       => ['required', 'in:info,warning,promo,maintenance'],
+            'type'       => ['required', 'in:info,promo,mise_a_jour,alerte_sync,alerte_abonnement'],
             'atelier_id' => ['nullable', 'uuid', 'exists:ateliers,id'],
         ]);
 

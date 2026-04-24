@@ -22,6 +22,8 @@ class Proprietaire extends Authenticatable
         'question_secrete',
         'reponse_secrete',
         'password',
+        'telephone_verified_at',
+        'derniere_connexion_at',
     ];
 
     protected $hidden = [

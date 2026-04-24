@@ -27,6 +27,7 @@ class FedaPayProvider implements PaymentProviderContract
     {
         // Étape 1 : créer la transaction
         $response = Http::withToken($this->apiKey)
+            ->asJson()
             ->post("{$this->baseUrl}/transactions", [
                 'description' => "Abonnement CouturePro — {$paiement->niveau_cle}",
                 'amount'      => (int) $paiement->montant,
@@ -41,12 +42,13 @@ class FedaPayProvider implements PaymentProviderContract
 
         $response->throw();
 
-        $transaction   = $response->json('v1/transaction');
-        $transactionId = (string) $transaction['id'];
+        $transaction   = $response->json()['v1/transaction'] ?? [];
+        $transactionId = (string) ($transaction['id'] ?? '');
 
-        // Étape 2 : générer le token de paiement
+        // Étape 2 : générer le token de paiement (POST requis par FedaPay)
         $tokenResponse = Http::withToken($this->apiKey)
-            ->get("{$this->baseUrl}/transactions/{$transactionId}/token");
+            ->asJson()
+            ->post("{$this->baseUrl}/transactions/{$transactionId}/token");
 
         $tokenResponse->throw();
 
@@ -105,7 +107,7 @@ class FedaPayProvider implements PaymentProviderContract
 
         $response->throw();
 
-        $fedaStatus = $response->json('v1/transaction.status') ?? 'unknown';
+        $fedaStatus = ($response->json()['v1/transaction']['status'] ?? null) ?? 'unknown';
 
         return match ($fedaStatus) {
             'approved' => 'completed',
