@@ -30,11 +30,16 @@ class TicketController extends Controller
     {
         $ticket->load(['atelier', 'proprietaire', 'assignedTo', 'messages']);
 
-        // Marquer messages admin non lus comme lus
+        // Marquer messages proprietaire non lus comme lus par l'admin
         $ticket->messages()
             ->where('expediteur_type', 'proprietaire')
             ->whereNull('lu_par_admin_at')
             ->update(['lu_par_admin_at' => now()]);
+
+        // Ajouter pj_url sur chaque message
+        $ticket->messages->each(function ($msg) {
+            $msg->pj_url = $msg->pj_path ? asset('storage/' . $msg->pj_path) : null;
+        });
 
         return response()->json($ticket);
     }
@@ -64,13 +69,20 @@ class TicketController extends Controller
         $data = $request->validate([
             'contenu'         => ['required', 'string', 'max:5000'],
             'is_note_interne' => ['boolean'],
+            'photo'           => ['nullable', 'image', 'max:5120'],
         ]);
+
+        $pjPath = null;
+        if ($request->hasFile('photo')) {
+            $pjPath = $request->file('photo')->store('tickets', 'public');
+        }
 
         $message = TicketMessage::create([
             'ticket_id'       => $ticket->id,
             'expediteur_type' => 'admin',
             'expediteur_id'   => $admin->id,
             'contenu'         => $data['contenu'],
+            'pj_path'         => $pjPath,
             'is_note_interne' => $data['is_note_interne'] ?? false,
             'created_at'      => now(),
         ]);
@@ -78,6 +90,8 @@ class TicketController extends Controller
         if ($ticket->statut === 'ouvert' && ! ($data['is_note_interne'] ?? false)) {
             $ticket->update(['statut' => 'en_cours']);
         }
+
+        $message->pj_url = $pjPath ? asset('storage/' . $pjPath) : null;
 
         return response()->json($message, 201);
     }
