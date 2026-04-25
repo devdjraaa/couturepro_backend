@@ -31,6 +31,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::post('ateliers/{atelier}/geler',   [AtelierController::class, 'geler']);
         Route::post('ateliers/{atelier}/degeler', [AtelierController::class, 'degeler']);
     });
+    Route::middleware('admin.permission:ateliers.view')->group(function () {
+        Route::post('ateliers/{atelier}/demo',  [AtelierController::class, 'demo']);
+        Route::post('ateliers/{atelier}/trial', [AtelierController::class, 'trial']);
+    });
 
     // Plans
     Route::middleware('admin.permission:plans.view')->group(function () {

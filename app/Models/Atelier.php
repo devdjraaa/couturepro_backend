@@ -20,10 +20,12 @@ class Atelier extends Model
         'is_maitre',
         'statut',
         'essai_expire_at',
+        'is_demo',
     ];
 
     protected $casts = [
         'is_maitre'       => 'boolean',
+        'is_demo'         => 'boolean',
         'essai_expire_at' => 'datetime',
     ];
 

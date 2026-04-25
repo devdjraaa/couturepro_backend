@@ -121,6 +121,23 @@ class ProprietaireAuthController extends Controller
         return response()->json(['message' => 'Déconnecté avec succès.']);
     }
 
+    public function renvoyerOtp(Request $request): JsonResponse
+    {
+        $data = $request->validate(['telephone' => ['required', 'string']]);
+
+        $proprietaire = Proprietaire::where('telephone', $data['telephone'])
+            ->whereNull('telephone_verified_at')
+            ->first();
+
+        if (!$proprietaire) {
+            return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
+        }
+
+        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
+
+        return response()->json(['message' => 'Code OTP renvoyé.', 'telephone' => $proprietaire->telephone]);
+    }
+
     public function me(Request $request): JsonResponse
     {
         $proprietaire = $request->user()->load('atelierMaitre.abonnement');

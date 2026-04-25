@@ -58,6 +58,52 @@ class AtelierController extends Controller
         return response()->json(['message' => 'Atelier gelé.', 'atelier' => $atelier]);
     }
 
+    public function demo(Request $request, Atelier $atelier): JsonResponse
+    {
+        $data  = $request->validate(['is_demo' => ['required', 'boolean']]);
+        $admin = $this->adminUser();
+
+        $atelier->update(['is_demo' => $data['is_demo']]);
+
+        $this->audit($admin, 'atelier.demo', 'atelier', $atelier->id, [
+            'is_demo' => $data['is_demo'],
+        ], $request->ip());
+
+        return response()->json(['message' => 'Mode démo mis à jour.', 'is_demo' => $atelier->is_demo]);
+    }
+
+    public function trial(Request $request, Atelier $atelier): JsonResponse
+    {
+        $data = $request->validate([
+            'duree' => ['required', 'integer', 'min:1'],
+            'unite' => ['required', 'in:minutes,heures,jours'],
+        ]);
+
+        $admin = $this->adminUser();
+
+        $expire = match ($data['unite']) {
+            'minutes' => now()->addMinutes($data['duree']),
+            'heures'  => now()->addHours($data['duree']),
+            'jours'   => now()->addDays($data['duree']),
+        };
+
+        $atelier->update([
+            'statut'          => 'essai',
+            'essai_expire_at' => $expire,
+        ]);
+
+        $this->audit($admin, 'atelier.trial', 'atelier', $atelier->id, [
+            'duree' => $data['duree'],
+            'unite' => $data['unite'],
+            'expire_at' => $expire->toISOString(),
+        ], $request->ip());
+
+        return response()->json([
+            'message'          => "Période d'essai mise à jour.",
+            'essai_expire_at'  => $atelier->essai_expire_at,
+        ]);
+    }
+
     public function degeler(Request $request, Atelier $atelier): JsonResponse
     {
         if ($atelier->statut !== 'gele') {

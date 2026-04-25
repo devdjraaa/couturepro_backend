@@ -7,10 +7,13 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\MesureController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
 use App\Http\Controllers\Api\SyncController;
+use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\WebhookController;
+use App\Http\Controllers\Api\WhatsAppController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Route d'entrée ─────────────────────────────────────────────────────────
@@ -22,10 +25,11 @@ Route::get('/', fn() => response()->json([
 
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('inscription',  [ProprietaireAuthController::class, 'inscription']);
-    Route::post('verifier-otp', [ProprietaireAuthController::class, 'verifierOtp']);
-    Route::post('login',        [ProprietaireAuthController::class, 'login']);
-    Route::post('equipe/login', [EquipeMembreAuthController::class, 'login']);
+    Route::post('inscription',   [ProprietaireAuthController::class, 'inscription']);
+    Route::post('verifier-otp',  [ProprietaireAuthController::class, 'verifierOtp']);
+    Route::post('renvoyer-otp',  [ProprietaireAuthController::class, 'renvoyerOtp']);
+    Route::post('login',         [ProprietaireAuthController::class, 'login']);
+    Route::post('equipe/login',  [EquipeMembreAuthController::class, 'login']);
 
     Route::prefix('recuperation')->group(function () {
         Route::post('initier',              [RecuperationController::class, 'etape1']);
@@ -44,11 +48,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/me',      [ProprietaireAuthController::class, 'me']);
 
     // Clients
-    Route::get('clients',                  [ClientController::class, 'index']);
-    Route::post('clients',                 [ClientController::class, 'store']);
-    Route::get('clients/{client}',         [ClientController::class, 'show']);
-    Route::put('clients/{client}',         [ClientController::class, 'update']);
-    Route::delete('clients/{client}',      [ClientController::class, 'destroy']);
+    Route::get('clients',                    [ClientController::class, 'index']);
+    Route::post('clients',                   [ClientController::class, 'store']);
+    Route::get('clients/{client}',           [ClientController::class, 'show']);
+    Route::put('clients/{client}',           [ClientController::class, 'update']);
+    Route::delete('clients/{client}',        [ClientController::class, 'destroy']);
     Route::post('clients/{client}/archiver', [ClientController::class, 'archiver']);
 
     // Mesures
@@ -65,22 +69,33 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('commandes/{commande}', [CommandeController::class, 'destroy']);
 
     // Vêtements
-    Route::get('vetements',              [VetementController::class, 'index']);
-    Route::post('vetements',             [VetementController::class, 'store']);
-    Route::put('vetements/{vetement}',   [VetementController::class, 'update']);
-    Route::delete('vetements/{vetement}',[VetementController::class, 'destroy']);
+    Route::get('vetements',               [VetementController::class, 'index']);
+    Route::post('vetements',              [VetementController::class, 'store']);
+    Route::put('vetements/{vetement}',    [VetementController::class, 'update']);
+    Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
 
     // Sync
     Route::post('sync/push', [SyncController::class, 'push']);
     Route::get('sync/pull',  [SyncController::class, 'pull']);
 
     // Fidélité
-    Route::get('fidelite',           [FideliteController::class, 'show']);
+    Route::get('fidelite',            [FideliteController::class, 'show']);
     Route::post('fidelite/convertir', [FideliteController::class, 'convertir']);
 
     // Paiements
-    Route::post('paiements/initier',        [PaiementController::class, 'initier']);
+    Route::post('paiements/initier',          [PaiementController::class, 'initier']);
     Route::get('paiements/{paiement}/status', [PaiementController::class, 'status']);
+
+    // Notifications
+    Route::get('notifications',              [NotificationController::class, 'index']);
+    Route::post('notifications/mark-as-read',[NotificationController::class, 'markAsRead']);
+
+    // Tickets support (propriétaire)
+    Route::get('support/tickets',  [TicketSupportController::class, 'index']);
+    Route::post('support/tickets', [TicketSupportController::class, 'store']);
+
+    // WhatsApp
+    Route::get('whatsapp/rappel-client/{clientId}', [WhatsAppController::class, 'rappelClient']);
 });
 
 // ─── Webhooks (pas d'auth) ───────────────────────────────────────────────────
