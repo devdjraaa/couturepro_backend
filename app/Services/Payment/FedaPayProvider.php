@@ -116,4 +116,12 @@ class FedaPayProvider implements PaymentProviderContract
             default    => 'pending',
         };
     }
+
+    public function refund(string $providerTransactionId): void
+    {
+        $response = Http::withToken($this->apiKey)
+            ->post("{$this->baseUrl}/transactions/{$providerTransactionId}/refund");
+
+        $response->throw();
+    }
 }

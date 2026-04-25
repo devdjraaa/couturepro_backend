@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\CommandePaiementController;
+use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
@@ -79,6 +80,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('vetements',              [VetementController::class, 'store']);
     Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update']);
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
+
+    // Équipe
+    Route::get('equipe',             [EquipeMembreController::class, 'index']);
+    Route::post('equipe',            [EquipeMembreController::class, 'store']);
+    Route::delete('equipe/{membre}', [EquipeMembreController::class, 'destroy']);
 
     // Sync
     Route::post('sync/push', [SyncController::class, 'push']);

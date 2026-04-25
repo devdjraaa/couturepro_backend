@@ -79,6 +79,22 @@ class PaymentService
         });
     }
 
+    public function refund(Paiement $paiement): void
+    {
+        $providerInstance = $this->resolveProvider($paiement->provider);
+        $providerInstance->refund($paiement->provider_transaction_id);
+
+        DB::transaction(function () use ($paiement) {
+            $paiement->update(['statut' => 'refunded']);
+
+            $abonnement = Abonnement::where('atelier_id', $paiement->atelier_id)->first();
+            if ($abonnement && $abonnement->statut === 'actif') {
+                $abonnement->update(['statut' => 'expire']);
+                Atelier::where('id', $paiement->atelier_id)->update(['statut' => 'expire']);
+            }
+        });
+    }
+
     public function handleRetour(string $provider, Paiement $paiement): void
     {
         $providerInstance = $this->resolveProvider($provider);

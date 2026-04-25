@@ -55,15 +55,20 @@ class PaiementController extends Controller
             return response()->json(['message' => 'Seul un paiement complété peut être remboursé.'], 422);
         }
 
-        $paiement->update([
-            'statut'       => 'refunded',
-            'validated_by' => $admin->id,
-        ]);
+        $paiement->update(['validated_by' => $admin->id]);
+
+        try {
+            $this->paymentService->refund($paiement);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Échec du remboursement FedaPay : ' . $e->getMessage(),
+            ], 502);
+        }
 
         $this->audit($admin, 'paiement.rembourser', 'paiement', $paiement->id, [
             'montant' => $paiement->montant,
         ], $request->ip());
 
-        return response()->json(['message' => 'Paiement marqué comme remboursé.']);
+        return response()->json(['message' => 'Remboursement effectué via FedaPay.']);
     }
 }

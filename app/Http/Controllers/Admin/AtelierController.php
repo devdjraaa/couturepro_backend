@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Traits\LogsAdminAction;
 use Illuminate\Http\JsonResponse;
@@ -91,6 +92,24 @@ class AtelierController extends Controller
             'statut'          => 'essai',
             'essai_expire_at' => $expire,
         ]);
+
+        $dureeJours = match ($data['unite']) {
+            'jours'   => $data['duree'],
+            'heures'  => max(1, (int) ceil($data['duree'] / 24)),
+            'minutes' => max(1, (int) ceil($data['duree'] / 1440)),
+        };
+
+        Abonnement::updateOrCreate(
+            ['atelier_id' => $atelier->id],
+            [
+                'statut'               => 'essai',
+                'niveau_cle'           => 'standard_mensuel',
+                'jours_restants'       => $dureeJours,
+                'timestamp_debut'      => now(),
+                'timestamp_expiration' => $expire,
+                'config_snapshot'      => null,
+            ]
+        );
 
         $this->audit($admin, 'atelier.trial', 'atelier', $atelier->id, [
             'duree' => $data['duree'],

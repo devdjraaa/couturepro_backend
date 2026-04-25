@@ -15,4 +15,6 @@ interface PaymentProviderContract
     public function parseWebhookPayload(array $payload): WebhookPayload;
 
     public function checkTransactionStatus(string $providerTransactionId): string;
+
+    public function refund(string $providerTransactionId): void;
 }
