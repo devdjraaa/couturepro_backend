@@ -11,9 +11,8 @@ class StoreMesureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'   => ['required', 'uuid', 'exists:clients,id'],
-            'vetement_id' => ['required', 'uuid', 'exists:vetements,id'],
-            'champs'      => ['required', 'array'],
+            'client_id' => ['required', 'uuid', 'exists:clients,id'],
+            'champs'    => ['required', 'array'],
         ];
     }
 }

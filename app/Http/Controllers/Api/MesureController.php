@@ -14,16 +14,16 @@ use Illuminate\Http\Request;
 class MesureController extends Controller
 {
     use AuthorizesRequests;
+
     public function index(Request $request, string $clientId): JsonResponse
     {
         $atelier = $this->getAtelier($request);
 
-        $mesures = Mesure::where('atelier_id', $atelier->id)
+        $mesure = Mesure::where('atelier_id', $atelier->id)
             ->where('client_id', $clientId)
-            ->with('vetement')
-            ->get();
+            ->first();
 
-        return response()->json($mesures);
+        return response()->json($mesure);
     }
 
     public function store(StoreMesureRequest $request): JsonResponse
@@ -31,14 +31,14 @@ class MesureController extends Controller
         $atelier = $this->getAtelier($request);
         $user    = $request->user();
 
-        $mesure = Mesure::create([
-            'atelier_id'      => $atelier->id,
-            'client_id'       => $request->client_id,
-            'vetement_id'     => $request->vetement_id,
-            'champs'          => $request->champs,
-            'created_by'      => $user->id,
-            'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
-        ]);
+        $mesure = Mesure::updateOrCreate(
+            ['atelier_id' => $atelier->id, 'client_id' => $request->client_id],
+            [
+                'champs'          => $request->champs,
+                'created_by'      => $user->id,
+                'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
+            ]
+        );
 
         return response()->json($mesure, 201);
     }

@@ -13,7 +13,6 @@ class Mesure extends Model
 
     protected $fillable = [
         'client_id',
-        'vetement_id',
         'atelier_id',
         'champs',
         'created_by',
@@ -27,11 +26,6 @@ class Mesure extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id');
-    }
-
-    public function vetement(): BelongsTo
-    {
-        return $this->belongsTo(Vetement::class, 'vetement_id');
     }
 
     public function atelier(): BelongsTo
