@@ -22,6 +22,7 @@ class EquipeMembre extends Authenticatable
         'code_acces',
         'nom',
         'prenom',
+        'telephone',
         'role',
         'password',
         'device_id',

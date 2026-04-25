@@ -17,7 +17,7 @@ class EquipeMembreController extends Controller
 
         $membres = EquipeMembre::where('atelier_id', $atelier->id)
             ->where('is_active', true)
-            ->get(['id', 'nom', 'prenom', 'role', 'code_acces', 'derniere_sync_at', 'created_at']);
+            ->get(['id', 'nom', 'prenom', 'telephone', 'role', 'code_acces', 'derniere_sync_at', 'created_at']);
 
         return response()->json($membres);
     }
@@ -25,9 +25,10 @@ class EquipeMembreController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'nom'    => ['required', 'string', 'max:100'],
-            'prenom' => ['required', 'string', 'max:100'],
-            'role'   => ['required', 'in:assistant,membre'],
+            'nom'       => ['required', 'string', 'max:100'],
+            'prenom'    => ['required', 'string', 'max:100'],
+            'telephone' => ['nullable', 'string', 'max:30'],
+            'role'      => ['required', 'in:assistant,membre'],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -51,6 +52,7 @@ class EquipeMembreController extends Controller
             'created_by' => $request->user()->id,
             'nom'        => $data['nom'],
             'prenom'     => $data['prenom'],
+            'telephone'  => $data['telephone'] ?? null,
             'role'       => $data['role'],
             'code_acces' => $code,
             'password'   => bcrypt($code),

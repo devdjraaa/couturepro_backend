@@ -79,11 +79,14 @@ class PaymentService
         });
     }
 
-    public function refund(Paiement $paiement): void
+    /**
+     * Marque le paiement comme remboursé en base et expire l'abonnement.
+     * FedaPay ne propose pas d'API REST de remboursement — l'admin doit
+     * effectuer le remboursement manuellement depuis le dashboard FedaPay.
+     * Retourne true si tout s'est bien passé, false si un avertissement doit être affiché.
+     */
+    public function refund(Paiement $paiement): bool
     {
-        $providerInstance = $this->resolveProvider($paiement->provider);
-        $providerInstance->refund($paiement->provider_transaction_id);
-
         DB::transaction(function () use ($paiement) {
             $paiement->update(['statut' => 'refunded']);
 
@@ -93,6 +96,8 @@ class PaymentService
                 Atelier::where('id', $paiement->atelier_id)->update(['statut' => 'expire']);
             }
         });
+
+        return true;
     }
 
     public function handleRetour(string $provider, Paiement $paiement): void

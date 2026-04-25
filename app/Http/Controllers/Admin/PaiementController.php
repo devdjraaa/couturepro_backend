@@ -57,18 +57,16 @@ class PaiementController extends Controller
 
         $paiement->update(['validated_by' => $admin->id]);
 
-        try {
-            $this->paymentService->refund($paiement);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'message' => 'Échec du remboursement FedaPay : ' . $e->getMessage(),
-            ], 502);
-        }
+        $this->paymentService->refund($paiement);
 
         $this->audit($admin, 'paiement.rembourser', 'paiement', $paiement->id, [
             'montant' => $paiement->montant,
         ], $request->ip());
 
-        return response()->json(['message' => 'Remboursement effectué via FedaPay.']);
+        return response()->json([
+            'message'      => 'Paiement marqué comme remboursé et abonnement expiré.',
+            'avertissement' => 'FedaPay ne dispose pas d\'API de remboursement automatique. Effectuez le remboursement manuellement depuis le tableau de bord FedaPay.',
+            'fedapay_transaction_id' => $paiement->provider_transaction_id,
+        ]);
     }
 }

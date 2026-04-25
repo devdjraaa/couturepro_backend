@@ -16,7 +16,7 @@ class AbonnementController extends Controller
     {
         $plans = NiveauConfig::actif()->get([
             'cle', 'label', 'duree_jours', 'prix_xof',
-            'prix_mensuel_equivalent_xof', 'description_courte', 'ordre_affichage',
+            'prix_mensuel_equivalent_xof', 'description_courte', 'ordre_affichage', 'config',
         ]);
 
         return response()->json($plans);
