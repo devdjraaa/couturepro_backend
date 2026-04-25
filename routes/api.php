@@ -72,7 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Vêtements
     Route::get('vetements',               [VetementController::class, 'index']);
     Route::post('vetements',              [VetementController::class, 'store']);
-    Route::put('vetements/{vetement}',    [VetementController::class, 'update']);
+    Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update']);
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
 
     // Sync

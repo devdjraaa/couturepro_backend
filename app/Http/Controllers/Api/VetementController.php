@@ -11,6 +11,7 @@ use App\Models\Vetement;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VetementController extends Controller
 {
@@ -34,17 +35,21 @@ class VetementController extends Controller
     {
         $this->authorize('create', Vetement::class);
 
-        $atelier  = $this->getAtelier($request);
-        $user     = $request->user();
+        $atelier = $this->getAtelier($request);
+        $user    = $request->user();
+
+        $imagePath = $request->hasFile('image')
+            ? $request->file('image')->store('vetements', 'public')
+            : null;
 
         $vetement = Vetement::create([
-            'atelier_id'       => $atelier->id,
-            'nom'              => $request->nom,
-            'libelles_mesures' => $request->libelles_mesures ?? [],
-            'is_systeme'       => false,
-            'is_archived'      => false,
-            'created_by'       => $user->id,
-            'created_by_role'  => 'proprietaire',
+            'atelier_id'      => $atelier->id,
+            'nom'             => $request->nom,
+            'image_path'      => $imagePath,
+            'is_systeme'      => false,
+            'is_archived'     => false,
+            'created_by'      => $user->id,
+            'created_by_role' => 'proprietaire',
         ]);
 
         return response()->json($vetement, 201);
@@ -54,7 +59,16 @@ class VetementController extends Controller
     {
         $this->authorize('update', $vetement);
 
-        $vetement->update($request->validated());
+        $data = ['nom' => $request->nom ?? $vetement->nom];
+
+        if ($request->hasFile('image')) {
+            if ($vetement->image_path) {
+                Storage::disk('public')->delete($vetement->image_path);
+            }
+            $data['image_path'] = $request->file('image')->store('vetements', 'public');
+        }
+
+        $vetement->update($data);
 
         return response()->json($vetement);
     }

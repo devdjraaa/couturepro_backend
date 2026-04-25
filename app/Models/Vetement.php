@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Vetement extends Model
 {
@@ -16,7 +18,7 @@ class Vetement extends Model
     protected $fillable = [
         'atelier_id',
         'nom',
-        'libelles_mesures',
+        'image_path',
         'template_numero',
         'is_systeme',
         'is_archived',
@@ -24,20 +26,23 @@ class Vetement extends Model
         'created_by_role',
     ];
 
+    protected $appends = ['image_url'];
+
     protected $casts = [
-        'libelles_mesures' => 'array',
-        'is_systeme'       => 'boolean',
-        'is_archived'      => 'boolean',
+        'is_systeme'  => 'boolean',
+        'is_archived' => 'boolean',
     ];
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->image_path ? Storage::url($this->image_path) : null,
+        );
+    }
 
     public function atelier(): BelongsTo
     {
         return $this->belongsTo(Atelier::class, 'atelier_id');
-    }
-
-    public function mesures(): HasMany
-    {
-        return $this->hasMany(Mesure::class, 'vetement_id');
     }
 
     public function commandes(): HasMany

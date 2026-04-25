@@ -11,9 +11,8 @@ class StoreVetementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom'              => ['required', 'string', 'max:100'],
-            'libelles_mesures'   => ['nullable', 'array'],
-            'libelles_mesures.*' => ['string', 'max:100'],
+            'nom'   => ['required', 'string', 'max:150'],
+            'image' => ['nullable', 'image', 'max:4096'],
         ];
     }
 }
