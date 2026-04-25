@@ -40,7 +40,7 @@ class VetementController extends Controller
         $vetement = Vetement::create([
             'atelier_id'       => $atelier->id,
             'nom'              => $request->nom,
-            'libelles_mesures' => $request->libelles_mesures,
+            'libelles_mesures' => $request->libelles_mesures ?? [],
             'is_systeme'       => false,
             'is_archived'      => false,
             'created_by'       => $user->id,

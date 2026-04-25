@@ -12,7 +12,7 @@ class StoreVetementRequest extends FormRequest
     {
         return [
             'nom'              => ['required', 'string', 'max:100'],
-            'libelles_mesures' => ['required', 'array'],
+            'libelles_mesures'   => ['nullable', 'array'],
             'libelles_mesures.*' => ['string', 'max:100'],
         ];
     }
