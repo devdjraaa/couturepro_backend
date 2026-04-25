@@ -52,6 +52,43 @@ class PaiementController extends Controller
         ]);
     }
 
+    /**
+     * Vérifie un paiement par son ID FedaPay (retour utilisateur depuis la page de paiement).
+     * Appelé par le frontend sur /paiement/retour?id=FEDAPAY_ID
+     */
+    public function verifierRetour(Request $request): JsonResponse
+    {
+        $request->validate(['id' => ['required', 'string']]);
+
+        $atelier  = $this->getAtelier($request);
+        $provider = config('payment.default_provider', 'fedapay');
+
+        $paiement = Paiement::where('atelier_id', $atelier->id)
+            ->where('provider', $provider)
+            ->where('provider_transaction_id', $request->id)
+            ->first();
+
+        if (!$paiement) {
+            return response()->json(['statut' => 'inconnu', 'message' => 'Paiement introuvable.'], 404);
+        }
+
+        // Si déjà complété (webhook reçu avant la redirect), on retourne direct
+        if ($paiement->statut === 'completed') {
+            return response()->json(['paiement_id' => $paiement->id, 'statut' => 'completed']);
+        }
+
+        // Sinon on vérifie le statut réel auprès de FedaPay et on active si approuvé
+        try {
+            $this->paymentService->handleRetour($provider, $paiement);
+        } catch (\Throwable) {
+            // Ne pas bloquer l'utilisateur si la vérification échoue
+        }
+
+        $paiement->refresh();
+
+        return response()->json(['paiement_id' => $paiement->id, 'statut' => $paiement->statut]);
+    }
+
     private function getAtelier(Request $request): Atelier
     {
         $user = $request->user();

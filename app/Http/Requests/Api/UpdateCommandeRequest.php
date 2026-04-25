@@ -19,6 +19,9 @@ class UpdateCommandeRequest extends FormRequest
             'date_livraison_prevue'    => ['sometimes', 'nullable', 'date'],
             'date_livraison_effective' => ['sometimes', 'nullable', 'date'],
             'note_interne'             => ['sometimes', 'nullable', 'string', 'max:1000'],
+            'description'              => ['sometimes', 'nullable', 'string', 'max:2000'],
+            'urgence'                  => ['sometimes', 'nullable', 'boolean'],
+            'photo_tissu'              => ['sometimes', 'nullable', 'image', 'max:8192'],
         ];
     }
 }

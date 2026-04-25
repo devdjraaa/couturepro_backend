@@ -79,6 +79,18 @@ class PaymentService
         });
     }
 
+    public function handleRetour(string $provider, Paiement $paiement): void
+    {
+        $providerInstance = $this->resolveProvider($provider);
+        $status           = $providerInstance->checkTransactionStatus($paiement->provider_transaction_id);
+
+        if ($status === 'completed') {
+            $this->activate($paiement);
+        } elseif (in_array($status, ['failed', 'refunded'])) {
+            $paiement->update(['statut' => $status]);
+        }
+    }
+
     public function handleWebhook(string $provider, string $rawPayload, string $signature): void
     {
         $providerInstance = $this->resolveProvider($provider);

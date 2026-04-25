@@ -3,8 +3,10 @@
 use App\Http\Controllers\Api\Auth\EquipeMembreAuthController;
 use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
+use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
+use App\Http\Controllers\Api\CommandePaiementController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
@@ -66,8 +68,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('commandes',               [CommandeController::class, 'index']);
     Route::post('commandes',              [CommandeController::class, 'store']);
     Route::get('commandes/{commande}',    [CommandeController::class, 'show']);
-    Route::put('commandes/{commande}',    [CommandeController::class, 'update']);
+    Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update']);
     Route::delete('commandes/{commande}', [CommandeController::class, 'destroy']);
+    // Paiements de commande
+    Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index']);
+    Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store']);
 
     // Vêtements
     Route::get('vetements',               [VetementController::class, 'index']);
@@ -83,9 +88,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('fidelite',            [FideliteController::class, 'show']);
     Route::post('fidelite/convertir', [FideliteController::class, 'convertir']);
 
-    // Paiements
+    // Paiements abonnement (FedaPay)
     Route::post('paiements/initier',          [PaiementController::class, 'initier']);
+    Route::get('paiements/retour',            [PaiementController::class, 'verifierRetour']);
     Route::get('paiements/{paiement}/status', [PaiementController::class, 'status']);
+
+    // Abonnement
+    Route::get('abonnement/plans',   [AbonnementController::class, 'plans']);
+    Route::get('abonnement/current', [AbonnementController::class, 'current']);
 
     // Notifications
     Route::get('notifications',              [NotificationController::class, 'index']);

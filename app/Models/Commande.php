@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Commande extends Model
 {
@@ -26,10 +29,13 @@ class Commande extends Model
         'date_livraison_prevue',
         'date_livraison_effective',
         'note_interne',
+        'photo_tissu_path',
+        'urgence',
+        'description',
         'rappel_j2_envoye',
     ];
 
-    // ⚠️ photo_tissu_local_path N'EXISTE PAS ici — stockage LOCAL uniquement
+    protected $appends = ['photo_tissu_url'];
 
     protected $casts = [
         'prix'                     => 'decimal:2',
@@ -38,7 +44,15 @@ class Commande extends Model
         'date_livraison_prevue'    => 'date',
         'date_livraison_effective' => 'datetime',
         'rappel_j2_envoye'         => 'boolean',
+        'urgence'                  => 'boolean',
     ];
+
+    protected function photoTissuUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->photo_tissu_path ? Storage::url($this->photo_tissu_path) : null,
+        );
+    }
 
     public function atelier(): BelongsTo
     {
@@ -53,6 +67,11 @@ class Commande extends Model
     public function vetement(): BelongsTo
     {
         return $this->belongsTo(Vetement::class, 'vetement_id');
+    }
+
+    public function commandePaiements(): HasMany
+    {
+        return $this->hasMany(CommandePaiement::class, 'commande_id');
     }
 
     public function scopeEnCours($query)

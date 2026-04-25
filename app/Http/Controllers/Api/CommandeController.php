@@ -12,6 +12,7 @@ use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CommandeController extends Controller
 {
@@ -43,6 +44,10 @@ class CommandeController extends Controller
 
         $user = $request->user();
 
+        $photoPath = $request->hasFile('photo_tissu')
+            ? $request->file('photo_tissu')->store('tissus', 'public')
+            : null;
+
         $commande = Commande::create([
             'atelier_id'            => $atelier->id,
             'client_id'             => $request->client_id,
@@ -56,6 +61,9 @@ class CommandeController extends Controller
             'date_commande'         => now()->toDateString(),
             'date_livraison_prevue' => $request->date_livraison_prevue,
             'note_interne'          => $request->note_interne,
+            'description'           => $request->description,
+            'urgence'               => $request->boolean('urgence', false),
+            'photo_tissu_path'      => $photoPath,
         ]);
 
         $this->limitsService->incrementCommandes($atelier);
@@ -74,7 +82,22 @@ class CommandeController extends Controller
     {
         $this->authorize('update', $commande);
 
-        $commande->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo_tissu')) {
+            if ($commande->photo_tissu_path) {
+                Storage::disk('public')->delete($commande->photo_tissu_path);
+            }
+            $data['photo_tissu_path'] = $request->file('photo_tissu')->store('tissus', 'public');
+        }
+
+        unset($data['photo_tissu']);
+
+        if ($request->has('urgence')) {
+            $data['urgence'] = $request->boolean('urgence');
+        }
+
+        $commande->update($data);
 
         return response()->json($commande);
     }

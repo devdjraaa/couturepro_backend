@@ -18,6 +18,9 @@ class StoreCommandeRequest extends FormRequest
             'acompte'               => ['nullable', 'numeric', 'min:0'],
             'date_livraison_prevue' => ['nullable', 'date'],
             'note_interne'          => ['nullable', 'string', 'max:1000'],
+            'description'           => ['nullable', 'string', 'max:2000'],
+            'urgence'               => ['nullable', 'boolean'],
+            'photo_tissu'           => ['nullable', 'image', 'max:8192'],
         ];
     }
 }
