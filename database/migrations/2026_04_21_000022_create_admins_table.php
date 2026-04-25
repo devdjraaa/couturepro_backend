@@ -9,7 +9,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('nom', 100);
             $table->string('prenom', 100);
-            $table->string('email')->unique();
+            $table->string('email', 191)->unique();
             $table->string('password');
             $table->enum('role', ['super_admin', 'admin']);
             $table->json('permissions')->nullable(); // null = super_admin (accès total)
