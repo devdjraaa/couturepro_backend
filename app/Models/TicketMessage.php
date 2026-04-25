@@ -19,6 +19,7 @@ class TicketMessage extends Model
         'expediteur_type',
         'expediteur_id',
         'contenu',
+        'pj_path',
         'is_note_interne',
         'lu_par_client_at',
         'lu_par_admin_at',

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
+use App\Http\Controllers\Api\ParametresController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
@@ -91,8 +92,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('notifications/mark-as-read',[NotificationController::class, 'markAsRead']);
 
     // Tickets support (propriétaire)
-    Route::get('support/tickets',  [TicketSupportController::class, 'index']);
-    Route::post('support/tickets', [TicketSupportController::class, 'store']);
+    Route::get('support/tickets',              [TicketSupportController::class, 'index']);
+    Route::post('support/tickets',             [TicketSupportController::class, 'store']);
+    Route::get('support/tickets/{id}',         [TicketSupportController::class, 'show']);
+    Route::post('support/tickets/{id}/repondre', [TicketSupportController::class, 'repondre']);
+
+    // Paramètres
+    Route::put('parametres/profil',          [ParametresController::class, 'updateProfil']);
+    Route::put('parametres/atelier',         [ParametresController::class, 'updateAtelier']);
+    Route::get('parametres/communications',  [ParametresController::class, 'getCommunications']);
+    Route::put('parametres/communications',  [ParametresController::class, 'updateCommunications']);
+    Route::put('parametres/mot-de-passe',    [ParametresController::class, 'changerMotDePasse']);
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}', [WhatsAppController::class, 'rappelClient']);

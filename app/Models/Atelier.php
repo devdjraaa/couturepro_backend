@@ -17,6 +17,8 @@ class Atelier extends Model
     protected $fillable = [
         'proprietaire_id',
         'nom',
+        'adresse',
+        'ville',
         'is_maitre',
         'statut',
         'essai_expire_at',

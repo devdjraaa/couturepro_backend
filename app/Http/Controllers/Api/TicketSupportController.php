@@ -39,6 +39,7 @@ class TicketSupportController extends Controller
             'sujet'     => ['required', 'string', 'max:255'],
             'message'   => ['required', 'string', 'max:5000'],
             'categorie' => ['required', 'in:facturation,technique,compte,abonnement,autre'],
+            'photo'     => ['nullable', 'image', 'max:5120'],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -57,11 +58,18 @@ class TicketSupportController extends Controller
             'priorite'        => 'normale',
         ]);
 
+        $pjPath = null;
+        if ($request->hasFile('photo')) {
+            $pjPath = $request->file('photo')->store('tickets', 'public');
+        }
+
         TicketMessage::create([
             'ticket_id'       => $ticket->id,
             'expediteur_type' => 'proprietaire',
             'expediteur_id'   => $propId,
             'contenu'         => $data['message'],
+            'pj_path'         => $pjPath,
+            'created_at'      => now(),
         ]);
 
         return response()->json([
@@ -71,6 +79,72 @@ class TicketSupportController extends Controller
             'categorie'  => $ticket->categorie,
             'statut'     => $ticket->statut,
             'created_at' => $ticket->created_at,
+        ], 201);
+    }
+
+    public function show(Request $request, string $id): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $ticket  = TicketSupport::where('atelier_id', $atelier->id)->findOrFail($id);
+
+        $messages = TicketMessage::where('ticket_id', $ticket->id)
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn($m) => [
+                'id'              => $m->id,
+                'expediteur_type' => $m->expediteur_type,
+                'contenu'         => $m->contenu,
+                'pj_url'          => $m->pj_path ? asset('storage/' . $m->pj_path) : null,
+                'created_at'      => $m->created_at,
+            ]);
+
+        return response()->json([
+            'id'         => $ticket->id,
+            'reference'  => $ticket->reference,
+            'sujet'      => $ticket->sujet,
+            'categorie'  => $ticket->categorie,
+            'statut'     => $ticket->statut,
+            'priorite'   => $ticket->priorite,
+            'created_at' => $ticket->created_at,
+            'messages'   => $messages,
+        ]);
+    }
+
+    public function repondre(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate([
+            'message' => ['required', 'string', 'max:5000'],
+            'photo'   => ['nullable', 'image', 'max:5120'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        $ticket  = TicketSupport::where('atelier_id', $atelier->id)->findOrFail($id);
+
+        $user   = $request->user();
+        $propId = $user instanceof Proprietaire
+            ? $user->id
+            : Atelier::find($user->atelier_id)?->proprietaire_id;
+
+        $pjPath = null;
+        if ($request->hasFile('photo')) {
+            $pjPath = $request->file('photo')->store('tickets', 'public');
+        }
+
+        $message = TicketMessage::create([
+            'ticket_id'       => $ticket->id,
+            'expediteur_type' => 'proprietaire',
+            'expediteur_id'   => $propId,
+            'contenu'         => $data['message'],
+            'pj_path'         => $pjPath,
+            'created_at'      => now(),
+        ]);
+
+        return response()->json([
+            'id'              => $message->id,
+            'expediteur_type' => $message->expediteur_type,
+            'contenu'         => $message->contenu,
+            'pj_url'          => $pjPath ? asset('storage/' . $pjPath) : null,
+            'created_at'      => $message->created_at,
         ], 201);
     }
 

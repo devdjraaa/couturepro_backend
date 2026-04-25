@@ -18,12 +18,14 @@ class CommunicationsConfig extends Model
         'confirmation_commande',
         'rappel_livraison_j2',
         'commande_prete',
+        'whatsapp_enabled',
     ];
 
     protected $casts = [
         'confirmation_commande' => 'boolean',
         'rappel_livraison_j2'   => 'boolean',
         'commande_prete'        => 'boolean',
+        'whatsapp_enabled'      => 'boolean',
     ];
 
     public function atelier(): BelongsTo
