@@ -17,7 +17,7 @@ class AtelierLimitsService
         $config = $this->getConfig($atelier);
         $max = $config['max_clients_par_mois'] ?? null;
 
-        if ($max === null) {
+        if ($max === null || (int) $max === -1) {
             return true;
         }
 

@@ -36,7 +36,7 @@ class EquipeMembreController extends Controller
         $max     = (int) ($config['max_membres'] ?? 0);
         $count   = EquipeMembre::where('atelier_id', $atelier->id)->where('is_active', true)->count();
 
-        if ($max > 0 && $count >= $max) {
+        if ($max > 0 && $max !== -1 && $count >= $max) {
             return response()->json([
                 'message' => "Limite de membres atteinte pour votre plan ({$max} max).",
             ], 403);

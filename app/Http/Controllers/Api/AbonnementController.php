@@ -24,8 +24,7 @@ class AbonnementController extends Controller
 
     public function current(Request $request): JsonResponse
     {
-        $atelier = $this->getAtelier($request);
-
+        $atelier    = $this->getAtelier($request);
         $abonnement = Abonnement::where('atelier_id', $atelier->id)
             ->with('niveau')
             ->latest('timestamp_debut')
@@ -35,6 +34,18 @@ class AbonnementController extends Controller
             return response()->json(null);
         }
 
+        // Auto-expirer si la date est passée
+        if (
+            in_array($abonnement->statut, ['actif', 'essai'])
+            && $abonnement->timestamp_expiration?->isPast()
+        ) {
+            $abonnement->update(['statut' => 'expire']);
+            $atelier->update(['statut' => 'expire']);
+            $abonnement->refresh();
+        }
+
+        $config = $abonnement->getConfigEffective();
+
         return response()->json([
             'niveau_cle'           => $abonnement->niveau_cle,
             'niveau_label'         => $abonnement->niveau?->label,
@@ -42,6 +53,7 @@ class AbonnementController extends Controller
             'jours_restants'       => max(0, $abonnement->jours_restants),
             'timestamp_expiration' => $abonnement->timestamp_expiration?->toIso8601String(),
             'prix_xof'             => $abonnement->niveau?->prix_xof,
+            'config'               => $config,
         ]);
     }
 
