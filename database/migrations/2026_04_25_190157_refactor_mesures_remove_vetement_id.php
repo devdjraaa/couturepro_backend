@@ -9,9 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Drop the FK that uses the composite unique index as its backing index
+        // Supprimer d'abord toutes les FK qui bloquent les drops d'index
         DB::statement('ALTER TABLE mesures DROP FOREIGN KEY mesures_client_id_foreign');
-        // Now we can drop both indexes on vetement_id
+        DB::statement('ALTER TABLE mesures DROP FOREIGN KEY mesures_vetement_id_foreign');
+        // Supprimer les index (plus bloqués par les FK)
         DB::statement('ALTER TABLE mesures DROP INDEX mesures_client_id_vetement_id_unique');
         DB::statement('ALTER TABLE mesures DROP INDEX mesures_vetement_id_foreign');
         DB::statement('ALTER TABLE mesures DROP COLUMN vetement_id');

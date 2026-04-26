@@ -57,7 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('clients/{client}',           [ClientController::class, 'show']);
     Route::put('clients/{client}',           [ClientController::class, 'update']);
     Route::delete('clients/{client}',        [ClientController::class, 'destroy']);
-    Route::post('clients/{client}/archiver', [ClientController::class, 'archiver']);
+    Route::post('clients/{client}/archiver',   [ClientController::class, 'archiver']);
+    Route::post('clients/{client}/toggle-vip', [ClientController::class, 'toggleVip']);
 
     // Mesures
     Route::get('clients/{clientId}/mesures', [MesureController::class, 'index']);
@@ -100,8 +101,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('paiements/{paiement}/status', [PaiementController::class, 'status']);
 
     // Abonnement
-    Route::get('abonnement/plans',   [AbonnementController::class, 'plans']);
-    Route::get('abonnement/current', [AbonnementController::class, 'current']);
+    Route::get('abonnement/plans',         [AbonnementController::class, 'plans']);
+    Route::get('abonnement/current',       [AbonnementController::class, 'current']);
+    Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
 
     // Notifications
     Route::get('notifications',              [NotificationController::class, 'index']);

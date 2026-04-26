@@ -19,8 +19,9 @@ Route::post('auth/login', [AuthController::class, 'login']);
 // ─── Routes protégées admin ───────────────────────────────────────────────────
 Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
-    Route::post('auth/logout', [AuthController::class, 'logout']);
-    Route::get('auth/me',     [AuthController::class, 'me']);
+    Route::post('auth/logout',           [AuthController::class, 'logout']);
+    Route::get('auth/me',               [AuthController::class, 'me']);
+    Route::put('auth/change-password',  [AuthController::class, 'changePassword']);
 
     // Ateliers
     Route::middleware('admin.permission:ateliers.view')->group(function () {

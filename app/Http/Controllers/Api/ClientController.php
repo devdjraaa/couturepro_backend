@@ -49,6 +49,9 @@ class ClientController extends Controller
             'prenom'          => $request->prenom,
             'telephone'       => $request->telephone,
             'type_profil'     => $request->type_profil ?? 'mixte',
+            'avatar_index'    => $request->avatar_index,
+            'is_vip'          => $request->boolean('is_vip', false),
+            'notes'           => $request->notes,
             'created_by'      => $user->id,
             'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
         ]);
@@ -81,6 +84,15 @@ class ClientController extends Controller
         $client->delete();
 
         return response()->json(['message' => 'Client supprimé.']);
+    }
+
+    public function toggleVip(Request $request, Client $client): JsonResponse
+    {
+        $this->authorize('update', $client);
+
+        $client->update(['is_vip' => ! $client->is_vip]);
+
+        return response()->json(['is_vip' => $client->is_vip]);
     }
 
     public function archiver(Request $request, Client $client): JsonResponse

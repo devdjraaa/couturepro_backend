@@ -58,4 +58,24 @@ class AuthController extends Controller
 
         return response()->json($admin->only(['id', 'nom', 'prenom', 'email', 'role', 'permissions', 'derniere_connexion_at']));
     }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $admin = $this->adminUser();
+
+        $data = $request->validate([
+            'ancien'  => ['required', 'string'],
+            'nouveau' => ['required', 'string', 'min:8'],
+        ]);
+
+        if (! Hash::check($data['ancien'], $admin->password)) {
+            return response()->json(['message' => 'Mot de passe actuel incorrect.'], 422);
+        }
+
+        $admin->update(['password' => Hash::make($data['nouveau'])]);
+
+        $this->audit($admin, 'admin.change_password', 'admin', $admin->id, [], $request->ip());
+
+        return response()->json(['message' => 'Mot de passe modifié avec succès.']);
+    }
 }

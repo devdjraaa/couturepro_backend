@@ -19,7 +19,9 @@ class Client extends Model
         'prenom',
         'telephone',
         'type_profil',
-        'avatar_key',
+        'avatar_index',
+        'is_vip',
+        'notes',
         'created_by',
         'created_by_role',
         'is_archived',
@@ -27,11 +29,11 @@ class Client extends Model
         'archived_by',
     ];
 
-    // ⚠️ photo_local_path N'EXISTE PAS ici — stockage LOCAL uniquement
-
     protected $casts = [
+        'is_vip'      => 'boolean',
         'is_archived' => 'boolean',
         'archived_at' => 'datetime',
+        'avatar_index'=> 'integer',
     ];
 
     public function atelier(): BelongsTo

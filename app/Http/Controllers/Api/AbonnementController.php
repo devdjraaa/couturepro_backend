@@ -7,6 +7,7 @@ use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\NiveauConfig;
+use App\Models\TransactionAbonnement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -54,6 +55,72 @@ class AbonnementController extends Controller
             'timestamp_expiration' => $abonnement->timestamp_expiration?->toIso8601String(),
             'prix_xof'             => $abonnement->niveau?->prix_xof,
             'config'               => $config,
+        ]);
+    }
+
+    public function activerCode(Request $request): JsonResponse
+    {
+        $request->validate(['code' => ['required', 'string', 'size:12']]);
+
+        $atelier     = $this->getAtelier($request);
+        $code        = strtoupper(trim($request->code));
+
+        $transaction = TransactionAbonnement::where('code_transaction', $code)
+            ->where('statut', 'actif')
+            ->whereNull('utilise_at')
+            ->where(function ($q) use ($atelier) {
+                $q->whereNull('atelier_id')->orWhere('atelier_id', $atelier->id);
+            })
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Code invalide, déjà utilisé ou non applicable à votre atelier.'], 422);
+        }
+
+        $niveau = NiveauConfig::where('cle', $transaction->niveau_cle)->first();
+        $duree  = $transaction->duree_jours;
+
+        // Prolonger ou créer l'abonnement
+        $abonnement = Abonnement::where('atelier_id', $atelier->id)
+            ->latest('timestamp_debut')
+            ->first();
+
+        $debut  = now();
+        $expire = $debut->copy()->addDays($duree);
+
+        if ($abonnement && in_array($abonnement->statut, ['actif', 'essai'])) {
+            // Prolonger l'abonnement existant
+            $newExpire = $abonnement->timestamp_expiration->copy()->addDays($duree);
+            $abonnement->update([
+                'statut'               => 'actif',
+                'jours_restants'       => $abonnement->jours_restants + $duree,
+                'timestamp_expiration' => $newExpire,
+                'niveau_cle'           => $transaction->niveau_cle,
+            ]);
+        } else {
+            $abonnement = Abonnement::create([
+                'atelier_id'           => $atelier->id,
+                'niveau_cle'           => $transaction->niveau_cle,
+                'statut'               => 'actif',
+                'jours_restants'       => $duree,
+                'timestamp_debut'      => $debut,
+                'timestamp_expiration' => $expire,
+            ]);
+        }
+
+        $atelier->update(['statut' => 'actif']);
+
+        $transaction->update([
+            'statut'     => 'utilise',
+            'atelier_id' => $atelier->id,
+            'utilise_at' => now(),
+        ]);
+
+        return response()->json([
+            'message'      => "Abonnement activé ({$duree} jours).",
+            'niveau_label' => $niveau?->label ?? $transaction->niveau_cle,
+            'duree_jours'  => $duree,
+            'expiration'   => $abonnement->timestamp_expiration->toIso8601String(),
         ]);
     }
 
