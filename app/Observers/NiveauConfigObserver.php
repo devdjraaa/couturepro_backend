@@ -18,11 +18,12 @@ class NiveauConfigObserver
         $dirty = $plan->getDirty();
 
         foreach ($dirty as $champ => $nouvelleValeur) {
+            $ancienne = $plan->getOriginal($champ);
             NiveauConfigChangelog::create([
                 'niveau_cle'      => $plan->cle,
                 'admin_id'        => $adminId,
                 'champ_modifie'   => $champ,
-                'ancienne_valeur' => (string) ($plan->getOriginal($champ) ?? ''),
+                'ancienne_valeur' => is_array($ancienne) ? json_encode($ancienne) : (string) ($ancienne ?? ''),
                 'nouvelle_valeur' => is_array($nouvelleValeur) ? json_encode($nouvelleValeur) : (string) $nouvelleValeur,
                 'created_at'      => now(),
             ]);
