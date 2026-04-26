@@ -38,14 +38,20 @@ class VetementController extends Controller
         $atelier = $this->getAtelier($request);
         $user    = $request->user();
 
-        $imagePath = $request->hasFile('image')
-            ? $request->file('image')->store('vetements', 'public')
-            : null;
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $imagePaths[] = $file->store('vetements', 'public');
+            }
+        } elseif ($request->hasFile('image')) {
+            $imagePaths[] = $request->file('image')->store('vetements', 'public');
+        }
 
         $vetement = Vetement::create([
             'atelier_id'      => $atelier->id,
             'nom'             => $request->nom,
-            'image_path'      => $imagePath,
+            'image_path'      => $imagePaths[0] ?? null,
+            'images'          => $imagePaths ?: null,
             'is_systeme'      => false,
             'is_archived'     => false,
             'created_by'      => $user->id,
@@ -61,11 +67,26 @@ class VetementController extends Controller
 
         $data = ['nom' => $request->nom ?? $vetement->nom];
 
-        if ($request->hasFile('image')) {
+        $newPaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($vetement->images ?? [] as $old) {
+                Storage::disk('public')->delete($old);
+            }
+            if ($vetement->image_path && !in_array($vetement->image_path, $vetement->images ?? [])) {
+                Storage::disk('public')->delete($vetement->image_path);
+            }
+            foreach ($request->file('images') as $file) {
+                $newPaths[] = $file->store('vetements', 'public');
+            }
+            $data['image_path'] = $newPaths[0] ?? null;
+            $data['images']     = $newPaths ?: null;
+        } elseif ($request->hasFile('image')) {
             if ($vetement->image_path) {
                 Storage::disk('public')->delete($vetement->image_path);
             }
-            $data['image_path'] = $request->file('image')->store('vetements', 'public');
+            $path = $request->file('image')->store('vetements', 'public');
+            $data['image_path'] = $path;
+            $data['images']     = [$path];
         }
 
         $vetement->update($data);

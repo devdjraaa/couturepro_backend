@@ -39,17 +39,50 @@ class CommandePaiementController extends Controller
         $user = $request->user();
 
         $paiement = CommandePaiement::create([
-            'commande_id'   => $commande->id,
-            'atelier_id'    => $atelier->id,
-            'montant'       => $data['montant'],
-            'mode_paiement' => $data['mode_paiement'],
+            'commande_id'    => $commande->id,
+            'atelier_id'     => $atelier->id,
+            'montant'        => $data['montant'],
+            'mode_paiement'  => $data['mode_paiement'],
             'enregistre_par' => $user->id,
         ]);
 
         // Met à jour le total des avances
         $commande->increment('acompte', $data['montant']);
+        $commande->refresh();
 
-        return response()->json($paiement, 201);
+        $whatsappUrl = null;
+        $config = $atelier->abonnement?->getConfigEffective() ?? [];
+        if (!empty($config['facture_whatsapp'])) {
+            $client = $commande->client;
+            if ($client?->telephone) {
+                $reste    = max(0, (float) $commande->prix - (float) $commande->acompte);
+                $modeLabel = match ($data['mode_paiement']) {
+                    'mobile_money' => 'Mobile Money',
+                    'virement'     => 'Virement',
+                    default        => 'Espèces',
+                };
+                $msg = "Bonjour {$client->prenom},\n\n"
+                     . "✅ Paiement reçu : *" . number_format((float) $data['montant'], 0, '.', ' ') . " FCFA*\n"
+                     . "Mode : {$modeLabel}\n\n"
+                     . "📋 Commande : #" . strtoupper(substr($commande->id, 0, 8)) . "\n"
+                     . "💰 Total : " . number_format((float) $commande->prix, 0, '.', ' ') . " FCFA\n"
+                     . "✅ Versé : " . number_format((float) $commande->acompte, 0, '.', ' ') . " FCFA\n";
+                if ($reste > 0) {
+                    $msg .= "⏳ Reste : " . number_format($reste, 0, '.', ' ') . " FCFA\n";
+                } else {
+                    $msg .= "🎉 Commande entièrement réglée !\n";
+                }
+                $msg .= "\nMerci pour votre confiance 🙏\n— {$atelier->nom}";
+
+                $tel = preg_replace('/\D/', '', $client->telephone);
+                $whatsappUrl = 'https://wa.me/' . $tel . '?text=' . urlencode($msg);
+            }
+        }
+
+        return response()->json([
+            'paiement'     => $paiement,
+            'whatsapp_url' => $whatsappUrl,
+        ], 201);
     }
 
     private function getAtelier(Request $request): Atelier

@@ -11,8 +11,10 @@ class UpdateVetementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom'   => ['sometimes', 'string', 'max:150'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'nom'       => ['sometimes', 'string', 'max:150'],
+            'image'     => ['nullable', 'image', 'max:4096'],
+            'images'    => ['nullable', 'array', 'max:5'],
+            'images.*'  => ['image', 'max:4096'],
         ];
     }
 }

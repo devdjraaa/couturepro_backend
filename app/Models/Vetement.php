@@ -19,6 +19,7 @@ class Vetement extends Model
         'atelier_id',
         'nom',
         'image_path',
+        'images',
         'template_numero',
         'is_systeme',
         'is_archived',
@@ -26,17 +27,28 @@ class Vetement extends Model
         'created_by_role',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'images_urls'];
 
     protected $casts = [
         'is_systeme'  => 'boolean',
         'is_archived' => 'boolean',
+        'images'      => 'array',
     ];
 
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->image_path ? Storage::url($this->image_path) : null,
+        );
+    }
+
+    protected function imagesUrls(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $paths = $this->images ?? ($this->image_path ? [$this->image_path] : []);
+                return array_values(array_map(fn ($p) => Storage::url($p), $paths));
+            },
         );
     }
 

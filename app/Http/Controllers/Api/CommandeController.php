@@ -48,6 +48,8 @@ class CommandeController extends Controller
             ? $request->file('photo_tissu')->store('tissus', 'public')
             : null;
 
+        $acompteInitial = $request->acompte ?? 0;
+
         $commande = Commande::create([
             'atelier_id'            => $atelier->id,
             'client_id'             => $request->client_id,
@@ -56,7 +58,7 @@ class CommandeController extends Controller
             'created_by_role'       => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
             'quantite'              => $request->quantite ?? 1,
             'prix'                  => $request->prix,
-            'acompte'               => $request->acompte ?? 0,
+            'acompte'               => $acompteInitial,
             'statut'                => 'en_cours',
             'date_commande'         => now()->toDateString(),
             'date_livraison_prevue' => $request->date_livraison_prevue,
@@ -65,6 +67,15 @@ class CommandeController extends Controller
             'urgence'               => $request->boolean('urgence', false),
             'photo_tissu_path'      => $photoPath,
         ]);
+
+        if ($acompteInitial > 0) {
+            $commande->commandePaiements()->create([
+                'atelier_id'    => $atelier->id,
+                'montant'       => $acompteInitial,
+                'mode_paiement' => $request->mode_paiement_acompte ?? 'especes',
+                'enregistre_par' => $user->id,
+            ]);
+        }
 
         $this->limitsService->incrementCommandes($atelier);
 
@@ -99,7 +110,7 @@ class CommandeController extends Controller
 
         $commande->update($data);
 
-        return response()->json($commande);
+        return response()->json($commande->load('client', 'vetement'));
     }
 
     public function destroy(Request $request, Commande $commande): JsonResponse

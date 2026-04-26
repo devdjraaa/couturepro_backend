@@ -35,7 +35,7 @@ class Commande extends Model
         'rappel_j2_envoye',
     ];
 
-    protected $appends = ['photo_tissu_url'];
+    protected $appends = ['photo_tissu_url', 'client_nom', 'vetement_nom'];
 
     protected $casts = [
         'prix'                     => 'decimal:2',
@@ -51,6 +51,20 @@ class Commande extends Model
     {
         return Attribute::make(
             get: fn () => $this->photo_tissu_path ? Storage::url($this->photo_tissu_path) : null,
+        );
+    }
+
+    protected function clientNom(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim(($this->client?->prenom ?? '') . ' ' . ($this->client?->nom ?? '')),
+        );
+    }
+
+    protected function vetementNom(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->vetement?->nom ?? null,
         );
     }
 
