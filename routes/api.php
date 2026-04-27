@@ -124,6 +124,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}', [WhatsAppController::class, 'rappelClient']);
+    Route::get('whatsapp/confirmation-commande/{commandeId}', [WhatsAppController::class, 'confirmationCommande']);
+    Route::get('whatsapp/commande-prete/{commandeId}', [WhatsAppController::class, 'commandePrete']);
 });
 
 // ─── Webhooks (pas d'auth) ───────────────────────────────────────────────────

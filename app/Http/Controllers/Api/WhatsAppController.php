@@ -42,6 +42,68 @@ class WhatsAppController extends Controller
         return response()->json(['lien' => $lien, 'message' => $message]);
     }
 
+    public function confirmationCommande(Request $request, string $commandeId): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        $commande = Commande::where('id', $commandeId)
+            ->where('atelier_id', $atelier->id)
+            ->with('client')
+            ->firstOrFail();
+
+        $client = $commande->client;
+
+        if (!$client || !$client->telephone) {
+            return response()->json(['message' => 'Ce client n\'a pas de numéro de téléphone.'], 422);
+        }
+
+        $phone   = preg_replace('/\D/', '', $client->telephone);
+        $restant = max(0, ($commande->prix ?? 0) - ($commande->acompte ?? 0));
+
+        $message = "Bonjour {$client->prenom}, votre commande ({$commande->vetement_nom}) a bien été enregistrée chez {$atelier->nom}.";
+        if ($commande->acompte > 0) {
+            $message .= ' Acompte reçu : ' . number_format($commande->acompte, 0, ',', ' ') . ' FCFA.';
+        }
+        if ($restant > 0) {
+            $message .= ' Reste à payer : ' . number_format($restant, 0, ',', ' ') . ' FCFA.';
+        }
+        $message .= ' Merci de votre confiance !';
+
+        $lien = 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
+
+        return response()->json(['lien' => $lien, 'message' => $message]);
+    }
+
+    public function commandePrete(Request $request, string $commandeId): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        $commande = Commande::where('id', $commandeId)
+            ->where('atelier_id', $atelier->id)
+            ->with('client')
+            ->firstOrFail();
+
+        $client = $commande->client;
+
+        if (!$client || !$client->telephone) {
+            return response()->json(['message' => 'Ce client n\'a pas de numéro de téléphone.'], 422);
+        }
+
+        $phone   = preg_replace('/\D/', '', $client->telephone);
+        $restant = max(0, ($commande->prix ?? 0) - ($commande->acompte ?? 0));
+
+        $message = "Bonjour {$client->prenom}, votre commande ({$commande->vetement_nom}) est prête chez {$atelier->nom} !";
+        if ($restant > 0) {
+            $message .= ' Reste à payer : ' . number_format($restant, 0, ',', ' ') . ' FCFA.';
+        } else {
+            $message .= ' Tout a été réglé, venez récupérer votre commande.';
+        }
+
+        $lien = 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
+
+        return response()->json(['lien' => $lien, 'message' => $message]);
+    }
+
     private function getAtelier(Request $request): Atelier
     {
         $user = $request->user();
