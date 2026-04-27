@@ -41,6 +41,18 @@ class ClientController extends Controller
             ], 403);
         }
 
+        $doublon = Client::where('atelier_id', $atelier->id)
+            ->where('nom', $request->nom)
+            ->where('prenom', $request->prenom ?? '')
+            ->exists();
+
+        if ($doublon) {
+            return response()->json([
+                'message' => 'Un client avec ce nom existe déjà dans votre atelier.',
+                'code'    => 'doublon',
+            ], 422);
+        }
+
         $user = $request->user();
 
         $client = Client::create([
