@@ -50,7 +50,7 @@ class Commande extends Model
     protected function photoTissuUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->photo_tissu_path ? Storage::url($this->photo_tissu_path) : null,
+            get: fn () => $this->photo_tissu_path ? url(Storage::url($this->photo_tissu_path)) : null,
         );
     }
 

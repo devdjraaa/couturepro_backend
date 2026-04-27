@@ -31,7 +31,7 @@ class NewFeaturesSeeder extends Seeder
                 'type'            => 'booleen',
                 'unite'           => null,
                 'categorie'       => 'communication',
-                'valeur_defaut'   => 'false',
+                'valeur_defaut'   => 'true',
                 'ordre_affichage' => 16,
             ],
         ];

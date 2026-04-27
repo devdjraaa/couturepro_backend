@@ -37,6 +37,7 @@ class AtelierController extends Controller
             'quotaMoisCourant',
             'pointsFidelite',
         ]);
+        $atelier->loadCount(['clients', 'commandes']);
 
         return response()->json($atelier);
     }

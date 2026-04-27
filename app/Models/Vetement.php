@@ -38,7 +38,7 @@ class Vetement extends Model
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->image_path ? Storage::url($this->image_path) : null,
+            get: fn () => $this->image_path ? url(Storage::url($this->image_path)) : null,
         );
     }
 
@@ -47,7 +47,7 @@ class Vetement extends Model
         return Attribute::make(
             get: function () {
                 $paths = $this->images ?? ($this->image_path ? [$this->image_path] : []);
-                return array_values(array_map(fn ($p) => Storage::url($p), $paths));
+                return array_values(array_map(fn ($p) => url(Storage::url($p)), $paths));
             },
         );
     }
