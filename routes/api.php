@@ -121,6 +121,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('parametres/communications',  [ParametresController::class, 'getCommunications']);
     Route::put('parametres/communications',  [ParametresController::class, 'updateCommunications']);
     Route::put('parametres/mot-de-passe',    [ParametresController::class, 'changerMotDePasse']);
+    Route::get('parametres/preferences',     [ParametresController::class, 'getPreferences']);
+    Route::put('parametres/preferences',     [ParametresController::class, 'updatePreferences']);
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}', [WhatsAppController::class, 'rappelClient']);

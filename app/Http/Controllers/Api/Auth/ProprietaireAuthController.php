@@ -140,7 +140,7 @@ class ProprietaireAuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $proprietaire = $request->user()->load('atelierMaitre.abonnement');
+        $proprietaire = $request->user()->load('atelierMaitre.abonnement', 'atelierMaitre.parametresAtelier');
 
         return response()->json($proprietaire);
     }

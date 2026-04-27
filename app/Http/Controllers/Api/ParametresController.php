@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\CommunicationsConfig;
 use App\Models\EquipeMembre;
+use App\Models\ParametresAtelier;
 use App\Models\Proprietaire;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -109,6 +110,34 @@ class ParametresController extends Controller
         $user->update(['password' => $data['nouveau']]);
 
         return response()->json(['message' => 'Mot de passe modifié avec succès.']);
+    }
+
+    public function getPreferences(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+
+        return response()->json([
+            'devise'       => $prefs->devise       ?? 'XOF',
+            'unite_mesure' => $prefs->unite_mesure ?? 'cm',
+        ]);
+    }
+
+    public function updatePreferences(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'devise'       => ['required', 'string', 'in:XOF,GNF,XAF,EUR,USD,GHS,NGN,MAD'],
+            'unite_mesure' => ['required', 'string', 'in:cm,pouces'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+
+        ParametresAtelier::updateOrCreate(
+            ['atelier_id' => $atelier->id],
+            $data
+        );
+
+        return response()->json($data);
     }
 
     private function getAtelier(Request $request): Atelier
