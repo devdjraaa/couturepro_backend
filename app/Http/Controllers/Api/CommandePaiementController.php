@@ -7,6 +7,7 @@ use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\CommandePaiement;
 use App\Models\EquipeMembre;
+use App\Models\QuotaMensuel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -53,29 +54,37 @@ class CommandePaiementController extends Controller
         $whatsappUrl = null;
         $config = $atelier->abonnement?->getConfigEffective() ?? [];
         if (!empty($config['facture_whatsapp'])) {
-            $client = $commande->client;
-            if ($client?->telephone) {
-                $reste    = max(0, (float) $commande->prix - (float) $commande->acompte);
-                $modeLabel = match ($data['mode_paiement']) {
-                    'mobile_money' => 'Mobile Money',
-                    'virement'     => 'Virement',
-                    default        => 'Espèces',
-                };
-                $msg = "Bonjour {$client->prenom},\n\n"
-                     . "✅ Paiement reçu : *" . number_format((float) $data['montant'], 0, '.', ' ') . " FCFA*\n"
-                     . "Mode : {$modeLabel}\n\n"
-                     . "📋 Commande : #" . strtoupper(substr($commande->id, 0, 8)) . "\n"
-                     . "💰 Total : " . number_format((float) $commande->prix, 0, '.', ' ') . " FCFA\n"
-                     . "✅ Versé : " . number_format((float) $commande->acompte, 0, '.', ' ') . " FCFA\n";
-                if ($reste > 0) {
-                    $msg .= "⏳ Reste : " . number_format($reste, 0, '.', ' ') . " FCFA\n";
-                } else {
-                    $msg .= "🎉 Commande entièrement réglée !\n";
-                }
-                $msg .= "\nMerci pour votre confiance 🙏\n— {$atelier->nom}";
+            $quota    = QuotaMensuel::courant($atelier->id);
+            $maxFact  = isset($config['max_factures_par_mois']) ? (int) $config['max_factures_par_mois'] : null;
+            $quotaOk  = $maxFact === null || $quota->nb_factures_envoyees < $maxFact;
 
-                $tel = preg_replace('/\D/', '', $client->telephone);
-                $whatsappUrl = 'https://wa.me/' . $tel . '?text=' . urlencode($msg);
+            if ($quotaOk) {
+                $client = $commande->client;
+                if ($client?->telephone) {
+                    $reste     = max(0, (float) $commande->prix - (float) $commande->acompte);
+                    $modeLabel = match ($data['mode_paiement']) {
+                        'mobile_money' => 'Mobile Money',
+                        'virement'     => 'Virement',
+                        default        => 'Espèces',
+                    };
+                    $msg = "Bonjour {$client->prenom},\n\n"
+                         . "✅ Paiement reçu : *" . number_format((float) $data['montant'], 0, '.', ' ') . " FCFA*\n"
+                         . "Mode : {$modeLabel}\n\n"
+                         . "📋 Commande : #" . strtoupper(substr($commande->id, 0, 8)) . "\n"
+                         . "💰 Total : " . number_format((float) $commande->prix, 0, '.', ' ') . " FCFA\n"
+                         . "✅ Versé : " . number_format((float) $commande->acompte, 0, '.', ' ') . " FCFA\n";
+                    if ($reste > 0) {
+                        $msg .= "⏳ Reste : " . number_format($reste, 0, '.', ' ') . " FCFA\n";
+                    } else {
+                        $msg .= "🎉 Commande entièrement réglée !\n";
+                    }
+                    $msg .= "\nMerci pour votre confiance 🙏\n— {$atelier->nom}";
+
+                    $tel         = preg_replace('/\D/', '', $client->telephone);
+                    $whatsappUrl = 'https://wa.me/' . $tel . '?text=' . urlencode($msg);
+
+                    $quota->increment('nb_factures_envoyees');
+                }
             }
         }
 

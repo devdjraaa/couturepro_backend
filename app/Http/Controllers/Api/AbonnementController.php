@@ -7,6 +7,7 @@ use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\NiveauConfig;
+use App\Models\QuotaMensuel;
 use App\Models\TransactionAbonnement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,16 @@ class AbonnementController extends Controller
 
         $config = $abonnement->getConfigEffective();
 
+        $quotaFactures = null;
+        if (!empty($config['facture_whatsapp'])) {
+            $quota        = QuotaMensuel::courant($atelier->id);
+            $maxFact      = isset($config['max_factures_par_mois']) ? (int) $config['max_factures_par_mois'] : null;
+            $quotaFactures = [
+                'utilise' => $quota->nb_factures_envoyees,
+                'max'     => $maxFact, // null = illimité
+            ];
+        }
+
         return response()->json([
             'niveau_cle'           => $abonnement->niveau_cle,
             'niveau_label'         => $abonnement->niveau?->label,
@@ -55,6 +66,7 @@ class AbonnementController extends Controller
             'timestamp_expiration' => $abonnement->timestamp_expiration?->toIso8601String(),
             'prix_xof'             => $abonnement->niveau?->prix_xof,
             'config'               => $config,
+            'quota_factures'       => $quotaFactures,
         ]);
     }
 
