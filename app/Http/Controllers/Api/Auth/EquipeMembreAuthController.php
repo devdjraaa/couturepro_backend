@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\EquipeLoginRequest;
 use App\Models\EquipeMembre;
+use App\Models\PermissionEquipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
@@ -37,9 +38,12 @@ class EquipeMembreAuthController extends Controller
 
         $token = $membre->createToken('equipe_token')->plainTextToken;
 
+        $permissions = PermissionEquipe::getForAtelier($membre->atelier_id, $membre->role);
+
         return response()->json([
-            'token'  => $token,
-            'membre' => $membre->only(['id', 'nom', 'prenom', 'role', 'code_acces', 'atelier_id']),
+            'token'       => $token,
+            'membre'      => $membre->only(['id', 'nom', 'prenom', 'role', 'code_acces', 'atelier_id']),
+            'permissions' => $permissions,
         ]);
     }
 }

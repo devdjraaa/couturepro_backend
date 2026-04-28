@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
 use App\Http\Controllers\Api\ParametresController;
+use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
@@ -83,9 +84,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
 
     // Équipe
-    Route::get('equipe',             [EquipeMembreController::class, 'index']);
-    Route::post('equipe',            [EquipeMembreController::class, 'store']);
-    Route::delete('equipe/{membre}', [EquipeMembreController::class, 'destroy']);
+    Route::get('equipe',                    [EquipeMembreController::class, 'index']);
+    Route::post('equipe',                   [EquipeMembreController::class, 'store']);
+    Route::delete('equipe/{membre}',        [EquipeMembreController::class, 'destroy']);
+    Route::get('equipe/permissions',        [PermissionsEquipeController::class, 'index']);
+    Route::put('equipe/permissions',        [PermissionsEquipeController::class, 'update']);
 
     // Sync
     Route::post('sync/push', [SyncController::class, 'push']);
