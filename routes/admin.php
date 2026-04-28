@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminsController;
 use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthController;
@@ -94,4 +95,12 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // Notifications
     Route::middleware('admin.permission:notifications.broadcast')->post('notifications', [NotificationController::class, 'store']);
+
+    // Gestion des admins (super_admin seulement via admins.manage)
+    Route::middleware('admin.permission:admins.manage')->group(function () {
+        Route::get('admins',           [AdminsController::class, 'index']);
+        Route::post('admins',          [AdminsController::class, 'store']);
+        Route::put('admins/{admin}',   [AdminsController::class, 'update']);
+        Route::delete('admins/{admin}',[AdminsController::class, 'destroy']);
+    });
 });
