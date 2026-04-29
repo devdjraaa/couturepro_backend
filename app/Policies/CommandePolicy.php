@@ -28,10 +28,18 @@ class CommandePolicy
         return $commande->atelier_id === $this->getAtelierId($user);
     }
 
-    public function delete(Proprietaire|EquipeMembre $user, Commande $commande): bool
+    public function archive(Proprietaire|EquipeMembre $user, Commande $commande): bool
     {
         if ($user instanceof EquipeMembre) {
             return $commande->atelier_id === $user->atelier_id && $user->role === 'assistant';
+        }
+        return $commande->atelier_id === $this->getAtelierId($user);
+    }
+
+    public function delete(Proprietaire|EquipeMembre $user, Commande $commande): bool
+    {
+        if ($user instanceof EquipeMembre) {
+            return false;
         }
         return $commande->atelier_id === $user->atelierMaitre?->id;
     }

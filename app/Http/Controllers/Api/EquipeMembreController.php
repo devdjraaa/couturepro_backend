@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 
 class EquipeMembreController extends Controller
 {
+    use ResolvesAtelier;
     public function index(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);
@@ -78,11 +80,4 @@ class EquipeMembreController extends Controller
         return response()->json(['message' => 'Membre révoqué.']);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-        return $user instanceof \App\Models\EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
-    }
 }

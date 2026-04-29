@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\Auth\EquipeMembreAuthController;
 use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
+use App\Http\Controllers\Api\ArchiveController;
+use App\Http\Controllers\Api\AtelierProprietaireController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\CommandePaiementController;
@@ -52,27 +54,40 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [ProprietaireAuthController::class, 'logout']);
     Route::get('auth/me',      [ProprietaireAuthController::class, 'me']);
 
+    // Multi-ateliers (propriétaire seulement — EquipeMembre bloqué côté controller)
+    Route::get('ateliers/mes-ateliers',           [AtelierProprietaireController::class, 'mesAteliers']);
+    Route::post('ateliers',                       [AtelierProprietaireController::class, 'store']);
+    Route::get('ateliers/{atelierIdParam}/stats', [AtelierProprietaireController::class, 'stats']);
+
     // Clients
     Route::get('clients',                    [ClientController::class, 'index']);
     Route::post('clients',                   [ClientController::class, 'store']);
     Route::get('clients/{client}',           [ClientController::class, 'show']);
     Route::put('clients/{client}',           [ClientController::class, 'update']);
     Route::delete('clients/{client}',        [ClientController::class, 'destroy']);
-    Route::post('clients/{client}/archiver',   [ClientController::class, 'archiver']);
-    Route::post('clients/{client}/toggle-vip', [ClientController::class, 'toggleVip']);
+    Route::post('clients/{client}/archiver',     [ClientController::class, 'archiver']);
+    Route::post('clients/{client}/desarchiver',  [ClientController::class, 'desarchiver']);
+    Route::post('clients/{client}/toggle-vip',   [ClientController::class, 'toggleVip']);
 
     // Mesures
-    Route::get('clients/{clientId}/mesures', [MesureController::class, 'index']);
-    Route::post('mesures',                   [MesureController::class, 'store']);
-    Route::put('mesures/{mesure}',           [MesureController::class, 'update']);
-    Route::delete('mesures/{mesure}',        [MesureController::class, 'destroy']);
+    Route::get('clients/{clientId}/mesures',      [MesureController::class, 'index']);
+    Route::post('mesures',                        [MesureController::class, 'store']);
+    Route::put('mesures/{mesure}',                [MesureController::class, 'update']);
+    Route::post('mesures/{mesure}/archiver',      [MesureController::class, 'archiver']);
+    Route::post('mesures/{mesure}/desarchiver',   [MesureController::class, 'desarchiver']);
+    Route::delete('mesures/{mesure}',             [MesureController::class, 'destroy']);
 
     // Commandes
-    Route::get('commandes',               [CommandeController::class, 'index']);
-    Route::post('commandes',              [CommandeController::class, 'store']);
-    Route::get('commandes/{commande}',    [CommandeController::class, 'show']);
+    Route::get('commandes',                           [CommandeController::class, 'index']);
+    Route::post('commandes',                          [CommandeController::class, 'store']);
+    Route::get('commandes/{commande}',                [CommandeController::class, 'show']);
     Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update']);
-    Route::delete('commandes/{commande}', [CommandeController::class, 'destroy']);
+    Route::post('commandes/{commande}/archiver',      [CommandeController::class, 'archiver']);
+    Route::post('commandes/{commande}/desarchiver',   [CommandeController::class, 'desarchiver']);
+    Route::delete('commandes/{commande}',             [CommandeController::class, 'destroy']);
+
+    // Archives (liste pour le patron)
+    Route::get('archives', [ArchiveController::class, 'index']);
     // Paiements de commande
     Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index']);
     Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store']);

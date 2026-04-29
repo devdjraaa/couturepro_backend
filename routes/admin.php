@@ -34,8 +34,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::post('ateliers/{atelier}/degeler', [AtelierController::class, 'degeler']);
     });
     Route::middleware('admin.permission:ateliers.view')->group(function () {
-        Route::post('ateliers/{atelier}/demo',  [AtelierController::class, 'demo']);
-        Route::post('ateliers/{atelier}/trial', [AtelierController::class, 'trial']);
+        Route::post('ateliers/{atelier}/demo',         [AtelierController::class, 'demo']);
+        Route::post('ateliers/{atelier}/trial',        [AtelierController::class, 'trial']);
+        Route::get('ateliers/{atelier}/sous-ateliers', [AtelierController::class, 'sousAteliers']);
+        Route::post('ateliers/{atelier}/trial-global', [AtelierController::class, 'trialGlobal']);
     });
 
     // Plans

@@ -27,6 +27,7 @@ class Client extends Model
         'is_archived',
         'archived_at',
         'archived_by',
+        'archive_note',
     ];
 
     protected $casts = [

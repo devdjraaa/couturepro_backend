@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\CommandePaiement;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 
 class CommandePaiementController extends Controller
 {
+    use ResolvesAtelier;
     public function index(Request $request, Commande $commande): JsonResponse
     {
         $atelier = $this->getAtelier($request);
@@ -94,12 +96,4 @@ class CommandePaiementController extends Controller
         ], 201);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
-    }
 }

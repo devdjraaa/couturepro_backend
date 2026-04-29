@@ -28,10 +28,18 @@ class ClientPolicy
         return $client->atelier_id === $this->getAtelierId($user);
     }
 
-    public function delete(Proprietaire|EquipeMembre $user, Client $client): bool
+    public function archive(Proprietaire|EquipeMembre $user, Client $client): bool
     {
         if ($user instanceof EquipeMembre) {
             return $client->atelier_id === $user->atelier_id && $user->role === 'assistant';
+        }
+        return $client->atelier_id === $this->getAtelierId($user);
+    }
+
+    public function delete(Proprietaire|EquipeMembre $user, Client $client): bool
+    {
+        if ($user instanceof EquipeMembre) {
+            return false; // Seul le propriétaire peut supprimer
         }
         return $client->atelier_id === $user->atelierMaitre?->id;
     }

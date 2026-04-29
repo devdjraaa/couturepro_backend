@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\Client;
 use App\Models\Commande;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 
 class WhatsAppController extends Controller
 {
+    use ResolvesAtelier;
     public function rappelClient(Request $request, string $clientId): JsonResponse
     {
         $atelier = $this->getAtelier($request);
@@ -104,9 +106,4 @@ class WhatsAppController extends Controller
         return response()->json(['lien' => $lien, 'message' => $message]);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-        return $user instanceof EquipeMembre ? $user->atelier : $user->atelierMaitre;
-    }
 }

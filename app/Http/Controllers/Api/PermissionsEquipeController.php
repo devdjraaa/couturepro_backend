@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\PermissionEquipe;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 
 class PermissionsEquipeController extends Controller
 {
+    use ResolvesAtelier;
     public function index(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);
@@ -50,15 +52,4 @@ class PermissionsEquipeController extends Controller
         ]);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        // Seul le propriétaire peut gérer les permissions
-        if (!$user instanceof \App\Models\Proprietaire) {
-            abort(403, 'Accès réservé au propriétaire.');
-        }
-
-        return $user->atelierMaitre;
-    }
 }

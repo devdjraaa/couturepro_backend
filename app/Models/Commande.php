@@ -33,6 +33,10 @@ class Commande extends Model
         'urgence',
         'description',
         'rappel_j2_envoye',
+        'is_archived',
+        'archived_at',
+        'archived_by',
+        'archive_note',
     ];
 
     protected $appends = ['photo_tissu_url', 'client_nom', 'vetement_nom'];
@@ -45,6 +49,8 @@ class Commande extends Model
         'date_livraison_effective' => 'datetime',
         'rappel_j2_envoye'         => 'boolean',
         'urgence'                  => 'boolean',
+        'is_archived'              => 'boolean',
+        'archived_at'              => 'datetime',
     ];
 
     protected function photoTissuUrl(): Attribute

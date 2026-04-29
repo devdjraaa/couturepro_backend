@@ -7,16 +7,19 @@ use App\Models\Atelier;
 use App\Models\PointsFidelite;
 use App\Models\PointsHistorique;
 use App\Services\PointsFideliteService;
+use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FideliteController extends Controller
 {
+    use ResolvesAtelier;
+
     public function __construct(private readonly PointsFideliteService $service) {}
 
     public function show(Request $request): JsonResponse
     {
-        $atelier = $this->atelier($request);
+        $atelier = $this->getAtelier($request);
 
         $solde = PointsFidelite::firstOrCreate(
             ['atelier_id' => $atelier->id],
@@ -40,7 +43,7 @@ class FideliteController extends Controller
 
     public function convertir(Request $request): JsonResponse
     {
-        $atelier = $this->atelier($request);
+        $atelier = $this->getAtelier($request);
 
         try {
             $abonnement = $this->service->convertirEnBonus($atelier);
@@ -56,15 +59,4 @@ class FideliteController extends Controller
         ]);
     }
 
-    private function atelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        if ($user instanceof \App\Models\Proprietaire) {
-            return $user->atelierMaitre ?? $user->ateliers()->firstOrFail();
-        }
-
-        // EquipeMembre
-        return Atelier::findOrFail($user->atelier_id);
-    }
 }

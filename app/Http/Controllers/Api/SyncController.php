@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\SyncPushRequest;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 
 class SyncController extends Controller
 {
+    use ResolvesAtelier;
     public function __construct(private SyncService $syncService) {}
 
     public function push(SyncPushRequest $request): JsonResponse
@@ -42,12 +44,4 @@ class SyncController extends Controller
         return response()->json($data);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
-    }
 }

@@ -17,10 +17,16 @@ class Mesure extends Model
         'champs',
         'created_by',
         'created_by_role',
+        'is_archived',
+        'archived_at',
+        'archived_by',
+        'archive_note',
     ];
 
     protected $casts = [
-        'champs' => 'array',
+        'champs'       => 'array',
+        'is_archived'  => 'boolean',
+        'archived_at'  => 'datetime',
     ];
 
     public function client(): BelongsTo

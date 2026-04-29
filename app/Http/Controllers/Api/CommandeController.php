@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreCommandeRequest;
 use App\Http\Requests\Api\UpdateCommandeRequest;
 use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\EquipeMembre;
+use App\Models\NotificationSysteme;
 use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CommandeController extends Controller
 {
+    use ResolvesAtelier;
     use AuthorizesRequests;
 
     public function __construct(private AtelierLimitsService $limitsService) {}
@@ -122,12 +125,46 @@ class CommandeController extends Controller
         return response()->json(['message' => 'Commande supprimée.']);
     }
 
-    private function getAtelier(Request $request): Atelier
+    public function archiver(Request $request, Commande $commande): JsonResponse
     {
-        $user = $request->user();
+        $this->authorize('archive', $commande);
 
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
+        $note   = $request->input('note');
+        $auteur = $request->user();
+        $nom    = $auteur->prenom ?? $auteur->nom ?? 'Un assistant';
+
+        $commande->update([
+            'is_archived'  => true,
+            'archived_at'  => now(),
+            'archived_by'  => $auteur->id,
+            'archive_note' => $note,
+        ]);
+
+        $atelier = $this->getAtelier($request);
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => "Commande archivée par {$nom}",
+            'contenu'    => "Commande #{$commande->id} — {$commande->client_nom}" . ($note ? " : {$note}" : ''),
+            'type'       => 'alerte_archive',
+            'is_read'    => false,
+        ]);
+
+        return response()->json(['message' => 'Commande archivée.']);
     }
+
+    public function desarchiver(Request $request, Commande $commande): JsonResponse
+    {
+        $this->authorize('update', $commande);
+
+        $commande->update([
+            'is_archived'  => false,
+            'archived_at'  => null,
+            'archived_by'  => null,
+            'archive_note' => null,
+        ]);
+
+        return response()->json(['message' => 'Commande désarchivée.']);
+    }
+
 }

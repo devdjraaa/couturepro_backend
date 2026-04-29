@@ -22,18 +22,19 @@ class PermissionEquipe extends Model
     ];
 
     // Permissions CDC §4.3 — utilisées quand aucune ligne n'existe en DB
+    // Assistant : CREATE + READ + ARCHIVE uniquement (pas d'UPDATE ni DELETE)
     public const DEFAULTS = [
         'assistant' => [
-            'clients.view', 'clients.create', 'clients.edit',
-            'commandes.view', 'commandes.create', 'commandes.edit',
-            'mesures.view', 'mesures.edit',
+            'clients.view', 'clients.create', 'clients.archive',
+            'commandes.view', 'commandes.create', 'commandes.archive',
+            'mesures.view', 'mesures.archive',
             'vetements.manage',
             'paiements.view', 'paiements.create',
             'notifications.view',
         ],
         'membre' => [
             'clients.view',
-            'commandes.view', 'commandes.create',
+            'commandes.view',
             'mesures.view',
             'notifications.view',
         ],
@@ -41,9 +42,9 @@ class PermissionEquipe extends Model
 
     // Toutes les permissions configurables (exposées dans l'UI)
     public const ALL_PERMISSIONS = [
-        'clients.view', 'clients.create', 'clients.edit', 'clients.delete',
-        'commandes.view', 'commandes.create', 'commandes.edit', 'commandes.delete',
-        'mesures.view', 'mesures.edit',
+        'clients.view', 'clients.create', 'clients.archive', 'clients.edit', 'clients.delete',
+        'commandes.view', 'commandes.create', 'commandes.archive', 'commandes.edit', 'commandes.delete',
+        'mesures.view', 'mesures.archive', 'mesures.edit',
         'vetements.manage',
         'paiements.view', 'paiements.create',
         'points.convert',

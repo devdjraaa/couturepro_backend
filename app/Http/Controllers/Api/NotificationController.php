@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\NotificationSysteme;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    use ResolvesAtelier;
     public function index(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);
@@ -51,9 +53,4 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Notifications marquées comme lues.']);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-        return $user instanceof EquipeMembre ? $user->atelier : $user->atelierMaitre;
-    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\Paiement;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 
 class PaiementController extends Controller
 {
+    use ResolvesAtelier;
     public function __construct(private PaymentService $paymentService) {}
 
     public function initier(Request $request): JsonResponse
@@ -89,12 +91,4 @@ class PaiementController extends Controller
         return response()->json(['paiement_id' => $paiement->id, 'statut' => $paiement->statut]);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
-    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreVetementRequest;
 use App\Http\Requests\Api\UpdateVetementRequest;
 use App\Models\Atelier;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class VetementController extends Controller
 {
+    use ResolvesAtelier;
     use AuthorizesRequests;
 
     public function index(Request $request): JsonResponse
@@ -103,12 +105,4 @@ class VetementController extends Controller
         return response()->json(['message' => 'Vêtement archivé.']);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
-    }
 }

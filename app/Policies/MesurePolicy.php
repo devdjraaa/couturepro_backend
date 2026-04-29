@@ -28,8 +28,19 @@ class MesurePolicy
         return $mesure->atelier_id === $this->getAtelierId($user);
     }
 
+    public function archive(Proprietaire|EquipeMembre $user, Mesure $mesure): bool
+    {
+        if ($user instanceof EquipeMembre) {
+            return $mesure->atelier_id === $user->atelier_id && $user->role === 'assistant';
+        }
+        return $mesure->atelier_id === $this->getAtelierId($user);
+    }
+
     public function delete(Proprietaire|EquipeMembre $user, Mesure $mesure): bool
     {
+        if ($user instanceof EquipeMembre) {
+            return false;
+        }
         return $mesure->atelier_id === $this->getAtelierId($user);
     }
 

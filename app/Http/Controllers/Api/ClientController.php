@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreClientRequest;
 use App\Http\Requests\Api\UpdateClientRequest;
 use App\Models\Atelier;
 use App\Models\Client;
 use App\Models\EquipeMembre;
+use App\Models\NotificationSysteme;
 use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    use ResolvesAtelier;
     use AuthorizesRequests;
 
     public function __construct(private AtelierLimitsService $limitsService) {}
@@ -109,23 +112,44 @@ class ClientController extends Controller
 
     public function archiver(Request $request, Client $client): JsonResponse
     {
-        $this->authorize('update', $client);
+        $this->authorize('archive', $client);
+
+        $note = $request->input('note');
 
         $client->update([
-            'is_archived' => true,
-            'archived_at' => now(),
-            'archived_by' => $request->user()->id,
+            'is_archived'  => true,
+            'archived_at'  => now(),
+            'archived_by'  => $request->user()->id,
+            'archive_note' => $note,
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        $auteur  = $request->user();
+        $nom     = $auteur->prenom ?? $auteur->nom ?? 'Un assistant';
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => "Client archivé par {$nom}",
+            'contenu'    => "{$client->prenom} {$client->nom}" . ($note ? " — {$note}" : ''),
+            'type'       => 'alerte_archive',
+            'is_read'    => false,
         ]);
 
         return response()->json(['message' => 'Client archivé.']);
     }
 
-    private function getAtelier(Request $request): Atelier
+    public function desarchiver(Request $request, Client $client): JsonResponse
     {
-        $user = $request->user();
+        $this->authorize('update', $client);
 
-        return $user instanceof EquipeMembre
-            ? $user->atelier
-            : $user->atelierMaitre;
+        $client->update([
+            'is_archived'  => false,
+            'archived_at'  => null,
+            'archived_by'  => null,
+            'archive_note' => null,
+        ]);
+
+        return response()->json(['message' => 'Client désarchivé.']);
     }
+
 }

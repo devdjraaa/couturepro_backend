@@ -111,6 +111,16 @@ class FonctionnalitesSeeder extends Seeder
                 'ordre_affichage' => 10,
             ],
             [
+                'cle'             => 'max_sous_ateliers',
+                'label'           => 'Sous-ateliers max',
+                'description'     => 'Nombre maximum de sous-ateliers autorisés (0 = désactivé)',
+                'type'            => 'numerique',
+                'unite'           => 'ateliers',
+                'categorie'       => 'module',
+                'valeur_defaut'   => '0',
+                'ordre_affichage' => 11,
+            ],
+            [
                 'cle'             => 'pts_par_client',
                 'label'           => 'Points par client créé',
                 'description'     => "Points de fidélité gagnés à chaque création de client",
@@ -156,6 +166,6 @@ class FonctionnalitesSeeder extends Seeder
             Fonctionnalite::updateOrCreate(['cle' => $feature['cle']], $feature);
         }
 
-        $this->command->info('✅ FonctionnalitesSeeder : 14 features insérées');
+        $this->command->info('✅ FonctionnalitesSeeder : 15 features insérées');
     }
 }

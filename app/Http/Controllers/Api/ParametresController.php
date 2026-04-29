@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\CommunicationsConfig;
 use App\Models\EquipeMembre;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ParametresController extends Controller
 {
+    use ResolvesAtelier;
     public function updateProfil(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -140,9 +142,4 @@ class ParametresController extends Controller
         return response()->json($data);
     }
 
-    private function getAtelier(Request $request): Atelier
-    {
-        $user = $request->user();
-        return $user instanceof EquipeMembre ? $user->atelier : $user->atelierMaitre;
-    }
 }

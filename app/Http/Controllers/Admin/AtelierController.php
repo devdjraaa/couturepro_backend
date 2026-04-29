@@ -143,4 +143,97 @@ class AtelierController extends Controller
 
         return response()->json(['message' => 'Atelier dégelé.', 'atelier' => $atelier]);
     }
+
+    /**
+     * Liste les sous-ateliers d'un atelier maître.
+     */
+    public function sousAteliers(Atelier $atelier): JsonResponse
+    {
+        $sousAteliers = Atelier::where('proprietaire_id', $atelier->proprietaire_id)
+            ->where('id', '!=', $atelier->id)
+            ->with('abonnement')
+            ->withCount(['clients', 'commandes'])
+            ->get()
+            ->map(fn ($a) => [
+                'id'              => $a->id,
+                'nom'             => $a->nom,
+                'ville'           => $a->ville,
+                'statut'          => $a->statut,
+                'essai_expire_at' => $a->essai_expire_at,
+                'clients_count'   => $a->clients_count,
+                'commandes_count' => $a->commandes_count,
+                'abonnement'      => $a->abonnement ? [
+                    'statut'         => $a->abonnement->statut,
+                    'jours_restants' => $a->abonnement->jours_restants,
+                ] : null,
+            ]);
+
+        return response()->json($sousAteliers);
+    }
+
+    /**
+     * Applique une période d'essai à tous les sous-ateliers du propriétaire (ou individuel).
+     * POST /ateliers/{atelier}/trial-global
+     */
+    public function trialGlobal(Request $request, Atelier $atelier): JsonResponse
+    {
+        $data = $request->validate([
+            'duree'      => ['required', 'integer', 'min:1'],
+            'unite'      => ['required', 'in:minutes,heures,jours'],
+            'atelier_ids'=> ['nullable', 'array'],
+            'atelier_ids.*' => ['string'],
+        ]);
+
+        $admin = $this->adminUser();
+
+        $expire = match ($data['unite']) {
+            'minutes' => now()->addMinutes($data['duree']),
+            'heures'  => now()->addHours($data['duree']),
+            'jours'   => now()->addDays($data['duree']),
+        };
+
+        $dureeJours = match ($data['unite']) {
+            'jours'   => $data['duree'],
+            'heures'  => max(1, (int) ceil($data['duree'] / 24)),
+            'minutes' => max(1, (int) ceil($data['duree'] / 1440)),
+        };
+
+        // Ateliers ciblés : sélection ou tous les ateliers du propriétaire
+        $query = Atelier::where('proprietaire_id', $atelier->proprietaire_id);
+        if (!empty($data['atelier_ids'])) {
+            $query->whereIn('id', $data['atelier_ids']);
+        }
+        $targets = $query->with('abonnement')->get();
+
+        foreach ($targets as $target) {
+            $target->update([
+                'statut'          => 'essai',
+                'essai_expire_at' => $expire,
+            ]);
+
+            Abonnement::updateOrCreate(
+                ['atelier_id' => $target->id],
+                [
+                    'statut'               => 'essai',
+                    'niveau_cle'           => $target->abonnement?->niveau_cle ?? 'standard_mensuel',
+                    'jours_restants'       => $dureeJours,
+                    'timestamp_debut'      => now(),
+                    'timestamp_expiration' => $expire,
+                ]
+            );
+        }
+
+        $this->audit($admin, 'atelier.trial_global', 'atelier', $atelier->id, [
+            'duree'       => $data['duree'],
+            'unite'       => $data['unite'],
+            'nb_ateliers' => $targets->count(),
+            'expire_at'   => $expire->toISOString(),
+        ], $request->ip());
+
+        return response()->json([
+            'message'        => "Période d'essai appliquée à {$targets->count()} atelier(s).",
+            'nb_ateliers'    => $targets->count(),
+            'essai_expire_at'=> $expire->toISOString(),
+        ]);
+    }
 }
