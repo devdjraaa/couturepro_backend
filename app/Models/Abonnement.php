@@ -51,6 +51,7 @@ class Abonnement extends Model
     }
 
     // Helper : retourne la config effective (snapshot ou plan direct)
+    // Le plan live remplit les clés absentes du snapshot (ajoutées après activation)
     public function getConfigEffective(): array
     {
         $snapshot = $this->config_snapshot;
@@ -59,13 +60,15 @@ class Abonnement extends Model
             $snapshot = json_decode($snapshot, true) ?? [];
         }
 
+        $liveConfig = $this->niveau?->config;
+        $live = is_array($liveConfig) ? $liveConfig : (json_decode($liveConfig, true) ?? []);
+
         if (is_array($snapshot) && !empty($snapshot)) {
-            return $snapshot;
+            // Snapshot prend priorité ; live remplit les clés manquantes
+            return array_merge($live, $snapshot);
         }
 
-        $config = $this->niveau?->config;
-
-        return is_array($config) ? $config : (json_decode($config, true) ?? []);
+        return $live;
     }
 
     public function scopeActif($query)
