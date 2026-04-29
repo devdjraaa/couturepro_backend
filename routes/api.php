@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\ArchiveController;
+use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
@@ -88,6 +89,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Archives (liste pour le patron)
     Route::get('archives', [ArchiveController::class, 'index']);
+
+    // Caisse (gated par plan module_caisse)
+    Route::get('caisse/stats',   [CaisseController::class, 'stats']);
+    Route::get('caisse/clients', [CaisseController::class, 'clients']);
     // Paiements de commande
     Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index']);
     Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store']);
