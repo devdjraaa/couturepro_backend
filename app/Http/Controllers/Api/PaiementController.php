@@ -21,12 +21,18 @@ class PaiementController extends Controller
         $request->validate([
             'niveau_cle' => ['required', 'string', 'exists:niveaux_config,cle'],
             'provider'   => ['sometimes', 'string', 'in:fedapay'],
+            'return_url' => ['sometimes', 'nullable', 'url'],
         ]);
 
         $atelier  = $this->getAtelier($request);
         $provider = $request->provider ?? config('payment.default_provider', 'fedapay');
 
-        $paiement = $this->paymentService->initiate($atelier, $request->niveau_cle, $provider);
+        $paiement = $this->paymentService->initiate(
+            $atelier,
+            $request->niveau_cle,
+            $provider,
+            $request->return_url,
+        );
 
         return response()->json([
             'paiement_id'  => $paiement->id,

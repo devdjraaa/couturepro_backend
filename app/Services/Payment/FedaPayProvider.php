@@ -37,7 +37,7 @@ class FedaPayProvider implements PaymentProviderContract
                     'firstname' => $customerData['prenom'] ?? '',
                     'lastname'  => $customerData['nom'] ?? '',
                 ],
-                'callback_url' => config('payment.fedapay.return_url'),
+                'callback_url' => $customerData['return_url'] ?? config('payment.fedapay.return_url'),
             ]);
 
         $response->throw();

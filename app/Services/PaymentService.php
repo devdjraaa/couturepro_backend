@@ -19,7 +19,7 @@ class PaymentService
         'fedapay' => FedaPayProvider::class,
     ];
 
-    public function initiate(Atelier $atelier, string $niveauCle, string $provider = 'fedapay'): Paiement
+    public function initiate(Atelier $atelier, string $niveauCle, string $provider = 'fedapay', ?string $returnUrl = null): Paiement
     {
         $niveau = NiveauConfig::where('cle', $niveauCle)->where('is_actif', true)->firstOrFail();
 
@@ -40,9 +40,10 @@ class PaymentService
         $proprietaire     = $atelier->proprietaire;
 
         $result = $providerInstance->initiate($paiement, [
-            'email'  => $proprietaire->email,
-            'nom'    => $proprietaire->nom,
-            'prenom' => $proprietaire->prenom,
+            'email'      => $proprietaire->email,
+            'nom'        => $proprietaire->nom,
+            'prenom'     => $proprietaire->prenom,
+            'return_url' => $returnUrl,
         ]);
 
         $paiement->update([
