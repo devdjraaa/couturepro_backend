@@ -11,7 +11,9 @@ class RecuperationEtape1Request extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
+            // Au moins un des deux est requis : email OU téléphone
+            'email'     => ['nullable', 'required_without:telephone', 'email'],
+            'telephone' => ['nullable', 'required_without:email', 'string'],
         ];
     }
 }

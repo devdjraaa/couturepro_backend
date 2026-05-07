@@ -17,17 +17,23 @@ class RecuperationController extends Controller
 {
     public function __construct(private OtpService $otpService) {}
 
-    // Étape 1 : entrer l'email → OTP envoyé par email
+    // Étape 1 : entrer l'email OU le téléphone → OTP envoyé sur l'email associé
     public function etape1(RecuperationEtape1Request $request): JsonResponse
     {
-        $proprietaire = Proprietaire::where('email', $request->email)->first();
+        $proprietaire = $request->filled('telephone')
+            ? Proprietaire::where('telephone', $request->telephone)->first()
+            : Proprietaire::where('email', $request->email)->first();
 
         if (!$proprietaire) {
-            return response()->json(['message' => 'Aucun compte associé à cet email.'], 404);
+            return response()->json([
+                'message' => $request->filled('telephone')
+                    ? 'Aucun compte associé à ce numéro.'
+                    : 'Aucun compte associé à cet email.',
+            ], 404);
         }
 
         $demande = DemandeRecuperation::create([
-            'email'      => $request->email,
+            'email'      => $proprietaire->email,
             'statut'     => 'etape_1',
             'ip_address' => $request->ip(),
             'otp_envoye' => true,
@@ -38,6 +44,7 @@ class RecuperationController extends Controller
         return response()->json([
             'message'    => 'Code OTP envoyé à votre adresse email.',
             'demande_id' => $demande->id,
+            'email'      => $proprietaire->email,
         ]);
     }
 
@@ -114,11 +121,11 @@ class RecuperationController extends Controller
         ]);
     }
 
-    // Étape 5 : nouveau mot de passe + mise à jour du compte
+    // Étape 5 : nouveau mot de passe (depuis etape_2 = simple reset, ou etape_4 = full recovery)
     public function etape5(RecuperationEtape5Request $request): JsonResponse
     {
         $demande = DemandeRecuperation::where('id', $request->demande_id)
-            ->where('statut', 'etape_4')
+            ->whereIn('statut', ['etape_2', 'etape_4'])
             ->first();
 
         if (!$demande) {
@@ -127,11 +134,15 @@ class RecuperationController extends Controller
 
         $proprietaire = Proprietaire::where('email', $demande->email)->firstOrFail();
 
-        $proprietaire->update([
-            'telephone'             => $demande->telephone_nouveau,
-            'telephone_verified_at' => now(),
-            'password'              => $request->password,
-        ]);
+        $update = ['password' => $request->password];
+
+        // Si l'utilisateur a changé de téléphone (étape 3+4), on l'applique
+        if ($demande->statut === 'etape_4' && $demande->telephone_nouveau) {
+            $update['telephone']             = $demande->telephone_nouveau;
+            $update['telephone_verified_at'] = now();
+        }
+
+        $proprietaire->update($update);
 
         $demande->update([
             'statut'       => 'complete',
@@ -141,7 +152,7 @@ class RecuperationController extends Controller
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Compte récupéré avec succès.',
+            'message' => 'Mot de passe réinitialisé avec succès.',
             'token'   => $token,
         ]);
     }

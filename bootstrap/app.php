@@ -4,10 +4,12 @@ use App\Console\Commands\CheckPendingPayments;
 use App\Console\Commands\ExpireStalePayments;
 use App\Console\Commands\NotifyAbonnementExpiry;
 use App\Console\Commands\ProcessBonusExpiry;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -40,5 +42,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command(NotifyAbonnementExpiry::class)->dailyAt('08:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Pour les requêtes API, retourner un 401 JSON au lieu de tenter
+        // une redirection vers la route web `login` (qui n'existe pas).
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Unauthenticated.',
+                ], 401);
+            }
+        });
     })->create();
