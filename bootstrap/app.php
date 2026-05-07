@@ -23,7 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        // statefulApi() retiré : l'app (web + mobile Capacitor) utilise
+        // exclusivement des Bearer tokens (cf. frontend src/services/api.js).
+        // Avec statefulApi(), Sanctum exigeait un CSRF token, ce qui cassait
+        // l'inscription depuis le WebView Android (Origin: https://localhost
+        // matche le domaine stateful par défaut).
         $middleware->alias([
             'admin.auth'       => \App\Http\Middleware\AdminAuth::class,
             'admin.permission' => \App\Http\Middleware\CheckAdminPermission::class,
