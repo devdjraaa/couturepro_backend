@@ -156,4 +156,56 @@ class RecuperationController extends Controller
             'token'   => $token,
         ]);
     }
+
+    /**
+     * Récupération via question secrète — étape 1 :
+     * On retourne la question secrète associée à un téléphone (sans la réponse).
+     * Le frontend l'affiche pour que l'utilisateur sache à quoi répondre.
+     */
+    public function lireQuestionSecrete(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate([
+            'telephone' => ['required', 'string'],
+        ]);
+
+        $proprietaire = Proprietaire::where('telephone', $request->telephone)->first();
+
+        if (!$proprietaire) {
+            return response()->json(['message' => 'Aucun compte associé à ce numéro.'], 404);
+        }
+
+        return response()->json([
+            'question_secrete' => $proprietaire->question_secrete,
+        ]);
+    }
+
+    /**
+     * Récupération via question secrète — étape 2 :
+     * Valide la réponse. Si correcte, retourne un token de session sans
+     * forcer le changement de mot de passe (UX type Google "essayer autrement").
+     */
+    public function verifierQuestionSecrete(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate([
+            'telephone'       => ['required', 'string'],
+            'reponse_secrete' => ['required', 'string'],
+        ]);
+
+        $proprietaire = Proprietaire::where('telephone', $request->telephone)->first();
+
+        if (!$proprietaire) {
+            return response()->json(['message' => 'Aucun compte associé à ce numéro.'], 404);
+        }
+
+        if (!\Illuminate\Support\Facades\Hash::check($request->reponse_secrete, $proprietaire->reponse_secrete)) {
+            return response()->json(['message' => 'Réponse incorrecte.'], 422);
+        }
+
+        $token = $proprietaire->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Connexion réussie via question secrète.',
+            'token'   => $token,
+        ]);
+    }
 }

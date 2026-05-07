@@ -45,6 +45,11 @@ Route::prefix('auth')->group(function () {
         Route::post('nouveau-telephone',    [RecuperationController::class, 'etape3']);
         Route::post('verifier-otp-nouveau', [RecuperationController::class, 'etape4']);
         Route::post('nouveau-mot-de-passe', [RecuperationController::class, 'etape5']);
+
+        // Recovery via question secrète : récupère la question puis valide la réponse
+        // → retourne un token directement (pas de changement de mot de passe forcé)
+        Route::post('question/lire',     [RecuperationController::class, 'lireQuestionSecrete']);
+        Route::post('question/verifier', [RecuperationController::class, 'verifierQuestionSecrete']);
     });
 });
 
