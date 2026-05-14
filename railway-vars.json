@@ -35,7 +35,7 @@
   "REDIS_PASSWORD": "null",
   "REDIS_PORT": "6379",
   "MAIL_MAILER": "resend",
-  "RESEND_KEY": "re_jFVqMdSj_92qkTJVhZhKVfFf6s6SXSLNR",
+  "RESEND_API_KEY": "re_jFVqMdSj_92qkTJVhZhKVfFf6s6SXSLNR",
   "MAIL_FROM_ADDRESS": "noreply@couturepro.app",
   "MAIL_FROM_NAME": "CouturePro",
   "AWS_ACCESS_KEY_ID": "",
