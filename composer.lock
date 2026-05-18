@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c132c90e8276d6ea36e0309db089741f",
+    "content-hash": "c1c7b794b8c1ba07022ab5a7e6903d7b",
     "packages": [
         {
             "name": "brick/math",
@@ -3487,6 +3487,76 @@
                 "source": "https://github.com/resend/resend-php/tree/v1.3.0"
             },
             "time": "2026-04-11T10:48:32+00:00"
+        },
+        {
+            "name": "symfony/brevo-mailer",
+            "version": "v8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/brevo-mailer.git",
+                "reference": "ba5d44aa012a948810dcdcc69ccb53f4b4e040bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/brevo-mailer/zipball/ba5d44aa012a948810dcdcc69ccb53f4b4e040bb",
+                "reference": "ba5d44aa012a948810dcdcc69ccb53f4b4e040bb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/mailer": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "symfony/http-client": "^7.4|^8.0",
+                "symfony/webhook": "^7.4|^8.0"
+            },
+            "type": "symfony-mailer-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Mailer\\Bridge\\Brevo\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pierre Tanguy",
+                    "homepage": "https://github.com/petanguy"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Brevo Mailer Bridge",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/brevo-mailer/tree/v8.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-08-04T07:36:47+00:00"
         },
         {
             "name": "symfony/clock",
