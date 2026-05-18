@@ -40,18 +40,12 @@ class ProprietaireAuthController extends Controller
             'reponse_secrete'  => $request->reponse_secrete,
         ]);
 
-        $otp = $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
+        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
 
-        $response = [
-            'message'   => 'Compte créé. Un code OTP a été envoyé au ' . $proprietaire->telephone,
+        return response()->json([
+            'message'   => 'Compte créé. Un code OTP a été envoyé par email.',
             'telephone' => $proprietaire->telephone,
-        ];
-
-        if (config('app.env') !== 'production') {
-            $response['otp_debug'] = $otp->code;
-        }
-
-        return response()->json($response, 201);
+        ], 201);
     }
 
     public function verifierOtp(VerifierOtpRequest $request): JsonResponse
@@ -139,15 +133,9 @@ class ProprietaireAuthController extends Controller
             return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
         }
 
-        $otp = $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
+        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
 
-        $response = ['message' => 'Code OTP renvoyé.', 'telephone' => $proprietaire->telephone];
-
-        if (config('app.env') !== 'production') {
-            $response['otp_debug'] = $otp->code;
-        }
-
-        return response()->json($response);
+        return response()->json(['message' => 'Code OTP renvoyé.', 'telephone' => $proprietaire->telephone]);
     }
 
     public function me(Request $request): JsonResponse
