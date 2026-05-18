@@ -10,6 +10,7 @@ use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\ListeNoire;
 use App\Models\NiveauConfig;
+use App\Models\NotificationSysteme;
 use App\Models\Proprietaire;
 use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
@@ -107,6 +108,17 @@ class ProprietaireAuthController extends Controller
         }
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
+
+        $atelier = $proprietaire->atelierMaitre;
+        if ($atelier) {
+            NotificationSysteme::create([
+                'atelier_id' => $atelier->id,
+                'titre'      => 'Connexion réussie',
+                'contenu'    => "Bienvenue, {$proprietaire->prenom} !",
+                'type'       => 'connexion',
+                'is_read'    => false,
+            ]);
+        }
 
         return response()->json([
             'token'        => $token,

@@ -8,6 +8,7 @@ use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\NiveauConfig;
+use App\Models\NotificationSysteme;
 use App\Models\QuotaMensuel;
 use App\Models\TransactionAbonnement;
 use Illuminate\Http\JsonResponse;
@@ -130,9 +131,18 @@ class AbonnementController extends Controller
             'utilise_at' => now(),
         ]);
 
+        $niveauLabel = $niveau?->label ?? $transaction->niveau_cle;
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Abonnement activé',
+            'contenu'    => "Plan {$niveauLabel} activé pour {$duree} jours.",
+            'type'       => 'abonnement_active',
+            'is_read'    => false,
+        ]);
+
         return response()->json([
             'message'      => "Abonnement activé ({$duree} jours).",
-            'niveau_label' => $niveau?->label ?? $transaction->niveau_cle,
+            'niveau_label' => $niveauLabel,
             'duree_jours'  => $duree,
             'expiration'   => $abonnement->timestamp_expiration->toIso8601String(),
         ]);

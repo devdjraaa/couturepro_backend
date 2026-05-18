@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
+use App\Models\NotificationSysteme;
 use App\Models\PointsFidelite;
 use App\Models\PointsHistorique;
 use App\Services\PointsFideliteService;
@@ -50,6 +51,14 @@ class FideliteController extends Controller
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Points convertis',
+            'contenu'    => '31 jours de bonus ont été ajoutés à votre abonnement.',
+            'type'       => 'points_convertis',
+            'is_read'    => false,
+        ]);
 
         return response()->json([
             'message'             => 'Conversion réussie. Bonus de 31 jours activé.',

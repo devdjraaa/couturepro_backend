@@ -6,6 +6,7 @@ use App\Models\Atelier;
 use App\Models\Client;
 use App\Models\Commande;
 use App\Models\Mesure;
+use App\Models\NotificationSysteme;
 use App\Models\PointsFidelite;
 use App\Models\PointsHistorique;
 use App\Models\Vetement;
@@ -109,6 +110,7 @@ class SyncService
                 case 'create':
                     $record = $modelClass::forceCreate(array_merge($data, ['id' => $id]));
                     $this->maybeAwardPoints($atelier, $table, (string) $record->id);
+                    $this->createActionNotification($atelier, $table, $record);
                     return ['id' => $record->id, 'status' => 'created'];
 
                 case 'update':
@@ -164,5 +166,26 @@ class SyncService
             'reference_id' => $recordId,
             'created_at'   => now(),
         ]);
+    }
+
+    private function createActionNotification(Atelier $atelier, string $table, $record): void
+    {
+        if ($table === 'clients') {
+            NotificationSysteme::create([
+                'atelier_id' => $atelier->id,
+                'titre'      => 'Nouveau client ajouté',
+                'contenu'    => trim("{$record->prenom} {$record->nom}"),
+                'type'       => 'client_cree',
+                'is_read'    => false,
+            ]);
+        } elseif ($table === 'commandes') {
+            NotificationSysteme::create([
+                'atelier_id' => $atelier->id,
+                'titre'      => 'Nouvelle commande créée',
+                'contenu'    => "Commande pour {$record->client_nom}",
+                'type'       => 'commande_cree',
+                'is_read'    => false,
+            ]);
+        }
     }
 }
