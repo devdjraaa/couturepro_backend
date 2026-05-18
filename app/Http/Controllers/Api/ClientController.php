@@ -73,6 +73,14 @@ class ClientController extends Controller
 
         $this->limitsService->incrementClients($atelier);
 
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Nouveau client ajouté',
+            'contenu'    => trim("{$client->prenom} {$client->nom}"),
+            'type'       => 'client_cree',
+            'is_read'    => false,
+        ]);
+
         return response()->json($client, 201);
     }
 

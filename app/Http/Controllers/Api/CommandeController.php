@@ -82,6 +82,18 @@ class CommandeController extends Controller
 
         $this->limitsService->incrementCommandes($atelier);
 
+        $clientNom = $commande->client?->prenom
+            ? "{$commande->client->prenom} {$commande->client->nom}"
+            : ($commande->client?->nom ?? 'Client');
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Nouvelle commande créée',
+            'contenu'    => "Commande pour {$clientNom}",
+            'type'       => 'commande_cree',
+            'is_read'    => false,
+        ]);
+
         return response()->json($commande->load('client', 'vetement'), 201);
     }
 
@@ -111,7 +123,20 @@ class CommandeController extends Controller
             $data['urgence'] = $request->boolean('urgence');
         }
 
+        $ancienStatut = $commande->statut;
         $commande->update($data);
+
+        if (isset($data['statut']) && $data['statut'] !== $ancienStatut) {
+            $atelier = $this->getAtelier($request);
+            $labels  = ['livre' => 'Commande livrée', 'annule' => 'Commande annulée', 'en_cours' => 'Commande en cours'];
+            NotificationSysteme::create([
+                'atelier_id' => $atelier->id,
+                'titre'      => $labels[$data['statut']] ?? 'Statut mis à jour',
+                'contenu'    => $commande->client_nom ?? "Commande #{$commande->id}",
+                'type'       => 'statut_commande',
+                'is_read'    => false,
+            ]);
+        }
 
         return response()->json($commande->load('client', 'vetement'));
     }
