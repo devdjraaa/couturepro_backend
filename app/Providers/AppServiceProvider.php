@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Models\NiveauConfig;
 use App\Observers\NiveauConfigObserver;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,5 +20,11 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         NiveauConfig::observe(NiveauConfigObserver::class);
+
+        Mail::extend('brevo', function () {
+            return (new BrevoTransportFactory())->create(
+                new Dsn('brevo+api', 'default', config('mail.mailers.brevo.key'))
+            );
+        });
     }
 }
