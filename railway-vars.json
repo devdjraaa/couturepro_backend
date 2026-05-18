@@ -35,7 +35,7 @@
   "REDIS_PASSWORD": "null",
   "REDIS_PORT": "6379",
   "MAIL_MAILER": "brevo",
-  "BREVO_API_KEY": "à_remplacer",
+  "BREVO_API_KEY": "à_configurer_dans_railway",
   "MAIL_FROM_ADDRESS": "dev.djraaa@gmail.com",
   "MAIL_FROM_NAME": "CouturePro",
   "AWS_ACCESS_KEY_ID": "",
