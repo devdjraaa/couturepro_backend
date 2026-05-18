@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Jobs\SendOtpEmail;
 use App\Models\OtpToken;
-use Illuminate\Support\Facades\Mail;
 
 class OtpService
 {
@@ -25,7 +25,7 @@ class OtpService
             'created_at'       => now(),
         ]);
 
-        $this->envoyer($email, $code);
+        SendOtpEmail::dispatch($email, $code);
 
         return $otp;
     }
@@ -54,18 +54,4 @@ class OtpService
         return true;
     }
 
-    private function envoyer(string $email, string $code): void
-    {
-        try {
-            Mail::raw(
-                "Votre code de vérification CouturePro est : {$code}\n\nCe code expire dans 10 minutes. Ne le partagez jamais.",
-                function ($message) use ($email) {
-                    $message->to($email)
-                            ->subject('Votre code de vérification CouturePro');
-                }
-            );
-        } catch (\Throwable $e) {
-            \Log::warning('OTP email non envoyé', ['email' => $email, 'error' => $e->getMessage()]);
-        }
-    }
 }

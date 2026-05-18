@@ -16,4 +16,4 @@ RUN php artisan storage:link || true
 
 EXPOSE 8080
 
-CMD php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+CMD php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan queue:work --timeout=60 --tries=3 --sleep=3 & php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
