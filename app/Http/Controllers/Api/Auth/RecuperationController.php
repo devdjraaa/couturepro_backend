@@ -39,13 +39,14 @@ class RecuperationController extends Controller
             'otp_envoye' => true,
         ]);
 
-        $this->otpService->generer($proprietaire->telephone, 'recuperation_compte', $proprietaire->email);
+        $otp = $this->otpService->generer($proprietaire->telephone, 'recuperation_compte', $proprietaire->email);
 
-        return response()->json([
+        return response()->json(array_filter([
             'message'    => 'Code OTP envoyé à votre adresse email.',
             'demande_id' => $demande->id,
             'email'      => $proprietaire->email,
-        ]);
+            'otp_debug'  => $this->otpService->debugCode($otp),
+        ]));
     }
 
     // Étape 2 : vérifier OTP
@@ -90,12 +91,13 @@ class RecuperationController extends Controller
         ]);
 
         // OTP envoyé sur le même email pour confirmer la prise en charge du nouveau numéro
-        $this->otpService->generer($request->telephone_nouveau, 'recuperation_nouveau_telephone', $demande->email);
+        $otp = $this->otpService->generer($request->telephone_nouveau, 'recuperation_nouveau_telephone', $demande->email);
 
-        return response()->json([
+        return response()->json(array_filter([
             'message'    => 'Code OTP envoyé à votre adresse email pour confirmer le nouveau numéro.',
             'demande_id' => $demande->id,
-        ]);
+            'otp_debug'  => $this->otpService->debugCode($otp),
+        ]));
     }
 
     // Étape 4 : vérifier OTP du nouveau téléphone

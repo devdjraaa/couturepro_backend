@@ -30,6 +30,16 @@ class OtpService
         return $otp;
     }
 
+    /**
+     * En environnement local uniquement : retourne le code OTP en clair
+     * pour éviter de dépendre d'un serveur mail.
+     * En production, retourne toujours null.
+     */
+    public function debugCode(OtpToken $otp): ?string
+    {
+        return app()->isLocal() ? $otp->code : null;
+    }
+
     public function verifier(string $telephone, string $code, string $type): bool
     {
         $otp = OtpToken::where('telephone', $telephone)

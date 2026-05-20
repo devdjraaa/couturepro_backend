@@ -41,12 +41,13 @@ class ProprietaireAuthController extends Controller
             'reponse_secrete'  => $request->reponse_secrete,
         ]);
 
-        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
+        $otp = $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
 
-        return response()->json([
+        return response()->json(array_filter([
             'message'   => 'Compte créé. Un code OTP a été envoyé par email.',
             'telephone' => $proprietaire->telephone,
-        ], 201);
+            'otp_debug' => $this->otpService->debugCode($otp),
+        ]), 201);
     }
 
     public function verifierOtp(VerifierOtpRequest $request): JsonResponse
@@ -145,9 +146,13 @@ class ProprietaireAuthController extends Controller
             return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
         }
 
-        $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
+        $otp = $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $proprietaire->email);
 
-        return response()->json(['message' => 'Code OTP renvoyé.', 'telephone' => $proprietaire->telephone]);
+        return response()->json(array_filter([
+            'message'   => 'Code OTP renvoyé.',
+            'telephone' => $proprietaire->telephone,
+            'otp_debug' => $this->otpService->debugCode($otp),
+        ]));
     }
 
     public function me(Request $request): JsonResponse
