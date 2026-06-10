@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\CommandeEcheanceController;
+use App\Http\Controllers\Api\CommandeGroupeController;
 use App\Http\Controllers\Api\CommandeItemController;
 use App\Http\Controllers\Api\CommandePaiementController;
 use App\Http\Controllers\Api\DashboardController;
@@ -120,6 +121,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('commandes/{commande}/echeances/{echeance}',     [CommandeEcheanceController::class, 'update']);
     Route::delete('commandes/{commande}/echeances/{echeance}',  [CommandeEcheanceController::class, 'destroy']);
 
+    // Commandes groupées (un client commande plusieurs types de vêtements en une fois)
+    Route::get('commande-groupes',          [CommandeGroupeController::class, 'index']);
+    Route::post('commande-groupes',         [CommandeGroupeController::class, 'store']);
+    Route::get('commande-groupes/{groupe}', [CommandeGroupeController::class, 'show']);
+
     // Archives (liste pour le patron)
     Route::get('archives', [ArchiveController::class, 'index']);
 
@@ -184,6 +190,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('parametres/preferences/complet', [ParametresController::class, 'getPreferencesComplet']);
     Route::get('parametres/langue',              [ParametresController::class, 'getLangue']);
     Route::put('parametres/langue',              [ParametresController::class, 'updateLangue']);
+    Route::get('parametres/facture',             [ParametresController::class, 'getFacture']);
+    Route::put('parametres/facture',             [ParametresController::class, 'updateFacture']);
+    Route::post('parametres/facture/logo',       [ParametresController::class, 'uploadFactureLogo']);
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}',            [WhatsAppController::class, 'rappelClient']);

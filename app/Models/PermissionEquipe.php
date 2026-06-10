@@ -49,6 +49,7 @@ class PermissionEquipe extends Model
         'paiements.view', 'paiements.create',
         'points.convert',
         'notifications.view',
+        'factures.generate',
     ];
 
     public function atelier(): BelongsTo

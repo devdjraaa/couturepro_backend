@@ -39,6 +39,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'             => false,
                     'max_sous_ateliers'          => 0,
                     'export_pdf'                 => true,
+                    'facture_personnalisee'      => false,
                 ],
             ],
             [
@@ -68,6 +69,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'             => true,
                     'max_sous_ateliers'          => 1,
                     'export_pdf'                 => true,
+                    'facture_personnalisee'      => false,
                 ],
             ],
             [
@@ -97,6 +99,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'            => true,
                     'max_sous_ateliers'         => 1,
                     'export_pdf'                => true,
+                    'facture_personnalisee'     => true,
                 ],
             ],
             [
@@ -126,6 +129,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'            => true,
                     'max_sous_ateliers'         => 3,
                     'export_pdf'                => true,
+                    'facture_personnalisee'     => true,
                 ],
             ],
             [
@@ -155,6 +159,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'            => true,
                     'max_sous_ateliers'         => 3,
                     'export_pdf'                => true,
+                    'facture_personnalisee'     => true,
                 ],
             ],
             [
@@ -184,6 +189,7 @@ class NiveauxConfigSeeder extends Seeder
                     'multi_ateliers'            => true,
                     'max_sous_ateliers'         => 7,
                     'export_pdf'                => true,
+                    'facture_personnalisee'     => true,
                 ],
             ],
         ];

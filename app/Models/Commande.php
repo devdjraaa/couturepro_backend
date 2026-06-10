@@ -18,6 +18,7 @@ class Commande extends Model
     protected $fillable = [
         'atelier_id',
         'client_id',
+        'commande_groupe_id',
         'vetement_id',
         'created_by',
         'created_by_role',
@@ -83,6 +84,11 @@ class Commande extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function groupe(): BelongsTo
+    {
+        return $this->belongsTo(CommandeGroupe::class, 'commande_groupe_id');
     }
 
     public function vetement(): BelongsTo

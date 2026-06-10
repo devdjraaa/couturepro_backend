@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Traits\ResolvesAtelier;
+use App\Models\Client;
+use App\Models\Commande;
+use App\Models\CommandeGroupe;
+use App\Models\EquipeMembre;
+use App\Models\NotificationSysteme;
+use App\Services\AtelierLimitsService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class CommandeGroupeController extends Controller
+{
+    use ResolvesAtelier;
+
+    public function __construct(private AtelierLimitsService $limitsService) {}
+
+    public function index(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        $groupes = CommandeGroupe::where('atelier_id', $atelier->id)
+            ->with(['client', 'commandes.vetement'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json($groupes);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if (!$this->limitsService->canCreateCommande($atelier)) {
+            return response()->json([
+                'message' => 'Abonnement expiré. Veuillez renouveler votre abonnement.',
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'client_id'     => ['required', 'uuid', 'exists:clients,id'],
+            'note'          => ['nullable', 'string', 'max:1000'],
+            'sous_commandes' => ['required', 'array', 'min:2'],
+            'sous_commandes.*.vetement_id'           => ['required', 'uuid', 'exists:vetements,id'],
+            'sous_commandes.*.quantite'              => ['nullable', 'integer', 'min:1'],
+            'sous_commandes.*.prix'                  => ['required', 'numeric', 'min:0'],
+            'sous_commandes.*.acompte'               => ['nullable', 'numeric', 'min:0'],
+            'sous_commandes.*.date_livraison_prevue' => ['nullable', 'date', 'after_or_equal:today'],
+            'sous_commandes.*.description'           => ['nullable', 'string', 'max:2000'],
+            'sous_commandes.*.urgence'               => ['nullable', 'boolean'],
+            'sous_commandes.*.mode_paiement_acompte' => ['nullable', 'in:especes,mobile_money,virement'],
+        ]);
+
+        $client = Client::where('id', $data['client_id'])
+            ->where('atelier_id', $atelier->id)
+            ->first();
+
+        if (!$client) {
+            return response()->json(['message' => 'Client introuvable pour cet atelier.'], 422);
+        }
+
+        $user = $request->user();
+        $role = $user instanceof EquipeMembre ? $user->role : 'proprietaire';
+
+        $groupe = DB::transaction(function () use ($data, $atelier, $client, $user, $role) {
+            $groupe = CommandeGroupe::create([
+                'atelier_id'      => $atelier->id,
+                'client_id'       => $client->id,
+                'created_by'      => $user->id,
+                'created_by_role' => $role,
+                'note'            => $data['note'] ?? null,
+            ]);
+
+            foreach ($data['sous_commandes'] as $sc) {
+                $acompteInitial = $sc['acompte'] ?? 0;
+
+                $commande = Commande::create([
+                    'atelier_id'            => $atelier->id,
+                    'client_id'             => $client->id,
+                    'commande_groupe_id'    => $groupe->id,
+                    'vetement_id'           => $sc['vetement_id'],
+                    'created_by'            => $user->id,
+                    'created_by_role'       => $role,
+                    'quantite'              => $sc['quantite'] ?? 1,
+                    'prix'                  => $sc['prix'],
+                    'acompte'               => $acompteInitial,
+                    'statut'                => 'en_cours',
+                    'date_commande'         => now()->toDateString(),
+                    'date_livraison_prevue' => $sc['date_livraison_prevue'] ?? null,
+                    'description'           => $sc['description'] ?? null,
+                    'urgence'               => $sc['urgence'] ?? false,
+                ]);
+
+                if ($acompteInitial > 0) {
+                    $commande->commandePaiements()->create([
+                        'atelier_id'     => $atelier->id,
+                        'montant'        => $acompteInitial,
+                        'mode_paiement'  => $sc['mode_paiement_acompte'] ?? 'especes',
+                        'enregistre_par' => $user->id,
+                    ]);
+                }
+
+                $this->limitsService->incrementCommandes($atelier);
+            }
+
+            return $groupe;
+        });
+
+        $clientNom = $client->prenom
+            ? "{$client->prenom} {$client->nom}"
+            : ($client->nom ?? 'Client');
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Nouvelle commande groupée créée',
+            'contenu'    => "Commande groupée pour {$clientNom} (" . count($data['sous_commandes']) . ' articles)',
+            'type'       => 'commande_cree',
+            'is_read'    => false,
+        ]);
+
+        return response()->json(
+            $groupe->load(['client', 'commandes.vetement', 'commandes.items', 'commandes.echeances']),
+            201
+        );
+    }
+
+    public function show(Request $request, CommandeGroupe $groupe): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if ($groupe->atelier_id !== $atelier->id) {
+            return response()->json(['message' => 'Non autorisé.'], 403);
+        }
+
+        return response()->json(
+            $groupe->load([
+                'client',
+                'commandes.vetement',
+                'commandes.items',
+                'commandes.echeances',
+                'commandes.commandePaiements',
+            ])
+        );
+    }
+}

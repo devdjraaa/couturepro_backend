@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class ParametresAtelier extends Model
 {
@@ -21,11 +23,25 @@ class ParametresAtelier extends Model
         'theme',
         'mode_sync_photos',
         'multi_ateliers_actif',
+        'format_facture',
+        'facture_logo_path',
+        'facture_ifu',
+        'facture_rccm',
+        'facture_pied_page',
     ];
+
+    protected $appends = ['facture_logo_url'];
 
     protected $casts = [
         'multi_ateliers_actif' => 'boolean',
     ];
+
+    protected function factureLogoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->facture_logo_path ? url(Storage::url($this->facture_logo_path)) : null,
+        );
+    }
 
     public function atelier(): BelongsTo
     {

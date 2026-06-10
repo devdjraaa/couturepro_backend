@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\CommunicationsConfig;
@@ -12,10 +13,11 @@ use App\Models\Proprietaire;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ParametresController extends Controller
 {
-    use ResolvesAtelier;
+    use ResolvesAtelier, ChecksPlanFeature;
     public function updateProfil(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -175,5 +177,79 @@ class ParametresController extends Controller
             'langue'       => $prefs->langue       ?? 'fr',
             'theme'        => $prefs->theme        ?? 'light',
         ]);
+    }
+
+    // Paramètres de facturation (standard / personnalisée)
+    public function getFacture(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+        $config  = $atelier->abonnement?->getConfigEffective() ?? [];
+
+        return response()->json([
+            'format_facture'        => $prefs->format_facture ?? 'standard',
+            'facture_logo_url'      => $prefs->facture_logo_url,
+            'facture_ifu'           => $prefs->facture_ifu,
+            'facture_rccm'          => $prefs->facture_rccm,
+            'facture_pied_page'     => $prefs->facture_pied_page,
+            'personnalisation_dispo'=> !empty($config['facture_personnalisee']),
+            'atelier_nom'           => $atelier->nom,
+            'atelier_adresse'       => $atelier->adresse,
+            'atelier_ville'         => $atelier->ville,
+        ]);
+    }
+
+    public function updateFacture(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        $data = $request->validate([
+            'format_facture'    => ['required', 'string', 'in:standard,personnalise'],
+            'facture_ifu'       => ['nullable', 'string', 'max:100'],
+            'facture_rccm'      => ['nullable', 'string', 'max:100'],
+            'facture_pied_page' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($data['format_facture'] === 'personnalise') {
+            if ($gate = $this->planGate($atelier, 'facture_personnalisee')) {
+                return $gate;
+            }
+        }
+
+        $prefs = ParametresAtelier::updateOrCreate(['atelier_id' => $atelier->id], $data);
+
+        return response()->json([
+            'format_facture'    => $prefs->format_facture,
+            'facture_ifu'       => $prefs->facture_ifu,
+            'facture_rccm'      => $prefs->facture_rccm,
+            'facture_pied_page' => $prefs->facture_pied_page,
+            'facture_logo_url'  => $prefs->facture_logo_url,
+        ]);
+    }
+
+    public function uploadFactureLogo(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if ($gate = $this->planGate($atelier, 'facture_personnalisee')) {
+            return $gate;
+        }
+
+        $request->validate([
+            'logo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:1024'],
+        ]);
+
+        $prefs = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+
+        if ($prefs->facture_logo_path) {
+            Storage::disk('public')->delete($prefs->facture_logo_path);
+        }
+
+        $path = $request->file('logo')->store('factures/' . $atelier->id, 'public');
+        $prefs->atelier_id = $atelier->id;
+        $prefs->facture_logo_path = $path;
+        $prefs->save();
+
+        return response()->json(['facture_logo_url' => $prefs->facture_logo_url]);
     }
 }
