@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\NiveauConfig;
+use App\Models\NotificationSysteme;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -133,5 +134,105 @@ class AtelierProprietaireController extends Controller
             'commandes_en_cours' => $commandesEnCours,
             'commandes_retard'   => $commandesRetard,
         ]);
+    }
+
+    // #48 — Répercuter config sur tous les sous-ateliers depuis le maître
+    // Appelé automatiquement après activerCode, ou manuellement via POST /ateliers/sync-config
+    public function syncConfig(Request $request): JsonResponse
+    {
+        $proprietaire = $request->user();
+        $maitre       = Atelier::where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', true)
+            ->with('abonnement.niveau')
+            ->firstOrFail();
+
+        $configMaitre = $maitre->abonnement?->getConfigEffective() ?? [];
+        if (empty($configMaitre)) {
+            return response()->json(['message' => 'Aucune config active sur l\'atelier maître.'], 422);
+        }
+
+        $sousAteliers = Atelier::where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', false)
+            ->with('abonnement')
+            ->get();
+
+        foreach ($sousAteliers as $sousAtelier) {
+            if ($sousAtelier->abonnement) {
+                $sousAtelier->abonnement->update(['config_snapshot' => $configMaitre]);
+            }
+        }
+
+        return response()->json(['message' => count($sousAteliers) . ' sous-atelier(s) synchronisé(s).']);
+    }
+
+    // #54-55 — Vérifier et verrouiller les ateliers excédentaires lors d'un downgrade
+    public function downgradeCheck(Request $request): JsonResponse
+    {
+        $proprietaire = $request->user();
+        $maitre       = Atelier::where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', true)
+            ->with('abonnement')
+            ->firstOrFail();
+
+        $config         = $maitre->abonnement?->getConfigEffective() ?? [];
+        $maxSousAteliers = (int) ($config['max_sous_ateliers'] ?? 0);
+
+        $sousAteliers = Atelier::where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', false)
+            ->orderBy('created_at')
+            ->get();
+
+        $excedentaires = $sousAteliers->skip($maxSousAteliers);
+        $locked        = [];
+
+        foreach ($excedentaires as $atelier) {
+            $atelier->update(['statut' => 'verrouille']);
+            NotificationSysteme::create([
+                'atelier_id' => $maitre->id,
+                'titre'      => "Atelier verrouillé : {$atelier->nom}",
+                'contenu'    => "Votre plan actuel permet {$maxSousAteliers} sous-atelier(s). L'atelier \"{$atelier->nom}\" a été verrouillé. Mettez à niveau votre plan pour y accéder à nouveau.",
+                'type'       => 'atelier_verrouille',
+                'is_read'    => false,
+            ]);
+            $locked[] = ['id' => $atelier->id, 'nom' => $atelier->nom];
+        }
+
+        return response()->json([
+            'plan_max_sous_ateliers' => $maxSousAteliers,
+            'total_sous_ateliers'    => $sousAteliers->count(),
+            'verrouilles'            => $locked,
+            'message'                => count($locked) > 0
+                ? count($locked) . ' atelier(s) verrouillé(s) suite au changement de plan.'
+                : 'Aucun atelier excédentaire.',
+        ]);
+    }
+
+    // Déverrouiller un sous-atelier (après mise à niveau du plan)
+    public function deverrouiller(Request $request, string $atelierIdParam): JsonResponse
+    {
+        $proprietaire = $request->user();
+        $atelier      = Atelier::where('id', $atelierIdParam)
+            ->where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', false)
+            ->firstOrFail();
+
+        $maitre  = Atelier::where('proprietaire_id', $proprietaire->id)->where('is_maitre', true)->with('abonnement')->first();
+        $config  = $maitre?->abonnement?->getConfigEffective() ?? [];
+        $max     = (int) ($config['max_sous_ateliers'] ?? 0);
+        $actifs  = Atelier::where('proprietaire_id', $proprietaire->id)
+            ->where('is_maitre', false)
+            ->where('statut', 'actif')
+            ->count();
+
+        if ($actifs >= $max) {
+            return response()->json([
+                'message'    => "Votre plan permet {$max} sous-atelier(s) actif(s). Mettez à niveau pour en débloquer davantage.",
+                'plan_requis'=> $max + 1 . ' sous-ateliers',
+            ], 403);
+        }
+
+        $atelier->update(['statut' => 'actif']);
+
+        return response()->json(['message' => "Atelier \"{$atelier->nom}\" déverrouillé."]);
     }
 }

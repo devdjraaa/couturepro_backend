@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Commande;
 use App\Models\CommandePaiement;
+use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -13,15 +14,15 @@ use Illuminate\Http\Request;
 
 class CaisseController extends Controller
 {
-    use ResolvesAtelier;
+    use ResolvesAtelier, ChecksPlanFeature;
 
-    /**
-     * Stats financières du mois (ou du mois passé en paramètre).
-     * GET /caisse/stats?mois=2026-04
-     */
     public function stats(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);
+
+        if ($gate = $this->planGate($atelier, 'module_caisse')) {
+            return $gate;
+        }
         $mois    = $request->input('mois', now()->format('Y-m'));
 
         [$annee, $num] = explode('-', $mois);
@@ -64,13 +65,13 @@ class CaisseController extends Controller
         ]);
     }
 
-    /**
-     * Classement des clients par solde restant dû (toutes commandes actives).
-     * GET /caisse/clients
-     */
     public function clients(Request $request): JsonResponse
     {
         $atelier = $this->getAtelier($request);
+
+        if ($gate = $this->planGate($atelier, 'module_caisse')) {
+            return $gate;
+        }
 
         $clients = Client::where('atelier_id', $atelier->id)
             ->where('is_archived', false)

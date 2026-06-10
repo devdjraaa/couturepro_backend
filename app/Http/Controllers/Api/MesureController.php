@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreMesureRequest;
 use App\Models\Atelier;
+use App\Models\Client;
 use App\Models\EquipeMembre;
 use App\Models\Mesure;
 use App\Models\NotificationSysteme;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MesureController extends Controller
 {
@@ -107,4 +110,63 @@ class MesureController extends Controller
         return response()->json(['message' => 'Mesure supprimée.']);
     }
 
+    // #9-10, #59-61 — Export mesures CSV
+    public function exportCsv(Request $request, string $clientId): StreamedResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $client  = Client::where('id', $clientId)->where('atelier_id', $atelier->id)->firstOrFail();
+        $mesure  = Mesure::where('atelier_id', $atelier->id)->where('client_id', $clientId)->first();
+
+        $nom     = trim("{$client->prenom} {$client->nom}");
+        $champs  = $mesure?->champs ?? [];
+
+        $filename = 'mesures_' . str_replace(' ', '_', strtolower($nom)) . '_' . now()->format('Ymd') . '.csv';
+
+        return response()->streamDownload(function () use ($nom, $champs, $atelier) {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+            fputcsv($out, ['Atelier', 'Client', 'Mesure', 'Valeur', 'Date export']);
+            foreach ($champs as $cle => $valeur) {
+                fputcsv($out, [
+                    $atelier->nom,
+                    $nom,
+                    ucfirst(str_replace('_', ' ', $cle)),
+                    $valeur,
+                    now()->format('d/m/Y'),
+                ]);
+            }
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+    // #9-10 — Lien WhatsApp avec les mesures formatées en texte
+    public function exportWhatsApp(Request $request, string $clientId): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $client  = Client::where('id', $clientId)->where('atelier_id', $atelier->id)->firstOrFail();
+        $mesure  = Mesure::where('atelier_id', $atelier->id)->where('client_id', $clientId)->first();
+
+        if (!$client->telephone) {
+            return response()->json(['message' => 'Ce client n\'a pas de numéro de téléphone.'], 422);
+        }
+
+        $nom    = trim("{$client->prenom} {$client->nom}");
+        $champs = $mesure?->champs ?? [];
+
+        $lignes = ["📏 *Mesures de {$nom}* — {$atelier->nom}", ''];
+        foreach ($champs as $cle => $valeur) {
+            $lignes[] = ucfirst(str_replace('_', ' ', $cle)) . ' : ' . $valeur;
+        }
+        $lignes[] = '';
+        $lignes[] = '_Exporté le ' . now()->format('d/m/Y') . '_';
+
+        $message = implode("\n", $lignes);
+        $phone   = preg_replace('/\D/', '', $client->telephone);
+        $lien    = 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
+
+        return response()->json(['lien' => $lien, 'message' => $message]);
+    }
 }

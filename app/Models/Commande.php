@@ -33,6 +33,7 @@ class Commande extends Model
         'urgence',
         'description',
         'rappel_j2_envoye',
+        'motif_surplus_acompte',
         'is_archived',
         'archived_at',
         'archived_by',
@@ -92,6 +93,16 @@ class Commande extends Model
     public function commandePaiements(): HasMany
     {
         return $this->hasMany(CommandePaiement::class, 'commande_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(CommandeItem::class, 'commande_id');
+    }
+
+    public function echeances(): HasMany
+    {
+        return $this->hasMany(CommandeEcheance::class, 'commande_id')->orderBy('date_echeance');
     }
 
     public function scopeEnCours($query)

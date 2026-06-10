@@ -5,13 +5,17 @@ use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\ArchiveController;
-use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
+use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommandeController;
+use App\Http\Controllers\Api\CommandeEcheanceController;
+use App\Http\Controllers\Api\CommandeItemController;
 use App\Http\Controllers\Api\CommandePaiementController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
+use App\Http\Controllers\Api\GalerieController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
@@ -60,10 +64,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [ProprietaireAuthController::class, 'logout']);
     Route::get('auth/me',      [ProprietaireAuthController::class, 'me']);
 
+    // Dashboard
+    Route::get('dashboard',       [DashboardController::class, 'index']);
+    Route::get('dashboard/multi', [DashboardController::class, 'multi']);
+
     // Multi-ateliers (propriétaire seulement — EquipeMembre bloqué côté controller)
-    Route::get('ateliers/mes-ateliers',           [AtelierProprietaireController::class, 'mesAteliers']);
-    Route::post('ateliers',                       [AtelierProprietaireController::class, 'store']);
-    Route::get('ateliers/{atelierIdParam}/stats', [AtelierProprietaireController::class, 'stats']);
+    Route::get('ateliers/mes-ateliers',                    [AtelierProprietaireController::class, 'mesAteliers']);
+    Route::post('ateliers',                                [AtelierProprietaireController::class, 'store']);
+    Route::get('ateliers/{atelierIdParam}/stats',          [AtelierProprietaireController::class, 'stats']);
+    Route::post('ateliers/sync-config',                    [AtelierProprietaireController::class, 'syncConfig']);
+    Route::post('ateliers/downgrade-check',                [AtelierProprietaireController::class, 'downgradeCheck']);
+    Route::post('ateliers/{atelierIdParam}/deverrouiller', [AtelierProprietaireController::class, 'deverrouiller']);
 
     // Clients
     Route::get('clients',                    [ClientController::class, 'index']);
@@ -76,21 +87,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('clients/{client}/toggle-vip',   [ClientController::class, 'toggleVip']);
 
     // Mesures
-    Route::get('clients/{clientId}/mesures',      [MesureController::class, 'index']);
-    Route::post('mesures',                        [MesureController::class, 'store']);
-    Route::put('mesures/{mesure}',                [MesureController::class, 'update']);
-    Route::post('mesures/{mesure}/archiver',      [MesureController::class, 'archiver']);
-    Route::post('mesures/{mesure}/desarchiver',   [MesureController::class, 'desarchiver']);
-    Route::delete('mesures/{mesure}',             [MesureController::class, 'destroy']);
+    Route::get('clients/{clientId}/mesures',             [MesureController::class, 'index']);
+    Route::get('clients/{clientId}/mesures/export-csv',  [MesureController::class, 'exportCsv']);
+    Route::get('clients/{clientId}/mesures/whatsapp',    [MesureController::class, 'exportWhatsApp']);
+    Route::post('mesures',                               [MesureController::class, 'store']);
+    Route::put('mesures/{mesure}',                       [MesureController::class, 'update']);
+    Route::post('mesures/{mesure}/archiver',             [MesureController::class, 'archiver']);
+    Route::post('mesures/{mesure}/desarchiver',          [MesureController::class, 'desarchiver']);
+    Route::delete('mesures/{mesure}',                    [MesureController::class, 'destroy']);
+
+    // Clients — recherche globale cross-ateliers
+    Route::get('clients/search-global', [ClientController::class, 'searchGlobal']);
 
     // Commandes
-    Route::get('commandes',                           [CommandeController::class, 'index']);
-    Route::post('commandes',                          [CommandeController::class, 'store']);
-    Route::get('commandes/{commande}',                [CommandeController::class, 'show']);
+    Route::get('commandes',                               [CommandeController::class, 'index']);
+    Route::post('commandes',                              [CommandeController::class, 'store']);
+    Route::get('commandes/{commande}',                    [CommandeController::class, 'show']);
     Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update']);
-    Route::post('commandes/{commande}/archiver',      [CommandeController::class, 'archiver']);
-    Route::post('commandes/{commande}/desarchiver',   [CommandeController::class, 'desarchiver']);
-    Route::delete('commandes/{commande}',             [CommandeController::class, 'destroy']);
+    Route::post('commandes/{commande}/archiver',          [CommandeController::class, 'archiver']);
+    Route::post('commandes/{commande}/desarchiver',       [CommandeController::class, 'desarchiver']);
+    Route::delete('commandes/{commande}',                 [CommandeController::class, 'destroy']);
+
+    // Commande items (multi-vêtements par commande)
+    Route::get('commandes/{commande}/items',                    [CommandeItemController::class, 'index']);
+    Route::post('commandes/{commande}/items',                   [CommandeItemController::class, 'store']);
+    Route::put('commandes/{commande}/items/{item}',             [CommandeItemController::class, 'update']);
+    Route::delete('commandes/{commande}/items/{item}',          [CommandeItemController::class, 'destroy']);
+
+    // Commande échéances (multi-dates de livraison)
+    Route::get('commandes/{commande}/echeances',                [CommandeEcheanceController::class, 'index']);
+    Route::post('commandes/{commande}/echeances',               [CommandeEcheanceController::class, 'store']);
+    Route::put('commandes/{commande}/echeances/{echeance}',     [CommandeEcheanceController::class, 'update']);
+    Route::delete('commandes/{commande}/echeances/{echeance}',  [CommandeEcheanceController::class, 'destroy']);
 
     // Archives (liste pour le patron)
     Route::get('archives', [ArchiveController::class, 'index']);
@@ -134,8 +162,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
 
     // Notifications
-    Route::get('notifications',              [NotificationController::class, 'index']);
-    Route::post('notifications/mark-as-read',[NotificationController::class, 'markAsRead']);
+    Route::get('notifications',                   [NotificationController::class, 'index']);
+    Route::post('notifications/mark-as-read',     [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/fcm-token',        [NotificationController::class, 'registerFcmToken']);
+    Route::delete('notifications/fcm-token',      [NotificationController::class, 'removeFcmToken']);
 
     // Tickets support (propriétaire)
     Route::get('support/tickets',              [TicketSupportController::class, 'index']);
@@ -144,18 +174,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('support/tickets/{id}/repondre', [TicketSupportController::class, 'repondre']);
 
     // Paramètres
-    Route::put('parametres/profil',          [ParametresController::class, 'updateProfil']);
-    Route::put('parametres/atelier',         [ParametresController::class, 'updateAtelier']);
-    Route::get('parametres/communications',  [ParametresController::class, 'getCommunications']);
-    Route::put('parametres/communications',  [ParametresController::class, 'updateCommunications']);
-    Route::put('parametres/mot-de-passe',    [ParametresController::class, 'changerMotDePasse']);
-    Route::get('parametres/preferences',     [ParametresController::class, 'getPreferences']);
-    Route::put('parametres/preferences',     [ParametresController::class, 'updatePreferences']);
+    Route::put('parametres/profil',              [ParametresController::class, 'updateProfil']);
+    Route::put('parametres/atelier',             [ParametresController::class, 'updateAtelier']);
+    Route::get('parametres/communications',      [ParametresController::class, 'getCommunications']);
+    Route::put('parametres/communications',      [ParametresController::class, 'updateCommunications']);
+    Route::put('parametres/mot-de-passe',        [ParametresController::class, 'changerMotDePasse']);
+    Route::get('parametres/preferences',         [ParametresController::class, 'getPreferences']);
+    Route::put('parametres/preferences',         [ParametresController::class, 'updatePreferences']);
+    Route::get('parametres/preferences/complet', [ParametresController::class, 'getPreferencesComplet']);
+    Route::get('parametres/langue',              [ParametresController::class, 'getLangue']);
+    Route::put('parametres/langue',              [ParametresController::class, 'updateLangue']);
 
     // WhatsApp
-    Route::get('whatsapp/rappel-client/{clientId}', [WhatsAppController::class, 'rappelClient']);
-    Route::get('whatsapp/confirmation-commande/{commandeId}', [WhatsAppController::class, 'confirmationCommande']);
-    Route::get('whatsapp/commande-prete/{commandeId}', [WhatsAppController::class, 'commandePrete']);
+    Route::get('whatsapp/rappel-client/{clientId}',            [WhatsAppController::class, 'rappelClient']);
+    Route::get('whatsapp/confirmation-commande/{commandeId}',  [WhatsAppController::class, 'confirmationCommande']);
+    Route::get('whatsapp/commande-prete/{commandeId}',         [WhatsAppController::class, 'commandePrete']);
+    Route::get('whatsapp/preuve-paiement/{commandeId}',        [WhatsAppController::class, 'preuvePaiement']);
+
+    // Galerie photos VIP
+    Route::get('galerie',              [GalerieController::class, 'index']);
+    Route::post('galerie',             [GalerieController::class, 'store']);
+    Route::delete('galerie/{photo}',   [GalerieController::class, 'destroy']);
+    Route::get('galerie/quota',        [GalerieController::class, 'quota']);
 });
 
 // ─── Webhooks (pas d'auth) ───────────────────────────────────────────────────

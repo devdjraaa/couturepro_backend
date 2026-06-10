@@ -142,4 +142,38 @@ class ParametresController extends Controller
         return response()->json($data);
     }
 
+    // #36 — Langue préférée stockée et retournée
+    public function getLangue(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+
+        return response()->json(['langue' => $prefs->langue ?? 'fr']);
+    }
+
+    public function updateLangue(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'langue' => ['required', 'string', 'in:fr,en,ar,pt,wo'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        ParametresAtelier::updateOrCreate(['atelier_id' => $atelier->id], $data);
+
+        return response()->json($data);
+    }
+
+    // Préférences complètes (devise + mesure + langue) en un seul appel
+    public function getPreferencesComplet(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+
+        return response()->json([
+            'devise'       => $prefs->devise       ?? 'XOF',
+            'unite_mesure' => $prefs->unite_mesure ?? 'cm',
+            'langue'       => $prefs->langue       ?? 'fr',
+            'theme'        => $prefs->theme        ?? 'light',
+        ]);
+    }
 }

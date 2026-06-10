@@ -14,6 +14,7 @@ use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
 {
@@ -26,8 +27,16 @@ class ClientController extends Controller
     {
         $atelier = $this->getAtelier($request);
 
+        $search = $request->query('search');
+
         $clients = Client::where('atelier_id', $atelier->id)
             ->actif()
+            ->when($search, fn ($q) => $q->where(function ($q2) use ($search) {
+                $q2->where('nom', 'like', "%{$search}%")
+                   ->orWhere('prenom', 'like', "%{$search}%")
+                   ->orWhere('telephone', 'like', "%{$search}%");
+            }))
+            ->withCount('commandes')
             ->orderByDesc('created_at')
             ->get();
 
@@ -160,4 +169,42 @@ class ClientController extends Controller
         return response()->json(['message' => 'Client désarchivé.']);
     }
 
+    // #72-77 — Recherche cross-ateliers (tous les ateliers du propriétaire)
+    public function searchGlobal(Request $request): JsonResponse
+    {
+        $search = $request->query('q', '');
+        if (strlen($search) < 2) {
+            return response()->json(['message' => 'Recherche trop courte (min 2 caractères).'], 422);
+        }
+
+        $user = $request->user();
+        // Propriétaire uniquement : récupère tous ses ateliers
+        $atelierIds = Atelier::where('proprietaire_id', $user->id)->pluck('id');
+
+        $clients = Client::whereIn('atelier_id', $atelierIds)
+            ->where('is_archived', false)
+            ->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                  ->orWhere('prenom', 'like', "%{$search}%")
+                  ->orWhere('telephone', 'like', "%{$search}%");
+            })
+            ->with('atelier:id,nom')
+            ->withCount('commandes')
+            ->orderByDesc('created_at')
+            ->limit(30)
+            ->get()
+            ->map(fn ($c) => [
+                'id'             => $c->id,
+                'nom'            => $c->nom,
+                'prenom'         => $c->prenom,
+                'telephone'      => $c->telephone,
+                'avatar_index'   => $c->avatar_index,
+                'is_vip'         => $c->is_vip,
+                'commandes_count'=> $c->commandes_count,
+                'atelier_id'     => $c->atelier_id,
+                'atelier_nom'    => $c->atelier?->nom,
+            ]);
+
+        return response()->json($clients);
+    }
 }

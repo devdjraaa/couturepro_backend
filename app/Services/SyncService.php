@@ -12,6 +12,7 @@ use App\Models\PointsHistorique;
 use App\Models\Vetement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Services\FcmService;
 
 class SyncService
 {
@@ -170,21 +171,38 @@ class SyncService
 
     private function createActionNotification(Atelier $atelier, string $table, $record): void
     {
+        $titre   = null;
+        $contenu = null;
+        $type    = null;
+
         if ($table === 'clients') {
-            NotificationSysteme::create([
-                'atelier_id' => $atelier->id,
-                'titre'      => 'Nouveau client ajouté',
-                'contenu'    => trim("{$record->prenom} {$record->nom}"),
-                'type'       => 'client_cree',
-                'is_read'    => false,
-            ]);
+            $titre   = 'Nouveau client ajouté';
+            $contenu = trim("{$record->prenom} {$record->nom}");
+            $type    = 'client_cree';
         } elseif ($table === 'commandes') {
-            NotificationSysteme::create([
+            $titre   = 'Nouvelle commande créée';
+            $contenu = "Commande pour {$record->client_nom}";
+            $type    = 'commande_cree';
+        }
+
+        if (!$titre) {
+            return;
+        }
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => $titre,
+            'contenu'    => $contenu,
+            'type'       => $type,
+            'is_read'    => false,
+        ]);
+
+        // #41-42 — Push FCM si le propriétaire a un token enregistré
+        $fcmToken = $atelier->proprietaire?->fcm_token;
+        if ($fcmToken) {
+            app(FcmService::class)->sendToToken($fcmToken, $titre, $contenu, [
+                'type'       => $type,
                 'atelier_id' => $atelier->id,
-                'titre'      => 'Nouvelle commande créée',
-                'contenu'    => "Commande pour {$record->client_nom}",
-                'type'       => 'commande_cree',
-                'is_read'    => false,
             ]);
         }
     }

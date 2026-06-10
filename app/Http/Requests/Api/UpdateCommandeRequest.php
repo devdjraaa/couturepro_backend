@@ -16,7 +16,7 @@ class UpdateCommandeRequest extends FormRequest
             'prix'                     => ['sometimes', 'numeric', 'min:0'],
             'acompte'                  => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'statut'                   => ['sometimes', 'string', 'in:en_cours,livre,annule'],
-            'date_livraison_prevue'    => ['sometimes', 'nullable', 'date'],
+            'date_livraison_prevue'    => ['sometimes', 'nullable', 'date', 'after_or_equal:today'],
             'date_livraison_effective' => ['sometimes', 'nullable', 'date'],
             'note_interne'             => ['sometimes', 'nullable', 'string', 'max:1000'],
             'description'              => ['sometimes', 'nullable', 'string', 'max:2000'],

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
-use App\Models\EquipeMembre;
 use App\Models\Proprietaire;
 use App\Models\TicketMessage;
 use App\Models\TicketSupport;
@@ -41,7 +40,7 @@ class TicketSupportController extends Controller
             'sujet'     => ['required', 'string', 'max:255'],
             'message'   => ['required', 'string', 'max:5000'],
             'categorie' => ['required', 'in:facturation,technique,compte,abonnement,autre'],
-            'photo'     => ['nullable', 'image', 'max:5120'],
+            'photo'     => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
 
         $atelier = $this->getAtelier($request);

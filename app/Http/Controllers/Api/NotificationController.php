@@ -7,6 +7,7 @@ use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\NotificationSysteme;
+use App\Models\Proprietaire;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -53,4 +54,33 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Notifications marquées comme lues.']);
     }
 
+    // #41-42 — Enregistrer le token FCM de l'appareil
+    public function registerFcmToken(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'fcm_token' => ['required', 'string', 'max:512'],
+            'platform'  => ['nullable', 'string', 'in:ios,android,web'],
+        ]);
+
+        $user = $request->user();
+        if ($user instanceof Proprietaire) {
+            $user->update([
+                'fcm_token'    => $data['fcm_token'],
+                'fcm_platform' => $data['platform'] ?? null,
+            ]);
+        }
+
+        return response()->json(['message' => 'Token FCM enregistré.']);
+    }
+
+    // Supprimer le token FCM (déconnexion appareil)
+    public function removeFcmToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user instanceof Proprietaire) {
+            $user->update(['fcm_token' => null, 'fcm_platform' => null]);
+        }
+
+        return response()->json(['message' => 'Token FCM supprimé.']);
+    }
 }

@@ -24,6 +24,8 @@ class Proprietaire extends Authenticatable
         'password',
         'telephone_verified_at',
         'derniere_connexion_at',
+        'fcm_token',
+        'fcm_platform',
     ];
 
     protected $hidden = [

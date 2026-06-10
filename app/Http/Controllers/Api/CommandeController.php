@@ -29,6 +29,8 @@ class CommandeController extends Controller
 
         $commandes = Commande::where('atelier_id', $atelier->id)
             ->with(['client', 'vetement'])
+            ->orderByRaw("CASE WHEN statut = 'en_cours' THEN 0 ELSE 1 END")
+            ->orderBy('date_livraison_prevue')
             ->orderByDesc('created_at')
             ->get();
 
@@ -67,6 +69,7 @@ class CommandeController extends Controller
             'date_livraison_prevue' => $request->date_livraison_prevue,
             'note_interne'          => $request->note_interne,
             'description'           => $request->description,
+            'motif_surplus_acompte' => $request->motif_surplus_acompte,
             'urgence'               => $request->boolean('urgence', false),
             'photo_tissu_path'      => $photoPath,
         ]);

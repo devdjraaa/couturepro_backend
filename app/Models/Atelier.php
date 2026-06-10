@@ -36,9 +36,15 @@ class Atelier extends Model
         return $this->belongsTo(Proprietaire::class, 'proprietaire_id');
     }
 
+    // Alias eager-loadable pour les notifications FCM
+    public function getProprietaireWithFcmAttribute()
+    {
+        return $this->proprietaire()->select('id', 'fcm_token', 'fcm_platform')->first();
+    }
+
     public function abonnement(): HasOne
     {
-        return $this->hasOne(Abonnement::class, 'atelier_id');
+        return $this->hasOne(Abonnement::class, 'atelier_id')->latestOfMany('timestamp_debut');
     }
 
     public function equipesMembres(): HasMany
