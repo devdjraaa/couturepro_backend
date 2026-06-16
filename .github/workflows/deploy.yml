@@ -60,6 +60,56 @@ jobs:
             -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/
 
+      - name: Deploy Nginx
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o BatchMode=yes \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENGNX'
+
+          CONF_SRC=/var/www/gextimo_backend/deploy/nginx.conf
+          CONF_DEST=/etc/nginx/sites-available/gextimo_backend.conf
+          CONF_LINK=/etc/nginx/sites-enabled/gextimo_backend.conf
+          DOMAIN=gextimoapi.novafriq.africa
+
+          # --- Déployer le vhost si la config a changé ---
+          if ! diff -q "$CONF_SRC" "$CONF_DEST" > /dev/null 2>&1; then
+            sudo cp "$CONF_SRC" "$CONF_DEST"
+            echo "→ nginx.conf mis à jour"
+          else
+            echo "→ nginx.conf inchangé"
+          fi
+
+          # --- Activer le site si pas encore fait ---
+          if [ ! -L "$CONF_LINK" ]; then
+            sudo ln -sf "$CONF_DEST" "$CONF_LINK"
+            echo "→ site activé"
+          fi
+
+          # --- Tester la config nginx ---
+          if sudo nginx -t 2>/dev/null; then
+            sudo systemctl reload nginx
+            echo "✓ nginx rechargé"
+          else
+            echo "❌ nginx config invalide — reload annulé"
+            sudo nginx -t
+            exit 1
+          fi
+
+          # --- SSL : certbot si pas encore fait ---
+          if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+            if command -v certbot > /dev/null; then
+              echo "→ Génération du certificat SSL..."
+              sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m dev.djraaa@gmail.com --redirect
+              echo "✅ SSL activé"
+            else
+              echo "⏭️  certbot absent — SSL à configurer manuellement"
+            fi
+          else
+            echo "→ SSL déjà présent"
+          fi
+          ENGNX
+
       - name: Post-deploy
         run: |
           ssh -i ~/.ssh/id_ed25519 \
