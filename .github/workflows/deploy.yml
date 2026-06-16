@@ -123,6 +123,7 @@ jobs:
           mkdir -p storage/framework/{cache/data,sessions,views} \
                    storage/{logs,app/public} \
                    bootstrap/cache
+          sudo chown -R $USER:www-data storage bootstrap/cache
           chmod -R 775 storage bootstrap/cache
 
           ENV_READY=true
