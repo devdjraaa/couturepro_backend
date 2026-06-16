@@ -8,20 +8,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        // Rendre token_opposition et opposition_expire_at nullables
-        // (le controller ne les utilise pas dans ce flow simplifié)
         Schema::table('demandes_recuperation', function (Blueprint $table) {
             $table->string('token_opposition', 100)->nullable()->change();
             $table->timestamp('opposition_expire_at')->nullable()->change();
         });
 
-        // Corriger le ENUM pour correspondre aux valeurs réelles du controller
-        DB::statement("ALTER TABLE demandes_recuperation
-            MODIFY COLUMN statut ENUM(
-                'etape_1','etape_2','etape_3','etape_4',
-                'complete','expire','bloque',
-                'en_attente_email','email_confirme','en_attente_otp'
-            ) NOT NULL DEFAULT 'etape_1'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE demandes_recuperation DROP CONSTRAINT IF EXISTS demandes_recuperation_statut_check');
+            DB::statement("ALTER TABLE demandes_recuperation ALTER COLUMN statut SET DEFAULT 'etape_1'");
+            DB::statement("ALTER TABLE demandes_recuperation ADD CONSTRAINT demandes_recuperation_statut_check CHECK (statut IN ('etape_1','etape_2','etape_3','etape_4','complete','expire','bloque','en_attente_email','email_confirme','en_attente_otp'))");
+        } else {
+            DB::statement("ALTER TABLE demandes_recuperation
+                MODIFY COLUMN statut ENUM(
+                    'etape_1','etape_2','etape_3','etape_4',
+                    'complete','expire','bloque',
+                    'en_attente_email','email_confirme','en_attente_otp'
+                ) NOT NULL DEFAULT 'etape_1'");
+        }
     }
 
     public function down(): void
@@ -31,10 +34,16 @@ return new class extends Migration {
             $table->timestamp('opposition_expire_at')->nullable(false)->change();
         });
 
-        DB::statement("ALTER TABLE demandes_recuperation
-            MODIFY COLUMN statut ENUM(
-                'en_attente_email','email_confirme','en_attente_otp',
-                'complete','expire','bloque'
-            ) NOT NULL DEFAULT 'en_attente_email'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE demandes_recuperation DROP CONSTRAINT IF EXISTS demandes_recuperation_statut_check');
+            DB::statement("ALTER TABLE demandes_recuperation ALTER COLUMN statut SET DEFAULT 'en_attente_email'");
+            DB::statement("ALTER TABLE demandes_recuperation ADD CONSTRAINT demandes_recuperation_statut_check CHECK (statut IN ('en_attente_email','email_confirme','en_attente_otp','complete','expire','bloque'))");
+        } else {
+            DB::statement("ALTER TABLE demandes_recuperation
+                MODIFY COLUMN statut ENUM(
+                    'en_attente_email','email_confirme','en_attente_otp',
+                    'complete','expire','bloque'
+                ) NOT NULL DEFAULT 'en_attente_email'");
+        }
     }
 };

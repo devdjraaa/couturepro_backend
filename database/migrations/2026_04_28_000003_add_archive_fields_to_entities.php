@@ -9,7 +9,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE notifications_systeme MODIFY COLUMN type ENUM('promo','mise_a_jour','alerte_sync','alerte_abonnement','info','alerte_archive')");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE notifications_systeme DROP CONSTRAINT IF EXISTS notifications_systeme_type_check');
+            DB::statement("ALTER TABLE notifications_systeme ADD CONSTRAINT notifications_systeme_type_check CHECK (type IN ('promo','mise_a_jour','alerte_sync','alerte_abonnement','info','alerte_archive'))");
+        } else {
+            DB::statement("ALTER TABLE notifications_systeme MODIFY COLUMN type ENUM('promo','mise_a_jour','alerte_sync','alerte_abonnement','info','alerte_archive')");
+        }
 
         Schema::table('clients', function (Blueprint $table) {
             $table->string('archive_note', 500)->nullable()->after('archived_by');
@@ -44,6 +49,11 @@ return new class extends Migration
             $table->dropColumn(['is_archived', 'archived_at', 'archived_by', 'archive_note'])
         );
 
-        DB::statement("ALTER TABLE notifications_systeme MODIFY COLUMN type ENUM('promo','mise_a_jour','alerte_sync','alerte_abonnement','info')");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE notifications_systeme DROP CONSTRAINT IF EXISTS notifications_systeme_type_check');
+            DB::statement("ALTER TABLE notifications_systeme ADD CONSTRAINT notifications_systeme_type_check CHECK (type IN ('promo','mise_a_jour','alerte_sync','alerte_abonnement','info'))");
+        } else {
+            DB::statement("ALTER TABLE notifications_systeme MODIFY COLUMN type ENUM('promo','mise_a_jour','alerte_sync','alerte_abonnement','info')");
+        }
     }
 };

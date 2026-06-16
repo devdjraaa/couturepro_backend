@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -12,7 +13,10 @@ return new class extends Migration
             $table->dropForeign('mesures_client_id_foreign');
             $table->dropForeign('mesures_vetement_id_foreign');
             $table->dropUnique('mesures_client_id_vetement_id_unique');
-            $table->dropIndex('mesures_vetement_id_foreign');
+            // MySQL auto-crée un index séparé pour les FK ; PostgreSQL non — on ignore si absent
+            if (DB::getDriverName() !== 'pgsql') {
+                $table->dropIndex('mesures_vetement_id_foreign');
+            }
             $table->dropColumn('vetement_id');
         });
 
