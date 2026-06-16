@@ -1,0 +1,45 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /var/www/gextimo_backend
+
+            echo "→ Pull du code..."
+            git pull origin master
+
+            echo "→ Installation des dépendances PHP..."
+            composer install --optimize-autoloader --no-dev --no-interaction --no-progress
+
+            echo "→ Migrations..."
+            php artisan migrate --force
+
+            echo "→ Mise en cache config/routes/vues..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            echo "→ Redémarrage queue..."
+            php artisan queue:restart
+
+            echo "→ Rechargement PHP-FPM..."
+            sudo systemctl reload php8.4-fpm
+
+            echo "✓ Déploiement terminé."
