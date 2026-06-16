@@ -1,52 +1,120 @@
-name: Deploy to VPS
+name: Deploy Gextimo Backend
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'tests/**'
+      - '.env.example'
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, pgsql, dom, filter, gd, json, bcmath, zip, curl, opcache
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-progress
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Deploy
+
+      - name: Sync files to VPS
         run: |
-          ssh -i ~/.ssh/deploy_key \
-              -o StrictHostKeyChecking=accept-new \
-              -o ConnectTimeout=30 \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENDDEPLOY'
-          set -e
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.env' \
+            --exclude='storage/app/public/*' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='bootstrap/cache/*' \
+            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/
+
+      - name: Post-deploy
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o BatchMode=yes \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
+
           cd /var/www/gextimo_backend
 
-          echo "→ Pull du code..."
-          git pull origin master
+          # --- Dossiers requis (toujours) ---
+          mkdir -p storage/framework/{cache/data,sessions,views} \
+                   storage/{logs,app/public} \
+                   bootstrap/cache
+          chmod -R 775 storage bootstrap/cache
 
-          echo "→ Installation des dépendances PHP..."
-          composer install --optimize-autoloader --no-dev --no-interaction --no-progress
+          ENV_READY=true
+          [ ! -f .env ]                                          && ENV_READY=false && echo "⚠️  .env absent"
+          ! grep -q "^APP_KEY=base64:" .env 2>/dev/null         && ENV_READY=false && echo "⚠️  APP_KEY manquante"
+          grep -q "^DB_PASSWORD=$" .env 2>/dev/null             && ENV_READY=false && echo "⚠️  DB_PASSWORD vide"
 
-          echo "→ Migrations..."
-          php artisan migrate --force
+          if [ "$ENV_READY" = "true" ]; then
+            set -e
 
-          echo "→ Mise en cache config/routes/vues..."
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
+            # --- Lien storage ---
+            [ ! -L public/storage ] && php artisan storage:link
 
-          echo "→ Redémarrage queue..."
-          php artisan queue:restart
+            # --- Caches ---
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan view:clear
+            php artisan route:clear
 
-          echo "→ Rechargement PHP-FPM..."
-          sudo systemctl reload php8.4-fpm
+            # --- Migrations ---
+            PENDING=$(php artisan migrate:status --no-ansi 2>/dev/null | grep -c "Pending" || true)
+            if [ "$PENDING" -gt 0 ]; then
+              echo "→ $PENDING migration(s) en attente..."
+              php artisan migrate --force
+            else
+              echo "→ Aucune migration en attente"
+            fi
 
-          echo "✓ Déploiement terminé."
-          ENDDEPLOY
+            # --- Reconstruire caches ---
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            # --- Queue (si worker actif) ---
+            systemctl is-active --quiet gextimo-worker 2>/dev/null && php artisan queue:restart
+
+            # --- Reload PHP-FPM ---
+            sudo systemctl reload php8.4-fpm
+
+            echo "✅ Déploiement complet"
+          else
+            echo "⏭️  Post-deploy ignoré — configure le .env sur le VPS puis redéploie"
+          fi
+          ENDSSH
