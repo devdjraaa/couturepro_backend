@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
+use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\WhatsAppController;
@@ -42,6 +43,10 @@ Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
 });
+
+// ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
+Route::get('suivi-sprints',  [SuiviSprintController::class, 'show']);
+Route::post('suivi-sprints', [SuiviSprintController::class, 'save']);
 
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {

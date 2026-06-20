@@ -52,6 +52,7 @@ jobs:
             --exclude='.github' \
             --exclude='.env' \
             --exclude='storage/app/public/*' \
+            --exclude='storage/app/suivi-sprints.json' \
             --exclude='storage/logs/*' \
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
