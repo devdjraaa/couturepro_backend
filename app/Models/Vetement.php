@@ -23,6 +23,7 @@ class Vetement extends Model
         'template_numero',
         'is_systeme',
         'is_archived',
+        'publie_vitrine',
         'created_by',
         'created_by_role',
     ];
@@ -30,9 +31,10 @@ class Vetement extends Model
     protected $appends = ['image_url', 'images_urls'];
 
     protected $casts = [
-        'is_systeme'  => 'boolean',
-        'is_archived' => 'boolean',
-        'images'      => 'array',
+        'is_systeme'     => 'boolean',
+        'is_archived'    => 'boolean',
+        'publie_vitrine' => 'boolean',
+        'images'         => 'array',
     ];
 
     protected function imageUrl(): Attribute

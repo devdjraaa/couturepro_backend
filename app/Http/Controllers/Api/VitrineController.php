@@ -24,7 +24,7 @@ class VitrineController extends Controller
     {
         $ateliers = Atelier::query()
             ->where('is_demo', false)
-            ->withCount(['vetements' => fn ($q) => $q->where('is_archived', false)])
+            ->withCount(['vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true)])
             ->orderBy('nom')
             ->get();
 
@@ -42,6 +42,7 @@ class VitrineController extends Controller
 
         $creations = $atelier->vetements()
             ->where('is_archived', false)
+            ->where('publie_vitrine', true)
             ->latest()
             ->get()
             ->map(fn ($v) => [
@@ -74,7 +75,7 @@ class VitrineController extends Controller
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),
             'nb_creations' => $a->vetements_count
-                ?? $a->vetements()->where('is_archived', false)->count(),
+                ?? $a->vetements()->where('is_archived', false)->where('publie_vitrine', true)->count(),
         ];
     }
 

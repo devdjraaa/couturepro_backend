@@ -105,4 +105,17 @@ class VetementController extends Controller
         return response()->json(['message' => 'Vêtement archivé.']);
     }
 
+    // POST /vetements/{vetement}/publication — publie / retire la création de la vitrine.
+    // Body optionnel { publie: bool } ; sans body, bascule l'état courant.
+    public function togglePublication(Request $request, Vetement $vetement): JsonResponse
+    {
+        $this->authorize('update', $vetement);
+
+        $vetement->update([
+            'publie_vitrine' => $request->boolean('publie', ! $vetement->publie_vitrine),
+        ]);
+
+        return response()->json($vetement);
+    }
+
 }

@@ -147,6 +147,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('vetements',               [VetementController::class, 'index']);
     Route::post('vetements',              [VetementController::class, 'store']);
     Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update']);
+    Route::post('vetements/{vetement}/publication', [VetementController::class, 'togglePublication']);
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
 
     // Équipe
