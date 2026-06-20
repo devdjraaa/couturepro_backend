@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
+use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\WhatsAppController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,12 @@ Route::get('/', fn() => response()->json([
     'version' => '1.0.0',
     'status'  => 'ok',
 ]));
+
+// ─── Vitrine publique (marketplace, sans authentification) ───────────────────
+Route::prefix('vitrine')->group(function () {
+    Route::get('createurs',            [VitrineController::class, 'index']);
+    Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
+});
 
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
