@@ -47,6 +47,8 @@ class ParametresController extends Controller
             'adresse' => ['nullable', 'string', 'max:255'],
             'ville'  => ['nullable', 'string', 'max:100'],
             'contact_public' => ['sometimes', 'boolean'],
+            'specialite' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'bio'        => ['sometimes', 'nullable', 'string', 'max:1000'],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -57,6 +59,8 @@ class ParametresController extends Controller
             'adresse'        => $atelier->adresse,
             'ville'          => $atelier->ville,
             'contact_public' => $atelier->contact_public,
+            'specialite'     => $atelier->specialite,
+            'bio'            => $atelier->bio,
         ]);
     }
 

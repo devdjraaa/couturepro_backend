@@ -65,6 +65,7 @@ class VitrineController extends Controller
         }
 
         return response()->json(array_merge($this->creatorCard($atelier), [
+            'bio'       => $atelier->bio,
             'whatsapp'  => $whatsapp,
             'creations' => $creations,
         ]));
@@ -77,11 +78,11 @@ class VitrineController extends Controller
             'id'           => (string) $a->id,
             'nom'          => $a->nom,
             'initiales'    => $this->initiales($a->nom),
-            'specialite'   => 'Atelier de couture',
+            'specialite'   => $a->specialite ?: 'Atelier de couture',
             'ville'        => $a->ville,
             'note'         => null,
             'avis'         => 0,
-            'verifie'      => false,
+            'verifie'      => (bool) $a->verifie,
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),
             'nb_creations' => $a->vetements_count
