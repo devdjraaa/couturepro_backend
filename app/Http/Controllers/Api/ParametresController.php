@@ -46,15 +46,17 @@ class ParametresController extends Controller
             'nom'    => ['required', 'string', 'max:255'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'ville'  => ['nullable', 'string', 'max:100'],
+            'contact_public' => ['sometimes', 'boolean'],
         ]);
 
         $atelier = $this->getAtelier($request);
         $atelier->update($data);
 
         return response()->json([
-            'nom'     => $atelier->nom,
-            'adresse' => $atelier->adresse,
-            'ville'   => $atelier->ville,
+            'nom'            => $atelier->nom,
+            'adresse'        => $atelier->adresse,
+            'ville'          => $atelier->ville,
+            'contact_public' => $atelier->contact_public,
         ]);
     }
 

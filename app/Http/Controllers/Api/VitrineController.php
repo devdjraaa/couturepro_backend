@@ -55,7 +55,17 @@ class VitrineController extends Controller
                 'type'      => 'Sur mesure',
             ])->values();
 
+        // Contact WhatsApp — uniquement si le créateur a activé l'opt-in.
+        $whatsapp = null;
+        if ($atelier->contact_public) {
+            $tel = optional($atelier->proprietaire)->telephone;
+            if ($tel) {
+                $whatsapp = preg_replace('/\D/', '', $tel);
+            }
+        }
+
         return response()->json(array_merge($this->creatorCard($atelier), [
+            'whatsapp'  => $whatsapp,
             'creations' => $creations,
         ]));
     }
