@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Atelier;
 use App\Models\QuotaMensuel;
+use App\Models\Vetement;
 
 class AtelierLimitsService
 {
@@ -35,6 +36,23 @@ class AtelierLimitsService
         }
 
         return true;
+    }
+
+    public function canPublishVetement(Atelier $atelier): bool
+    {
+        $config = $this->getConfig($atelier);
+        $max = $config['max_creations_vitrine'] ?? 10; // défaut offre gratuite
+
+        if ((int) $max === -1) {
+            return true;
+        }
+
+        $count = Vetement::where('atelier_id', $atelier->id)
+            ->where('is_archived', false)
+            ->where('publie_vitrine', true)
+            ->count();
+
+        return $count < $max;
     }
 
     public function incrementClients(Atelier $atelier): void

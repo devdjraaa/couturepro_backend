@@ -9,6 +9,7 @@ use App\Http\Requests\Api\UpdateVetementRequest;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
 use App\Models\Vetement;
+use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,9 +112,19 @@ class VetementController extends Controller
     {
         $this->authorize('update', $vetement);
 
-        $vetement->update([
-            'publie_vitrine' => $request->boolean('publie', ! $vetement->publie_vitrine),
-        ]);
+        $publie = $request->boolean('publie', ! $vetement->publie_vitrine);
+
+        // Limite de publications (offre gratuite = 10) — uniquement au passage en publié.
+        if ($publie && ! $vetement->publie_vitrine) {
+            $atelier = $this->getAtelier($request);
+            if (! app(AtelierLimitsService::class)->canPublishVetement($atelier)) {
+                return response()->json([
+                    'message' => 'Limite de 10 créations publiées atteinte (offre gratuite). Passez à une offre supérieure pour en publier davantage.',
+                ], 403);
+            }
+        }
+
+        $vetement->update(['publie_vitrine' => $publie]);
 
         return response()->json($vetement);
     }
