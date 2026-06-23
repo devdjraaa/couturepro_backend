@@ -94,6 +94,8 @@ class VitrineController extends Controller
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),
             'logo_url'     => $a->logo_url,
+            'latitude'     => $a->latitude,
+            'longitude'    => $a->longitude,
             'nb_creations' => $a->vetements_count
                 ?? $a->vetements()->where('is_archived', false)->where('publie_vitrine', true)->count(),
         ];

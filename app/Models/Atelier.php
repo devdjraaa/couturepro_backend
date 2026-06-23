@@ -32,6 +32,8 @@ class Atelier extends Model
         'instagram',
         'facebook',
         'site_web',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
@@ -39,6 +41,8 @@ class Atelier extends Model
         'is_demo'         => 'boolean',
         'contact_public'  => 'boolean',
         'verifie'         => 'boolean',
+        'latitude'        => 'float',
+        'longitude'       => 'float',
         'essai_expire_at' => 'datetime',
     ];
 

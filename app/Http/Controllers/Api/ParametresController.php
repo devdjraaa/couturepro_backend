@@ -52,6 +52,8 @@ class ParametresController extends Controller
             'instagram'  => ['sometimes', 'nullable', 'string', 'max:255'],
             'facebook'   => ['sometimes', 'nullable', 'string', 'max:255'],
             'site_web'   => ['sometimes', 'nullable', 'string', 'max:255'],
+            'latitude'   => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude'  => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -67,6 +69,8 @@ class ParametresController extends Controller
             'instagram'      => $atelier->instagram,
             'facebook'       => $atelier->facebook,
             'site_web'       => $atelier->site_web,
+            'latitude'       => $atelier->latitude,
+            'longitude'      => $atelier->longitude,
         ]);
     }
 
