@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\VitrineController;
+use App\Http\Controllers\Api\VitrineStatsController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\WhatsAppController;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,7 @@ Route::prefix('vitrine')->group(function () {
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
     Route::post('createurs/{atelier}/avis', [AvisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
+    Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
@@ -169,6 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Avis (modération par le créateur)
     Route::get('avis',                    [AvisController::class, 'index']);
     Route::post('avis/{avis}/moderation', [AvisController::class, 'moderer']);
+    Route::get('vitrine-stats',           [VitrineStatsController::class, 'mesStats']);
 
     // Équipe
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);
