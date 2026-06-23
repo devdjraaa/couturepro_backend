@@ -58,4 +58,14 @@ class AvisController extends Controller
 
         return response()->json($avis);
     }
+
+    // POST /api/vitrine/avis/{avis}/signaler — signalement public (repasse en attente de modération).
+    public function signaler(Avis $avis): JsonResponse
+    {
+        if ($avis->statut === 'valide') {
+            $avis->update(['statut' => 'signale']);
+        }
+
+        return response()->json(['message' => 'Avis signalé. Merci.']);
+    }
 }

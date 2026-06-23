@@ -74,7 +74,7 @@ class VitrineController extends Controller
                 'site_web'  => $atelier->site_web,
             ],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
-            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['auteur_nom', 'note', 'texte', 'created_at']),
+            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'created_at']),
             'creations'   => $creations,
         ]));
     }

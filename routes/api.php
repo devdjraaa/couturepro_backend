@@ -45,6 +45,7 @@ Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
     Route::post('createurs/{atelier}/avis', [AvisController::class, 'store']);
+    Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
