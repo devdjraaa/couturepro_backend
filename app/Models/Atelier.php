@@ -29,6 +29,9 @@ class Atelier extends Model
         'specialite',
         'bio',
         'logo_path',
+        'instagram',
+        'facebook',
+        'site_web',
     ];
 
     protected $casts = [

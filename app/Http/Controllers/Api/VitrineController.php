@@ -67,6 +67,11 @@ class VitrineController extends Controller
         return response()->json(array_merge($this->creatorCard($atelier), [
             'bio'       => $atelier->bio,
             'whatsapp'  => $whatsapp,
+            'reseaux'   => [
+                'instagram' => $atelier->instagram,
+                'facebook'  => $atelier->facebook,
+                'site_web'  => $atelier->site_web,
+            ],
             'creations' => $creations,
         ]));
     }

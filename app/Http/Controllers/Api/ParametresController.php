@@ -49,6 +49,9 @@ class ParametresController extends Controller
             'contact_public' => ['sometimes', 'boolean'],
             'specialite' => ['sometimes', 'nullable', 'string', 'max:120'],
             'bio'        => ['sometimes', 'nullable', 'string', 'max:1000'],
+            'instagram'  => ['sometimes', 'nullable', 'string', 'max:255'],
+            'facebook'   => ['sometimes', 'nullable', 'string', 'max:255'],
+            'site_web'   => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -61,6 +64,9 @@ class ParametresController extends Controller
             'contact_public' => $atelier->contact_public,
             'specialite'     => $atelier->specialite,
             'bio'            => $atelier->bio,
+            'instagram'      => $atelier->instagram,
+            'facebook'       => $atelier->facebook,
+            'site_web'       => $atelier->site_web,
         ]);
     }
 
