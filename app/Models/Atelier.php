@@ -51,6 +51,11 @@ class Atelier extends Model
         );
     }
 
+    public function collections(): HasMany
+    {
+        return $this->hasMany(Collection::class, 'atelier_id');
+    }
+
     public function proprietaire(): BelongsTo
     {
         return $this->belongsTo(Proprietaire::class, 'proprietaire_id');

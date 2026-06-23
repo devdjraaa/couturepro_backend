@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
 use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\CommandeEcheanceController;
 use App\Http\Controllers\Api\CommandeGroupeController;
@@ -153,7 +154,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('vetements',              [VetementController::class, 'store']);
     Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update']);
     Route::post('vetements/{vetement}/publication', [VetementController::class, 'togglePublication']);
+    Route::post('vetements/{vetement}/collection',  [VetementController::class, 'setCollection']);
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
+
+    // Collections (regroupement de créations)
+    Route::get('collections',                 [CollectionController::class, 'index']);
+    Route::post('collections',                [CollectionController::class, 'store']);
+    Route::put('collections/{collection}',    [CollectionController::class, 'update']);
+    Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
 
     // Équipe
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);

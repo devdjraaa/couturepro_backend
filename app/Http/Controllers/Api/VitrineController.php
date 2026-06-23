@@ -50,9 +50,10 @@ class VitrineController extends Controller
                 'nom'       => $v->nom,
                 'image_url' => $v->image_url,
                 'images'    => $v->images_urls,
-                'prix'      => null,            // pas de prix en base -> « Sur devis » côté front
-                'categorie' => null,
-                'type'      => 'Sur mesure',
+                'prix'          => null,        // pas de prix en base -> « Sur devis » côté front
+                'categorie'     => null,
+                'type'          => 'Sur mesure',
+                'collection_id' => $v->collection_id,
             ])->values();
 
         // Contact WhatsApp — uniquement si le créateur a activé l'opt-in.
@@ -72,7 +73,8 @@ class VitrineController extends Controller
                 'facebook'  => $atelier->facebook,
                 'site_web'  => $atelier->site_web,
             ],
-            'creations' => $creations,
+            'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
+            'creations'   => $creations,
         ]));
     }
 

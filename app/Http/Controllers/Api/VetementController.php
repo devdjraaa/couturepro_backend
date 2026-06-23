@@ -118,4 +118,15 @@ class VetementController extends Controller
         return response()->json($vetement);
     }
 
+    // POST /vetements/{vetement}/collection — assigne (ou retire) la création à une collection.
+    public function setCollection(Request $request, Vetement $vetement): JsonResponse
+    {
+        $this->authorize('update', $vetement);
+        $request->validate(['collection_id' => ['nullable', 'string']]);
+
+        $vetement->update(['collection_id' => $request->input('collection_id') ?: null]);
+
+        return response()->json($vetement);
+    }
+
 }

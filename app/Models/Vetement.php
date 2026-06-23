@@ -24,6 +24,7 @@ class Vetement extends Model
         'is_systeme',
         'is_archived',
         'publie_vitrine',
+        'collection_id',
         'created_by',
         'created_by_role',
     ];
@@ -57,6 +58,11 @@ class Vetement extends Model
     public function atelier(): BelongsTo
     {
         return $this->belongsTo(Atelier::class, 'atelier_id');
+    }
+
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(Collection::class, 'collection_id');
     }
 
     public function commandes(): HasMany
