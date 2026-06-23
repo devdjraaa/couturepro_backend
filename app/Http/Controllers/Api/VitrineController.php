@@ -85,6 +85,7 @@ class VitrineController extends Controller
             'verifie'      => (bool) $a->verifie,
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),
+            'logo_url'     => $a->logo_url,
             'nb_creations' => $a->vetements_count
                 ?? $a->vetements()->where('is_archived', false)->where('publie_vitrine', true)->count(),
         ];

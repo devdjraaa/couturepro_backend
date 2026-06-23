@@ -258,4 +258,22 @@ class ParametresController extends Controller
 
         return response()->json(['facture_logo_url' => $prefs->facture_logo_url]);
     }
+
+    public function uploadAtelierLogo(Request $request): JsonResponse
+    {
+        $request->validate([
+            'logo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:1024'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+
+        if ($atelier->logo_path) {
+            Storage::disk('public')->delete($atelier->logo_path);
+        }
+
+        $path = $request->file('logo')->store('ateliers/' . $atelier->id, 'public');
+        $atelier->update(['logo_path' => $path]);
+
+        return response()->json(['logo_url' => $atelier->logo_url]);
+    }
 }

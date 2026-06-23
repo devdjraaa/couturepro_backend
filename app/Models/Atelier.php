@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Atelier extends Model
 {
@@ -26,6 +28,7 @@ class Atelier extends Model
         'contact_public',
         'specialite',
         'bio',
+        'logo_path',
     ];
 
     protected $casts = [
@@ -35,6 +38,15 @@ class Atelier extends Model
         'verifie'         => 'boolean',
         'essai_expire_at' => 'datetime',
     ];
+
+    protected $appends = ['logo_url'];
+
+    protected function logoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->logo_path ? url(Storage::url($this->logo_path)) : null,
+        );
+    }
 
     public function proprietaire(): BelongsTo
     {
