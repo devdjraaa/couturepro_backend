@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
+use App\Http\Controllers\Api\AvisController;
 use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CollectionController;
@@ -43,6 +44,7 @@ Route::get('/', fn() => response()->json([
 Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
+    Route::post('createurs/{atelier}/avis', [AvisController::class, 'store']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
@@ -162,6 +164,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('collections',                [CollectionController::class, 'store']);
     Route::put('collections/{collection}',    [CollectionController::class, 'update']);
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
+
+    // Avis (modération par le créateur)
+    Route::get('avis',                    [AvisController::class, 'index']);
+    Route::post('avis/{avis}/moderation', [AvisController::class, 'moderer']);
 
     // Équipe
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);

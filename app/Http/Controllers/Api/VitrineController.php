@@ -74,6 +74,7 @@ class VitrineController extends Controller
                 'site_web'  => $atelier->site_web,
             ],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
+            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['auteur_nom', 'note', 'texte', 'created_at']),
             'creations'   => $creations,
         ]));
     }
@@ -87,8 +88,8 @@ class VitrineController extends Controller
             'initiales'    => $this->initiales($a->nom),
             'specialite'   => $a->specialite ?: 'Atelier de couture',
             'ville'        => $a->ville,
-            'note'         => null,
-            'avis'         => 0,
+            'note'         => ($avgNote = $a->avis()->where('statut', 'valide')->avg('note')) ? round($avgNote, 1) : null,
+            'avis'         => $a->avis()->where('statut', 'valide')->count(),
             'verifie'      => (bool) $a->verifie,
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),
