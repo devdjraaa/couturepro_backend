@@ -160,6 +160,25 @@ class AtelierController extends Controller
         ]);
     }
 
+    public function sponsoriser(Request $request, Atelier $atelier): JsonResponse
+    {
+        $admin = $this->adminUser();
+
+        $jours = (int) $request->input('jours', 7);
+        $atelier->update([
+            'sponsor_jusqu_a' => $jours > 0 ? now()->addDays($jours) : null,
+        ]);
+
+        $this->audit($admin, 'atelier.sponsoriser', 'atelier', $atelier->id, [
+            'jours' => $jours,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => $jours > 0 ? "Atelier sponsorisé pour {$jours} jours." : 'Sponsorisation retirée.',
+            'atelier' => $atelier,
+        ]);
+    }
+
     /**
      * Liste les sous-ateliers d'un atelier maître.
      */

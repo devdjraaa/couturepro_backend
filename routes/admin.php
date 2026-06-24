@@ -32,7 +32,8 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::middleware('admin.permission:ateliers.freeze')->group(function () {
         Route::post('ateliers/{atelier}/geler',   [AtelierController::class, 'geler']);
         Route::post('ateliers/{atelier}/degeler', [AtelierController::class, 'degeler']);
-        Route::post('ateliers/{atelier}/verifier', [AtelierController::class, 'verifier']);
+        Route::post('ateliers/{atelier}/verifier',   [AtelierController::class, 'verifier']);
+        Route::post('ateliers/{atelier}/sponsoriser', [AtelierController::class, 'sponsoriser']);
     });
     Route::middleware('admin.permission:ateliers.view')->group(function () {
         Route::post('ateliers/{atelier}/demo',         [AtelierController::class, 'demo']);

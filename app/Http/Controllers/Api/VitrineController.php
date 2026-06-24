@@ -30,7 +30,7 @@ class VitrineController extends Controller
             ->get();
 
         return response()->json(
-            $ateliers->map(fn ($a) => $this->creatorCard($a))->values()
+            $ateliers->map(fn ($a) => $this->creatorCard($a))->sortByDesc('sponsorise')->values()
         );
     }
 
@@ -116,6 +116,7 @@ class VitrineController extends Controller
             'logo_url'     => $a->logo_url,
             'latitude'     => $a->latitude,
             'longitude'    => $a->longitude,
+            'sponsorise'   => (bool) $a->sponsorise,
             'nb_creations' => $a->vetements_count
                 ?? $a->vetements()->where('is_archived', false)->where('publie_vitrine', true)->count(),
         ];

@@ -35,6 +35,7 @@ class Atelier extends Model
         'site_web',
         'latitude',
         'longitude',
+        'sponsor_jusqu_a',
     ];
 
     protected $casts = [
@@ -44,15 +45,23 @@ class Atelier extends Model
         'verifie'         => 'boolean',
         'latitude'        => 'float',
         'longitude'       => 'float',
+        'sponsor_jusqu_a' => 'datetime',
         'essai_expire_at' => 'datetime',
     ];
 
-    protected $appends = ['logo_url'];
+    protected $appends = ['logo_url', 'sponsorise'];
 
     protected function logoUrl(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->logo_path ? url(Storage::url($this->logo_path)) : null,
+        );
+    }
+
+    protected function sponsorise(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->sponsor_jusqu_a !== null && $this->sponsor_jusqu_a->isFuture(),
         );
     }
 
