@@ -31,6 +31,7 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::post('signalements/{signalement}/traiter', [SignalementController::class, 'traiter']);
 
     // Bannière vitrine (publicité)
+    Route::get('vitrine/banniere', [VitrineController::class, 'banniere']);
     Route::put('vitrine/banniere', [VitrineController::class, 'setBanniere']);
 
     // Ateliers
