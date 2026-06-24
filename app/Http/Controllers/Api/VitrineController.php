@@ -25,9 +25,13 @@ class VitrineController extends Controller
     {
         $ateliers = Atelier::query()
             ->where('is_demo', false)
+            ->with('abonnement')
             ->withCount(['vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true)])
             ->orderBy('nom')
-            ->get();
+            ->get()
+            // Plan « Free » (visible_galerie = false) : profil accessible par lien direct,
+            // mais non listé dans la galerie. Défaut = visible si non défini par le plan.
+            ->filter(fn ($a) => ($a->abonnement?->getConfigEffective()['visible_galerie'] ?? true) !== false);
 
         return response()->json(
             $ateliers->map(fn ($a) => $this->creatorCard($a))->sortByDesc('sponsorise')->values()
