@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Atelier;
+use App\Models\Avis;
 use App\Models\Signalement;
+use App\Models\Vetement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,7 +28,28 @@ class SignalementController extends Controller
             'statut'   => 'en_attente',
         ]);
 
+        $this->blocageAutomatique($data['type'], $data['cible_id']);
+
         return response()->json(['message' => 'Signalement enregistré. Merci.'], 201);
+    }
+
+    // Récidive : au-delà du seuil, retrait/suspension automatique (réversible par l'admin).
+    private function blocageAutomatique(string $type, string $cibleId): void
+    {
+        $seuil = 3;
+        $count = Signalement::where('type', $type)->where('cible_id', $cibleId)
+            ->where('statut', 'en_attente')->count();
+
+        if ($count < $seuil) {
+            return;
+        }
+
+        match ($type) {
+            'creation' => Vetement::where('id', $cibleId)->update(['is_archived' => true]),
+            'profil'   => Atelier::where('id', $cibleId)->update(['statut' => 'gele']),
+            'avis'     => Avis::where('id', $cibleId)->update(['statut' => 'signale']),
+            default    => null,
+        };
     }
 
     // GET /api/admin/signalements — liste pour la modération.
