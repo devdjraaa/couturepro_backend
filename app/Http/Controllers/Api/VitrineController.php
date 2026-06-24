@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
+use App\Models\Commande;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -77,6 +78,25 @@ class VitrineController extends Controller
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'created_at']),
             'creations'   => $creations,
         ]));
+    }
+
+    /** GET /api/vitrine/suivi/{reference} — suivi public d'une commande par n°. */
+    public function suivi(string $reference): JsonResponse
+    {
+        $c = Commande::where('reference', $reference)->with(['vetement', 'atelier'])->first();
+
+        if (! $c) {
+            return response()->json(['message' => 'Commande introuvable'], 404);
+        }
+
+        return response()->json([
+            'reference'             => $c->reference,
+            'modele'                => optional($c->vetement)->nom,
+            'atelier'               => optional($c->atelier)->nom,
+            'etape'                 => $c->etape,
+            'statut'                => $c->statut,
+            'date_livraison_prevue' => $c->date_livraison_prevue,
+        ]);
     }
 
     /** Forme « carte créateur » attendue par la vitrine. */

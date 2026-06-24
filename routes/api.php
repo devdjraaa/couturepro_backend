@@ -48,6 +48,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('createurs/{atelier}/avis', [AvisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
+    Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
@@ -125,6 +126,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update']);
     Route::post('commandes/{commande}/archiver',          [CommandeController::class, 'archiver']);
     Route::post('commandes/{commande}/desarchiver',       [CommandeController::class, 'desarchiver']);
+    Route::post('commandes/{commande}/etape',             [CommandeController::class, 'setEtape']);
     Route::delete('commandes/{commande}',                 [CommandeController::class, 'destroy']);
 
     // Commande items (multi-vêtements par commande)

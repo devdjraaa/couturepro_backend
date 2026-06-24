@@ -195,4 +195,15 @@ class CommandeController extends Controller
         return response()->json(['message' => 'Commande désarchivée.']);
     }
 
+    // POST /commandes/{commande}/etape — avance l'étape de suivi (créateur).
+    public function setEtape(Request $request, Commande $commande): JsonResponse
+    {
+        $this->authorize('update', $commande);
+
+        $data = $request->validate(['etape' => ['required', 'in:commande,coupe,confection,essayage,livraison']]);
+        $commande->update(['etape' => $data['etape']]);
+
+        return response()->json($commande);
+    }
+
 }

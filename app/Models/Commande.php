@@ -10,10 +10,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Commande extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $commande) {
+            if (empty($commande->reference)) {
+                do {
+                    $ref = 'GEX-' . strtoupper(Str::random(6));
+                } while (static::where('reference', $ref)->exists());
+                $commande->reference = $ref;
+            }
+            if (empty($commande->etape)) {
+                $commande->etape = 'commande';
+            }
+        });
+    }
 
     protected $fillable = [
         'atelier_id',
@@ -26,6 +42,8 @@ class Commande extends Model
         'prix',
         'acompte',
         'statut',
+        'reference',
+        'etape',
         'date_commande',
         'date_livraison_prevue',
         'date_livraison_effective',
