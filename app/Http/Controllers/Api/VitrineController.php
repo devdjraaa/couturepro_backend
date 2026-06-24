@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\Commande;
+use App\Models\VitrineSetting;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * API PUBLIQUE de la vitrine (marketplace) — sans authentification.
@@ -101,6 +103,28 @@ class VitrineController extends Controller
             'statut'                => $c->statut,
             'date_livraison_prevue' => $c->date_livraison_prevue,
         ]);
+    }
+
+    /** GET /api/vitrine/banniere — bannière publicitaire (publique). */
+    public function banniere(): JsonResponse
+    {
+        $b = VitrineSetting::where('cle', 'banniere')->value('valeur');
+
+        return response()->json($b ?: ['actif' => false]);
+    }
+
+    /** PUT /api/admin/vitrine/banniere — édition (admin). */
+    public function setBanniere(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'actif' => ['required', 'boolean'],
+            'texte' => ['nullable', 'string', 'max:300'],
+            'lien'  => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'banniere'], ['valeur' => $data]);
+
+        return response()->json($s->valeur);
     }
 
     /** Forme « carte créateur » attendue par la vitrine. */

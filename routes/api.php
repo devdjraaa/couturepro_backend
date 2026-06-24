@@ -51,6 +51,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
     Route::post('signaler',                      [SignalementController::class, 'store']);
+    Route::get('banniere',                       [VitrineController::class, 'banniere']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Api\SignalementController;
+use App\Http\Controllers\Api\VitrineController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth admin (publique) ────────────────────────────────────────────────────
@@ -28,6 +29,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);
     Route::post('signalements/{signalement}/traiter', [SignalementController::class, 'traiter']);
+
+    // Bannière vitrine (publicité)
+    Route::put('vitrine/banniere', [VitrineController::class, 'setBanniere']);
 
     // Ateliers
     Route::middleware('admin.permission:ateliers.view')->group(function () {
