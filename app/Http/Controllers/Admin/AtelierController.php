@@ -144,6 +144,22 @@ class AtelierController extends Controller
         return response()->json(['message' => 'Atelier dégelé.', 'atelier' => $atelier]);
     }
 
+    public function verifier(Request $request, Atelier $atelier): JsonResponse
+    {
+        $admin = $this->adminUser();
+
+        $atelier->update(['verifie' => ! $atelier->verifie]);
+
+        $this->audit($admin, 'atelier.verifier', 'atelier', $atelier->id, [
+            'verifie' => $atelier->verifie,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => $atelier->verifie ? 'Atelier vérifié.' : 'Vérification retirée.',
+            'atelier' => $atelier,
+        ]);
+    }
+
     /**
      * Liste les sous-ateliers d'un atelier maître.
      */

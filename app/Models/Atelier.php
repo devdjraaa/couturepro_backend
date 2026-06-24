@@ -25,6 +25,7 @@ class Atelier extends Model
         'statut',
         'essai_expire_at',
         'is_demo',
+        'type',
         'contact_public',
         'specialite',
         'bio',
