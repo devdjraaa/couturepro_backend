@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\VetementController;
+use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\VitrineStatsController;
@@ -49,6 +50,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
+    Route::post('signaler',                      [SignalementController::class, 'store']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────

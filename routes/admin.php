@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\OffreSpecialeController;
 use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Api\SignalementController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth admin (publique) ────────────────────────────────────────────────────
@@ -23,6 +24,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::post('auth/logout',           [AuthController::class, 'logout']);
     Route::get('auth/me',               [AuthController::class, 'me']);
     Route::put('auth/change-password',  [AuthController::class, 'changePassword']);
+
+    // Signalements (modération)
+    Route::get('signalements',                        [SignalementController::class, 'index']);
+    Route::post('signalements/{signalement}/traiter', [SignalementController::class, 'traiter']);
 
     // Ateliers
     Route::middleware('admin.permission:ateliers.view')->group(function () {
