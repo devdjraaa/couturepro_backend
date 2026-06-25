@@ -209,6 +209,8 @@ class ParametresController extends Controller
             'facture_rccm'          => $prefs->facture_rccm,
             'facture_pied_page'     => $prefs->facture_pied_page,
             'personnalisation_dispo'=> !empty($config['facture_personnalisee']),
+            'assujetti_tva'         => (bool) $prefs->assujetti_tva,
+            'emecef_configure'      => !empty($prefs->emecef_token), // jamais le jeton lui-même
             'atelier_nom'           => $atelier->nom,
             'atelier_adresse'       => $atelier->adresse,
             'atelier_ville'         => $atelier->ville,
@@ -224,6 +226,8 @@ class ParametresController extends Controller
             'facture_ifu'       => ['nullable', 'string', 'max:100'],
             'facture_rccm'      => ['nullable', 'string', 'max:100'],
             'facture_pied_page' => ['nullable', 'string', 'max:1000'],
+            'assujetti_tva'     => ['sometimes', 'boolean'],
+            'emecef_token'      => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         if ($data['format_facture'] === 'personnalise') {

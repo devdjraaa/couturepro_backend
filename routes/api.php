@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\CommandeItemController;
 use App\Http\Controllers\Api\CommandePaiementController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DevisController;
+use App\Http\Controllers\Api\FactureController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\GalerieController;
@@ -240,6 +241,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('parametres/facture',             [ParametresController::class, 'getFacture']);
     Route::put('parametres/facture',             [ParametresController::class, 'updateFacture']);
     Route::post('parametres/facture/logo',       [ParametresController::class, 'uploadFactureLogo']);
+
+    // Facturation designer (devis / factures / reçus)
+    Route::get('factures',                    [FactureController::class, 'index']);
+    Route::post('factures',                   [FactureController::class, 'store']);
+    Route::get('factures/{facture}',          [FactureController::class, 'show']);
+    Route::patch('factures/{facture}/statut', [FactureController::class, 'updateStatut']);
+    Route::post('factures/{facture}/dgi',     [FactureController::class, 'uploadDgi']);
+    Route::delete('factures/{facture}',       [FactureController::class, 'destroy']);
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}',            [WhatsAppController::class, 'rappelClient']);
