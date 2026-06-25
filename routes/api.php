@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\CommandeGroupeController;
 use App\Http\Controllers\Api\CommandeItemController;
 use App\Http\Controllers\Api\CommandePaiementController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DevisController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\GalerieController;
@@ -46,7 +47,8 @@ Route::get('/', fn() => response()->json([
 Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
-    Route::post('createurs/{atelier}/avis', [AvisController::class, 'store']);
+    Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store']);
+    Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
@@ -177,6 +179,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('avis',                    [AvisController::class, 'index']);
     Route::post('avis/{avis}/moderation', [AvisController::class, 'moderer']);
     Route::get('vitrine-stats',           [VitrineStatsController::class, 'mesStats']);
+
+    // Demandes de devis (reçues par le créateur)
+    Route::get('devis',                   [DevisController::class, 'index']);
+    Route::post('devis/{devis}/traiter',  [DevisController::class, 'traiter']);
 
     // Équipe
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);
