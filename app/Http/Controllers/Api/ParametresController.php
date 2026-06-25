@@ -286,4 +286,36 @@ class ParametresController extends Controller
 
         return response()->json(['logo_url' => $atelier->logo_url]);
     }
+
+    // POST /api/parametres/demande-verification — le créateur demande le badge vérifié
+    // (pièce justificative et/ou lien). L'admin tranche ensuite via /admin/ateliers/{id}/verifier.
+    public function demanderVerification(Request $request): JsonResponse
+    {
+        $request->validate([
+            'document' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'lien'     => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+
+        if (! $request->hasFile('document') && ! $request->filled('lien')) {
+            return response()->json(['message' => 'Fournissez un document ou un lien justificatif.'], 422);
+        }
+
+        if ($request->hasFile('document')) {
+            if ($atelier->verification_doc_path) {
+                Storage::disk('public')->delete($atelier->verification_doc_path);
+            }
+            $atelier->verification_doc_path = $request->file('document')->store('verifications/' . $atelier->id, 'public');
+        }
+
+        if ($request->filled('lien')) {
+            $atelier->verification_lien = $request->input('lien');
+        }
+
+        $atelier->verification_demandee_a = now();
+        $atelier->save();
+
+        return response()->json(['message' => "Demande de vérification envoyée. Notre équipe l'examinera prochainement."]);
+    }
 }

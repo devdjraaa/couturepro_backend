@@ -225,6 +225,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('parametres/profil',              [ParametresController::class, 'updateProfil']);
     Route::put('parametres/atelier',             [ParametresController::class, 'updateAtelier']);
     Route::post('parametres/atelier/logo',       [ParametresController::class, 'uploadAtelierLogo']);
+    Route::post('parametres/demande-verification', [ParametresController::class, 'demanderVerification']);
     Route::get('parametres/communications',      [ParametresController::class, 'getCommunications']);
     Route::put('parametres/communications',      [ParametresController::class, 'updateCommunications']);
     Route::put('parametres/mot-de-passe',        [ParametresController::class, 'changerMotDePasse']);

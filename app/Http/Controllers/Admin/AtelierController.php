@@ -148,7 +148,12 @@ class AtelierController extends Controller
     {
         $admin = $this->adminUser();
 
-        $atelier->update(['verifie' => ! $atelier->verifie]);
+        $nouveau = ! $atelier->verifie;
+        $atelier->update([
+            'verifie' => $nouveau,
+            // Vérifier (ou retirer) solde la demande en attente.
+            'verification_demandee_a' => null,
+        ]);
 
         $this->audit($admin, 'atelier.verifier', 'atelier', $atelier->id, [
             'verifie' => $atelier->verifie,
