@@ -54,6 +54,7 @@ Route::prefix('vitrine')->group(function () {
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
     Route::post('signaler',                      [SignalementController::class, 'store']);
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
+    Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
@@ -208,6 +209,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('abonnement/plans',         [AbonnementController::class, 'plans']);
     Route::get('abonnement/current',       [AbonnementController::class, 'current']);
     Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
+    Route::post('abonnement/sponsoriser',  [AbonnementController::class, 'sponsoriser']);
 
     // Notifications
     Route::get('notifications',                   [NotificationController::class, 'index']);

@@ -8,6 +8,7 @@ use App\Models\Atelier;
 use App\Models\NiveauConfig;
 use App\Models\Paiement;
 use App\Models\TransactionAbonnement;
+use App\Models\VitrineSetting;
 use App\Services\Payment\FedaPayProvider;
 use App\Services\PointsFideliteService;
 use Illuminate\Support\Facades\DB;
@@ -55,8 +56,81 @@ class PaymentService
         return $paiement->fresh();
     }
 
+    /**
+     * Achat de mise en avant (sponsorisation) : prix config-driven, durée libre.
+     * Réutilise le même provider de paiement que l'abonnement.
+     */
+    public function initiateSponsorisation(Atelier $atelier, int $jours, string $provider = 'fedapay', ?string $returnUrl = null): Paiement
+    {
+        $config = VitrineSetting::sponsorisation();
+
+        abort_unless((bool) ($config['actif'] ?? false), 422, "La sponsorisation n'est pas disponible actuellement.");
+
+        $offre = collect($config['offres'] ?? [])->firstWhere('jours', $jours);
+        abort_unless($offre, 422, 'Offre de sponsorisation invalide.');
+
+        $paiement = Paiement::create([
+            'atelier_id'   => $atelier->id,
+            'type'         => 'sponsorisation',
+            'meta'         => ['jours' => $jours],
+            // niveau_cle est requis (FK) : on conserve le plan courant à titre indicatif.
+            'niveau_cle'   => $atelier->abonnement?->niveau_cle ?? NiveauConfig::query()->value('cle'),
+            'duree_jours'  => $jours,
+            'montant'      => (int) $offre['prix'],
+            'devise'       => 'XOF',
+            'provider'     => $provider,
+            'statut'       => 'pending',
+            'initiated_at' => now(),
+            'expires_at'   => now()->addHours(2),
+            'ip_address'   => request()->ip(),
+        ]);
+
+        $providerInstance = $this->resolveProvider($provider);
+        $proprietaire     = $atelier->proprietaire;
+
+        $result = $providerInstance->initiate($paiement, [
+            'email'      => $proprietaire->email,
+            'nom'        => $proprietaire->nom,
+            'prenom'     => $proprietaire->prenom,
+            'return_url' => $returnUrl,
+        ]);
+
+        $paiement->update([
+            'checkout_url'            => $result->checkoutUrl,
+            'provider_transaction_id' => $result->providerTransactionId,
+            'provider_metadata'       => $result->providerMetadata,
+        ]);
+
+        return $paiement->fresh();
+    }
+
+    private function activerSponsorisation(Paiement $paiement): void
+    {
+        DB::transaction(function () use ($paiement) {
+            $atelier = Atelier::find($paiement->atelier_id);
+            $jours   = (int) ($paiement->meta['jours'] ?? $paiement->duree_jours);
+
+            // Prolonge si déjà sponsorisé, sinon part de maintenant.
+            $base = ($atelier->sponsor_jusqu_a && $atelier->sponsor_jusqu_a->isFuture())
+                ? $atelier->sponsor_jusqu_a->copy()
+                : now();
+
+            $atelier->update(['sponsor_jusqu_a' => $base->addDays($jours)]);
+
+            $paiement->update([
+                'statut'       => 'completed',
+                'completed_at' => now(),
+            ]);
+        });
+    }
+
     public function activate(Paiement $paiement): void
     {
+        if ($paiement->type === 'sponsorisation') {
+            $this->activerSponsorisation($paiement);
+            return;
+        }
+
         DB::transaction(function () use ($paiement) {
             $code = TransactionAbonnement::create([
                 'code_transaction' => Str::upper(Str::random(16)),

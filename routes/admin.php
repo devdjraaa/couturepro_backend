@@ -34,6 +34,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/banniere', [VitrineController::class, 'banniere']);
     Route::put('vitrine/banniere', [VitrineController::class, 'setBanniere']);
 
+    // Offres de sponsorisation (mise en avant vitrine, config-driven)
+    Route::get('vitrine/sponsorisation', [VitrineController::class, 'sponsorisation']);
+    Route::put('vitrine/sponsorisation', [VitrineController::class, 'setSponsorisation']);
+
     // Ateliers
     Route::middleware('admin.permission:ateliers.view')->group(function () {
         Route::get('ateliers',          [AtelierController::class, 'index']);

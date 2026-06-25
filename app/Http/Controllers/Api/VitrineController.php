@@ -127,6 +127,27 @@ class VitrineController extends Controller
         return response()->json($s->valeur);
     }
 
+    /** GET /api/vitrine/sponsorisation — offres de mise en avant (config-driven). */
+    public function sponsorisation(): JsonResponse
+    {
+        return response()->json(VitrineSetting::sponsorisation());
+    }
+
+    /** PUT /api/admin/vitrine/sponsorisation — édition des offres (admin). */
+    public function setSponsorisation(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'actif'          => ['required', 'boolean'],
+            'offres'         => ['required', 'array', 'min:1'],
+            'offres.*.jours' => ['required', 'integer', 'min:1', 'max:365'],
+            'offres.*.prix'  => ['required', 'integer', 'min:0'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'sponsorisation'], ['valeur' => $data]);
+
+        return response()->json($s->valeur);
+    }
+
     /** Forme « carte créateur » attendue par la vitrine. */
     private function creatorCard(Atelier $a): array
     {

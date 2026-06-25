@@ -14,6 +14,8 @@ class Paiement extends Model
 
     protected $fillable = [
         'atelier_id',
+        'type',
+        'meta',
         'niveau_cle',
         'duree_jours',
         'montant',
@@ -33,6 +35,7 @@ class Paiement extends Model
 
     protected $casts = [
         'provider_metadata'    => 'array',
+        'meta'                 => 'array',
         'initiated_at'         => 'datetime',
         'webhook_received_at'  => 'datetime',
         'completed_at'         => 'datetime',

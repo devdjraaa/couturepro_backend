@@ -11,6 +11,7 @@ use App\Models\NiveauConfig;
 use App\Models\NotificationSysteme;
 use App\Models\QuotaMensuel;
 use App\Models\TransactionAbonnement;
+use App\Services\PaymentService;
 use App\Services\PointsFideliteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,35 @@ use Illuminate\Http\Request;
 class AbonnementController extends Controller
 {
     use ResolvesAtelier;
+
+    // POST /api/abonnement/sponsoriser — achat d'une mise en avant vitrine (FedaPay).
+    // Le prix dépend du nombre de jours (offres config-driven : VitrineSetting).
+    public function sponsoriser(Request $request, PaymentService $paymentService): JsonResponse
+    {
+        $request->validate([
+            'jours'      => ['required', 'integer', 'min:1', 'max:365'],
+            'provider'   => ['sometimes', 'string', 'in:fedapay'],
+            'return_url' => ['sometimes', 'nullable', 'url'],
+        ]);
+
+        $atelier  = $this->getAtelier($request);
+        $provider = $request->provider ?? config('payment.default_provider', 'fedapay');
+
+        $paiement = $paymentService->initiateSponsorisation(
+            $atelier,
+            (int) $request->jours,
+            $provider,
+            $request->return_url,
+        );
+
+        return response()->json([
+            'paiement_id'  => $paiement->id,
+            'checkout_url' => $paiement->checkout_url,
+            'montant'      => $paiement->montant,
+            'devise'       => $paiement->devise,
+        ], 201);
+    }
+
     public function plans(): JsonResponse
     {
         $plans = NiveauConfig::actif()->get([
