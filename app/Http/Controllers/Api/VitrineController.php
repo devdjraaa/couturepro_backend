@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\Commande;
+use App\Models\NiveauConfig;
 use App\Models\VitrineSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -131,6 +132,17 @@ class VitrineController extends Controller
     public function sponsorisation(): JsonResponse
     {
         return response()->json(VitrineSetting::sponsorisation());
+    }
+
+    /** GET /api/vitrine/plans — offres d'abonnement actives (publique, page tarifs). */
+    public function plans(): JsonResponse
+    {
+        return response()->json(
+            NiveauConfig::actif()->get([
+                'cle', 'label', 'duree_jours', 'prix_xof',
+                'prix_mensuel_equivalent_xof', 'description_courte', 'config',
+            ])
+        );
     }
 
     /** PUT /api/admin/vitrine/sponsorisation — édition des offres (admin). */

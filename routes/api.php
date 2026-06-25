@@ -55,6 +55,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('signaler',                      [SignalementController::class, 'store']);
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
+    Route::get('plans',                          [VitrineController::class, 'plans']);
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
