@@ -69,7 +69,9 @@ class EMecefService
         }
 
         // 2) Confirmation -> éléments de sécurité (Code MECeF/DGI, QR, compteurs).
-        $confirm = $http()->put("{$base}/invoice/{$uid}/confirm");
+        // Corps vide explicite : le serveur e-MECeF (IIS) renvoie 411 sur un PUT
+        // sans Content-Length (validé sur le sandbox).
+        $confirm = $http()->withBody('', 'application/json')->put("{$base}/invoice/{$uid}/confirm");
         $confirm->throw();
         $sec = $confirm->json() ?? [];
 
@@ -77,6 +79,9 @@ class EMecefService
             throw new RuntimeException('e-MECeF (confirmation) : ' . ($sec['errorDesc'] ?? $sec['errorCode']));
         }
 
+        // NB : `qrCode` est le CONTENU à encoder en QR (ex. "F;NIM;…;IFU;date"),
+        // pas une URL → le front doit en générer une image QR. `emecef_qr_url`
+        // stocke ce contenu (nom historique conservé pour éviter une migration).
         $facture->update([
             'emecef_code'   => $sec['codeMECeFDGI'] ?? null,
             'emecef_qr_url' => $sec['qrCode'] ?? null,
