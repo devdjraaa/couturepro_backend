@@ -248,6 +248,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('factures/{facture}',          [FactureController::class, 'show']);
     Route::patch('factures/{facture}/statut', [FactureController::class, 'updateStatut']);
     Route::post('factures/{facture}/dgi',     [FactureController::class, 'uploadDgi']);
+    Route::post('factures/{facture}/normaliser', [FactureController::class, 'normaliser']);
     Route::delete('factures/{facture}',       [FactureController::class, 'destroy']);
 
     // WhatsApp

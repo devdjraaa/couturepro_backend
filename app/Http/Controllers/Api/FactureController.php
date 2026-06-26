@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Facture;
 use App\Models\ParametresAtelier;
+use App\Services\EMecefService;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -124,6 +125,23 @@ class FactureController extends Controller
         $facture->delete();
 
         return response()->json(['message' => 'Document supprimé.']);
+    }
+
+    // POST /api/factures/{facture}/normaliser — normalisation DGI via e-MECeF (étape B).
+    public function normaliser(Request $request, Facture $facture, EMecefService $emecef): JsonResponse
+    {
+        $this->authorizeFacture($request, $facture);
+
+        $atelier = $this->getAtelier($request);
+        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+
+        try {
+            $facture = $emecef->normaliser($facture, $prefs);
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json($facture);
     }
 
     private function authorizeFacture(Request $request, Facture $facture): void
