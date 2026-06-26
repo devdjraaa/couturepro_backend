@@ -118,6 +118,21 @@ class FactureController extends Controller
         return response()->json($facture);
     }
 
+    // GET /api/factures/{facture}/dgi — sert le PDF DGI joint via l'API (même
+    // origine + CORS api/* ok) pour l'habillage front, sans dépendre du CORS du stockage.
+    public function downloadDgi(Request $request, Facture $facture)
+    {
+        $this->authorizeFacture($request, $facture);
+
+        if (! $facture->dgi_pdf_path || ! Storage::disk('public')->exists($facture->dgi_pdf_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->response($facture->dgi_pdf_path, 'facture-' . $facture->numero . '-dgi.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     // DELETE /api/factures/{facture}
     public function destroy(Request $request, Facture $facture): JsonResponse
     {
