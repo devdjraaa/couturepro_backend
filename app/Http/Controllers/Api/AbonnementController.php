@@ -13,12 +13,13 @@ use App\Models\QuotaMensuel;
 use App\Models\TransactionAbonnement;
 use App\Services\PaymentService;
 use App\Services\PointsFideliteService;
+use App\Traits\ChecksPlanFeature;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AbonnementController extends Controller
 {
-    use ResolvesAtelier;
+    use ResolvesAtelier, ChecksPlanFeature;
 
     // POST /api/abonnement/sponsoriser — achat d'une mise en avant vitrine (FedaPay).
     // Le prix dépend du nombre de jours (offres config-driven : VitrineSetting).
@@ -31,6 +32,9 @@ class AbonnementController extends Controller
         ]);
 
         $atelier  = $this->getAtelier($request);
+        if ($gate = $this->planGate($atelier, 'sponsorisation')) {
+            return $gate;
+        }
         $provider = $request->provider ?? config('payment.default_provider', 'fedapay');
 
         $paiement = $paymentService->initiateSponsorisation(

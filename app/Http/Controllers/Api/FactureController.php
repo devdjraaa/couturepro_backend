@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Facture;
 use App\Models\ParametresAtelier;
 use App\Services\EMecefService;
+use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 class FactureController extends Controller
 {
-    use ResolvesAtelier;
+    use ResolvesAtelier, ChecksPlanFeature;
 
     // GET /api/factures — documents (devis/factures/reçus) de mon atelier.
     public function index(Request $request): JsonResponse
@@ -53,7 +54,10 @@ class FactureController extends Controller
         ]);
 
         $atelier = $this->getAtelier($request);
-        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+        if ($gate = $this->planGate($atelier, 'facturation')) {
+            return $gate;
+        }
+        $prefs = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
 
         $facture = Facture::create([
             'atelier_id'       => $atelier->id,
@@ -133,7 +137,10 @@ class FactureController extends Controller
         $this->authorizeFacture($request, $facture);
 
         $atelier = $this->getAtelier($request);
-        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
+        if ($gate = $this->planGate($atelier, 'facturation_normalisee')) {
+            return $gate;
+        }
+        $prefs = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
 
         try {
             $facture = $emecef->normaliser($facture, $prefs);

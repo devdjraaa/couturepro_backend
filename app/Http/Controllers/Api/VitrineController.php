@@ -84,6 +84,8 @@ class VitrineController extends Controller
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'created_at']),
             'creations'   => $creations,
+            // RBAC : la demande de devis est-elle incluse dans le plan du créateur ?
+            'devis'       => (bool) ($atelier->abonnement?->getConfigEffective()['devis_vitrine'] ?? false),
         ]));
     }
 

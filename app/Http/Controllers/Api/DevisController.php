@@ -20,6 +20,12 @@ class DevisController extends Controller
             return response()->json(['message' => 'Créateur introuvable'], 404);
         }
 
+        // RBAC par abonnement : la demande de devis doit être incluse dans le plan.
+        $config = $atelier->abonnement?->getConfigEffective() ?? [];
+        if (empty($config['devis_vitrine'])) {
+            return response()->json(['message' => "Ce créateur n'accepte pas les demandes de devis."], 403);
+        }
+
         $data = $request->validate([
             'nom'         => ['required', 'string', 'max:80'],
             'contact'     => ['required', 'string', 'max:120'],
