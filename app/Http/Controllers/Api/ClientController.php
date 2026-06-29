@@ -54,13 +54,20 @@ class ClientController extends Controller
         }
 
         $doublon = Client::where('atelier_id', $atelier->id)
-            ->where('nom', $request->nom)
-            ->where('prenom', $request->prenom ?? '')
+            ->where(function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('nom', $request->nom)
+                        ->where('prenom', $request->prenom ?? '');
+                });
+                if ($request->filled('telephone')) {
+                    $q->orWhere('telephone', $request->telephone);
+                }
+            })
             ->exists();
 
         if ($doublon) {
             return response()->json([
-                'message' => 'Un client avec ce nom existe déjà dans votre atelier.',
+                'message' => 'Un client avec ce nom ou ce numéro existe déjà dans votre atelier.',
                 'code'    => 'doublon',
             ], 422);
         }
@@ -91,6 +98,56 @@ class ClientController extends Controller
         ]);
 
         return response()->json($client, 201);
+    }
+
+    public function importBatch(Request $request): JsonResponse
+    {
+        $request->validate([
+            'contacts'              => ['required', 'array', 'max:200'],
+            'contacts.*.nom'        => ['required', 'string', 'max:100'],
+            'contacts.*.prenom'     => ['nullable', 'string', 'max:100'],
+            'contacts.*.telephone'  => ['required', 'string', 'max:30'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        $user    = $request->user();
+
+        $existing = Client::where('atelier_id', $atelier->id)
+            ->pluck('telephone')
+            ->map(fn ($t) => preg_replace('/\D/', '', $t))
+            ->filter()
+            ->flip()
+            ->all();
+
+        $imported = 0;
+        $skipped  = 0;
+
+        foreach ($request->contacts as $c) {
+            $normalized = preg_replace('/\D/', '', $c['telephone']);
+            if (isset($existing[$normalized])) {
+                $skipped++;
+                continue;
+            }
+
+            Client::create([
+                'atelier_id'      => $atelier->id,
+                'nom'             => $c['nom'],
+                'prenom'          => $c['prenom'] ?? null,
+                'telephone'       => $c['telephone'],
+                'type_profil'     => 'mixte',
+                'created_by'      => $user->id,
+                'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
+            ]);
+
+            $existing[$normalized] = true;
+            $imported++;
+        }
+
+        return response()->json([
+            'imported' => $imported,
+            'skipped'  => $skipped,
+            'total'    => count($request->contacts),
+        ]);
     }
 
     public function show(Request $request, Client $client): JsonResponse
