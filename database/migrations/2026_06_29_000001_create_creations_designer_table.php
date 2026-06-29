@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('creations_designer', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('atelier_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('atelier_id')->constrained()->cascadeOnDelete();
             $table->string('categorie'); // croquis | fiche_technique | patron | moodboard
             $table->string('titre');
             $table->text('description')->nullable();
