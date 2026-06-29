@@ -241,6 +241,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('parametres/facture',             [ParametresController::class, 'getFacture']);
     Route::put('parametres/facture',             [ParametresController::class, 'updateFacture']);
     Route::post('parametres/facture/logo',       [ParametresController::class, 'uploadFactureLogo']);
+    Route::put('parametres/type-compte',        [ParametresController::class, 'changerTypeCompte']);
 
     // Facturation designer (devis / factures / reçus)
     Route::get('factures',                    [FactureController::class, 'index']);

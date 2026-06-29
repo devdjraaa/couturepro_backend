@@ -322,4 +322,19 @@ class ParametresController extends Controller
 
         return response()->json(['message' => "Demande de vérification envoyée. Notre équipe l'examinera prochainement."]);
     }
+
+    public function changerTypeCompte(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'type' => ['required', 'string', 'in:artisan,designer'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        $atelier->update(['type' => $data['type']]);
+
+        return response()->json([
+            'type'    => $atelier->type,
+            'message' => 'Type de compte mis à jour.',
+        ]);
+    }
 }
