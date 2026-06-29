@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\CommandeEcheanceController;
 use App\Http\Controllers\Api\CommandeGroupeController;
 use App\Http\Controllers\Api\CommandeItemController;
 use App\Http\Controllers\Api\CommandePaiementController;
+use App\Http\Controllers\Api\CreationDesignerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DevisController;
 use App\Http\Controllers\Api\FactureController;
@@ -258,6 +259,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('whatsapp/confirmation-commande/{commandeId}',  [WhatsAppController::class, 'confirmationCommande']);
     Route::get('whatsapp/commande-prete/{commandeId}',         [WhatsAppController::class, 'commandePrete']);
     Route::get('whatsapp/preuve-paiement/{commandeId}',        [WhatsAppController::class, 'preuvePaiement']);
+
+    // Outils créatifs designer (croquis, fiches techniques, patrons, moodboards)
+    Route::get('creations-designer',                       [CreationDesignerController::class, 'index']);
+    Route::post('creations-designer',                      [CreationDesignerController::class, 'store']);
+    Route::get('creations-designer/{creation}',            [CreationDesignerController::class, 'show']);
+    Route::match(['PUT', 'POST'], 'creations-designer/{creation}', [CreationDesignerController::class, 'update']);
+    Route::delete('creations-designer/{creation}',         [CreationDesignerController::class, 'destroy']);
 
     // Galerie photos VIP
     Route::get('galerie',              [GalerieController::class, 'index']);
