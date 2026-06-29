@@ -198,7 +198,7 @@ class NiveauxConfigSeeder extends Seeder
             [
                 'cle'                         => 'free',
                 'label'                       => 'Free',
-                'duree_jours'                 => 36500,
+                'duree_jours'                 => 32000,
                 'prix_xof'                    => 0,
                 'prix_mensuel_equivalent_xof' => 0,
                 'is_actif'                    => true,
