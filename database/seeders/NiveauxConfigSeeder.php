@@ -366,6 +366,6 @@ class NiveauxConfigSeeder extends Seeder
             NiveauConfig::updateOrCreate(['cle' => $plan['cle']], $plan);
         }
 
-        $this->command->info('✅ NiveauxConfigSeeder : 6 plans insérés');
+        $this->command?->info('✅ NiveauxConfigSeeder : 6 plans insérés');
     }
 }
