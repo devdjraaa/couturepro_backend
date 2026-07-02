@@ -116,7 +116,7 @@ class ProprietaireAuthController extends Controller
                 'atelier_id' => $atelier->id,
                 'titre'      => 'Connexion réussie',
                 'contenu'    => "Bienvenue, {$proprietaire->prenom} !",
-                'type'       => 'connexion',
+                'type'       => 'info',
                 'is_read'    => false,
             ]);
         }
