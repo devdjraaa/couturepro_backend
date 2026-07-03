@@ -34,6 +34,7 @@ class ProprietaireAuthController extends Controller
         $proprietaire = Proprietaire::create([
             'nom'              => $request->nom,
             'prenom'           => $request->prenom,
+            'nom_atelier'      => $request->nom_atelier,
             'telephone'        => $request->telephone,
             'email'            => $request->email,
             'password'         => $request->password,
@@ -68,7 +69,9 @@ class ProprietaireAuthController extends Controller
 
         $atelier = Atelier::create([
             'proprietaire_id' => $proprietaire->id,
-            'nom'             => 'Atelier de ' . $proprietaire->prenom,
+            // Nom saisi par l'utilisateur à l'inscription (zéro hardcode) ;
+            // repli sur le prénom si absent (comptes anciens), sans préfixe en dur.
+            'nom'             => $proprietaire->nom_atelier ?: $proprietaire->prenom,
             'is_maitre'       => true,
             'statut'          => 'actif',
             'essai_expire_at' => now()->addDays(14),

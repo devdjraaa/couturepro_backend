@@ -16,6 +16,7 @@ class InscriptionRequest extends FormRequest
         return [
             'nom'              => ['required', 'string', 'max:100'],
             'prenom'           => ['required', 'string', 'max:100'],
+            'nom_atelier'      => ['required', 'string', 'max:150'],
             'telephone'        => ['required', 'string', 'max:20', 'unique:proprietaires,telephone'],
             'email'            => ['required', 'email', 'max:150', 'unique:proprietaires,email'],
             'password'         => ['required', 'string', 'min:8', 'confirmed'],
