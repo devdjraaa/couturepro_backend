@@ -177,9 +177,20 @@
 - [ ] Facturation
 - [ ] Connexion propriétaire (re-login UI avec ce compte)
 
-### Rebuild APK à faire (pour rendre les fixes i18n #2/#5/#6 visibles dans l'app installée)
-Les correctifs i18n sont commités mais l'APK installée date d'avant #5/#6 → un `npm run build`
-+ `cap sync` + `assembleDebug` + `adb install -r` à un point de contrôle.
+### ✅ Rebuild APK fait + vérifs live
+APK rebuild + réinstallée. Vérifié à l'écran : **#9 état vide Outils créatifs** (icône + titre +
+sous-titre au lieu de l'écran blanc) ✅, **#6 onglet « Annulées »** ✅, liste créations OK.
+
+### ✅ Couverture fonctionnelle (après fix #11 déployé) — 0 erreur 500
+Flux d'écriture validés (API réelle, même endpoints que l'UI) :
+- **Commandes** : `POST /commandes` ✅ (wizard UI 4 étapes rend + valide bien ; Suivant `disabled`
+  tant que le modèle n'est pas choisi = bonne validation), `POST commandes/{id}/etape` ✅ (étape→coupe).
+- **Clients** `POST /clients` ✅, **Mesures** `POST /mesures` ✅ (champs sur-mesure), **Vêtements**
+  `POST /vetements` ✅, **Créations designer** `POST /creations-designer` ✅.
+- **Facturation** `POST /factures` ✅ (FAC-2026-001, type facture, lignes, acompte).
+- **Profil atelier** `PUT /parametres/atelier` ✅ (nom/spécialité/bio/ville) — requiert `nom`.
+- **Fidélité** `POST /fidelite/convertir` → 422 métier « solde insuffisant » (pas de crash) ✅.
+- **Type de compte** artisan→designer ✅ (persisté).
 
 ### Compte de test créé depuis l'UI (à nettoyer)
 - Tél `+229 90000088` · email `mebag61642@kinws.com` · atelier « Atelier Test Claude » ·
