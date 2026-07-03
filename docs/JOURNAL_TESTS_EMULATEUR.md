@@ -45,6 +45,21 @@
 
 ## Points à surveiller (non bloquants)
 
+### ✅ #5 — Onglet Paramètres « facture » non traduit
+- **Symptôme** : dans Paramètres, un onglet affiche la clé brute `parametres.onglets.facture`.
+- **Cause** : clé i18n manquante (`facture`) dans `parametres.onglets` (FR + EN).
+- **Fix** : ajout `"facture": "Facturation"` (FR) / `"Invoicing"` (EN).
+- **Fichiers** : `src/lang/fr.json`, `src/lang/en.json`.
+
+### ✅ #6 — Onglet Commandes « annulées » non traduit
+- **Symptôme** : onglet affiche la clé brute `commandes.onglets.annulees`.
+- **Fix** : ajout `"annulees": "Annulées"` (FR) / `"Cancelled"` (EN) dans `commandes.onglets`.
+- **Fichiers** : `src/lang/fr.json`, `src/lang/en.json`.
+- **Scan i18n global** : lancé un scan de toutes les clés `t('...')` statiques vs `fr.json`.
+  Seuls #5 et #6 étaient de vraies clés manquantes. 4 autres (`dashboard.subtitle.urgentes`,
+  `.en_cours`, `caisse.debiteur`, `admin.dashboard.link_tickets_sub`) sont des **faux positifs**
+  (clés pluralisées i18next `_one`/`_other`, présentes). → i18n statique globalement propre.
+
 ### ⚠️ #4 — Téléphone stocké/recherché avec espace
 - Le `PhoneInput` compose `"+229 90000099"` (indicatif + espace + numéro). Le backend
   stocke et recherche le téléphone **tel quel** (aucune normalisation). Risque de fragilité :
@@ -67,12 +82,25 @@
 
 ## Progression du parcours UI (depuis l'inscription)
 
-- [ ] Inscription (email `mebag61642@kinws.com`) → OTP → onboarding → bienvenue
-- [ ] Connexion propriétaire
-- [ ] Dashboard
-- [ ] Clients (+ import contacts)
+- [x] **Inscription** (email `mebag61642@kinws.com`, tél `+229 90000088`) → OTP (récupéré VPS) →
+  onboarding (4 slides) → `/bienvenue` (3 étapes) → `/parametres` → **Dashboard** ✅ bout en bout
+- [x] Onboarding + écran de bienvenue (nouvelles pages S7) — OK
+- [x] Dashboard — charge les vraies données (checklist 1/4, caisse, à faire)
+- [x] **Clients** — page + état vide OK ; **création client OK** (Awa Traore créé, visible après reload).
+  Note : `handleCreate` ferme bien le modal (`setShowSheet(false)`) + invalide la liste sur succès ;
+  le modal resté ouvert observé via CDP = artefact de pilotage, pas un bug (un vrai tap ferme).
+- [x] Bouton **« Importer depuis les contacts »** (S7) présent dans le modal Nouveau client.
+- [x] **Commandes** — page + état vide OK (après fix #6).
+- [x] **Paramètres › Type de compte** (S7) — l'écran s'affiche (cartes Artisan/Designer + Confirmer).
+- [ ] Bascule Type de compte Artisan→Designer (à exécuter) + Ma Vitrine (Designer)
 - [ ] Créations / Outils créatifs (croquis, fiches, patrons, moodboards)
-- [ ] Commandes / suivi
 - [ ] Facturation
-- [ ] Paramètres (type de compte, profil atelier/designer)
-- [ ] Ma Vitrine (Designer)
+- [ ] Connexion propriétaire (re-login UI avec ce compte)
+
+### Rebuild APK à faire (pour rendre les fixes i18n #2/#5/#6 visibles dans l'app installée)
+Les correctifs i18n sont commités mais l'APK installée date d'avant #5/#6 → un `npm run build`
++ `cap sync` + `assembleDebug` + `adb install -r` à un point de contrôle.
+
+### Compte de test créé depuis l'UI (à nettoyer)
+- Tél `+229 90000088` · email `mebag61642@kinws.com` · atelier « Atelier Test Claude » ·
+  mdp `TestGextimo2026!` · réponse secrète « bleu ».
