@@ -107,6 +107,27 @@
 
 ---
 
+## ⏸️ État à la pause (reprise plus tard, depuis l'interface)
+
+- **Blocage émulateur** : qemu boote (~30 s) puis **meurt tout seul** sous charge, quelle que soit la
+  config (testé `-memory`, `-wipe-data`, `-no-snapshot`, GPU swiftshader). Log : *« cannot unmap ptr in
+  protected range »* → **problème KVM au niveau hôte** après trop de cycles de boot. **Correctif : redémarrer
+  la machine** (libère l'état KVM) avant de reprendre le test UI live.
+- **Cause d'instabilité RÉSOLUE en cours de route** : conflit de versions adb — `/usr/bin/adb` (v34 debian,
+  1ᵉʳ dans le PATH) vs `~/Android/Sdk/platform-tools/adb` (v36 attendu par l'émulateur) → *« adb protocol
+  fault »*. **Toujours utiliser le adb du SDK** : `~/Android/Sdk/platform-tools/adb` (cf. [[reference_mobile_test_setup]]).
+- **Santé fonctionnelle confirmée par sweep API** (compte de test, 23 endpoints Designer) : **0 erreur 500**.
+  Tout à 200 sauf `mesures` 405 (route nichée `clients/{id}/mesures`) et `caisse/*`, `galerie` 403 (gates de
+  plan/permission = normal pour un compte designer/Free). Les 2 anciens 500 (#1, #3) sont bien à 200.
+- **Écritures API testées** : `POST creations-designer` ✅, `POST vetements` ✅. (`POST commandes` : à refaire
+  proprement, `client_id` était vide dans mon test batch — la liste `/clients` renvoie une enveloppe `data`.)
+- **Reste à tester DEPUIS L'UI à la reprise** : création commande (+ étapes de suivi), mesures client,
+  facturation (devis/facture/reçu/DGI), création d'une œuvre dans Outils créatifs (+ vérifier l'état vide
+  corrigé #9), import contacts, fidélité, notifications. Puis re-vérifier visuellement #5/#6/#8/#9 avec la
+  nouvelle APK (déjà buildée : `android/app/build/outputs/apk/debug/app-debug.apk`).
+- **Données de test créées sur la prod** (à nettoyer quand fini) : compte `+229 90000088` /
+  `mebag61642@kinws.com`, client « Awa Traore », création « Croquis test Claude », vêtement « Boubou test Claude ».
+
 ## Stratégie de branches (commits — les push sont faits par le client)
 
 - **Backend `couturepro_backend` (master)** : bugs #1 (`10032ba`, déjà poussé/déployé) et #3
