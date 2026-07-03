@@ -54,6 +54,17 @@
 
 ---
 
+## Stratégie de branches (commits — les push sont faits par le client)
+
+- **Backend `couturepro_backend` (master)** : bugs #1 (`10032ba`, déjà poussé/déployé) et #3
+  (`b511e57`, à pousser). master = branche principale, rien à porter ailleurs.
+- **Frontend `couturepro_frontend`** : les correctifs i18n/facturation sont **généraux** → présents
+  sur les deux branches :
+  - `android` : commit `6d21eca` (i18n neutre + dédup FacturationPage — ce dernier était un artefact
+    propre à `android`).
+  - `master` : commit `7cf23b3` (cherry-pick de `6d21eca` ; seul l'i18n s'applique, master n'avait pas
+    le doublon FacturationPage). → rien de perdu entre les deux branches.
+
 ## Progression du parcours UI (depuis l'inscription)
 
 - [ ] Inscription (email `mebag61642@kinws.com`) → OTP → onboarding → bienvenue
