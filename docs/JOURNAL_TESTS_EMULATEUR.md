@@ -45,6 +45,27 @@
 
 ## Points à surveiller (non bloquants)
 
+### ✅ #11 — CRITIQUE : contrainte CHECK `notifications_systeme.type` désynchronisée (500 en cascade)
+- **Symptôme** : `POST /commandes` → **500** (`new row ... violates check constraint
+  notifications_systeme_type_check`, type `commande_cree`). Découvert en testant la création de
+  commande depuis l'UI (wizard 4 étapes).
+- **Ampleur** : la contrainte n'autorise que `promo|mise_a_jour|alerte_sync|alerte_abonnement|info|
+  alerte_archive`, mais le code émet **10 types non autorisés** : `commande_cree`, `client_cree`,
+  `statut_commande`, `points_convertis`, `sponsorisation`, `abonnement_active`, `atelier_verrouille`,
+  `bienvenue_plan`, `bonus_admin`, `conversion`. → **500 sur** : créer commande, créer client,
+  changer étape commande, convertir points fidélité, sponsoriser, verrouiller atelier, activer
+  abonnement, bonus admin… (même famille que #1 `connexion`).
+- **Rectificatif #6/modal** : le modal « Nouveau client » qui restait ouvert **n'était pas** un
+  artefact CDP — c'était **ce 500** (`client_cree`) : le client était créé (commit avant la notif)
+  mais la requête renvoyait 500 → modal non fermé. Sera réglé par ce fix.
+- **Fix** : migration `2026_07_03_000001_relax_notifications_systeme_type_constraint.php` qui
+  **supprime la contrainte CHECK** (le `type` est un enum applicatif backend, jamais une saisie
+  utilisateur → validé au niveau applicatif, pas en base ; évite que ça recasse au prochain type).
+  `down()` restaure la contrainte avec la liste complète. **À POUSSER pour déployer.**
+- *Alternative si le client préfère garder une validation DB* : étendre la contrainte à la liste
+  complète des 16 types au lieu de la supprimer (même migration, remplacer `up()` par le contenu de
+  `down()`).
+
 ### ✅ #5 — Onglet Paramètres « facture » non traduit
 - **Symptôme** : dans Paramètres, un onglet affiche la clé brute `parametres.onglets.facture`.
 - **Cause** : clé i18n manquante (`facture`) dans `parametres.onglets` (FR + EN).
