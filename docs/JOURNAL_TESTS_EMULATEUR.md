@@ -60,12 +60,50 @@
   `.en_cours`, `caisse.debiteur`, `admin.dashboard.link_tickets_sub`) sont des **faux positifs**
   (clés pluralisées i18next `_one`/`_other`, présentes). → i18n statique globalement propre.
 
+### ✅ #8 — Sidebar : item « Catalogue » affiche la clé `nav.atelier`
+- **Symptôme** : dans le menu, un item (→ `/catalogue`) affiche `nav.atelier` brut.
+- **Cause** : `Sidebar.jsx` utilisait `key: 'atelier'` (rendu via `t(\`nav.${navKey}\`)`) alors que la
+  clé i18n est `nav.catalogue`.
+- **Fix** : `key: 'atelier'` → `key: 'catalogue'`. Fichier `src/components/layout/Sidebar.jsx`.
+
+### ✅ #9 — Outils créatifs : état vide = écran blanc
+- **Symptôme** : sur Outils créatifs sans contenu, grand écran **noir vide**, aucun message.
+- **Cause** : `<EmptyState message={...} />` — or `EmptyState` n'a **pas** de prop `message`
+  (il attend `icon`/`title`/`description`) → rend un `<div>` vide.
+- **Fix** : `<EmptyState icon={ImagePlus} title={t('outils_creatifs.aucun')}
+  description={t('outils_creatifs.aucun_sous')} />` + nouvelle clé `aucun_sous` (FR/EN).
+  Vérifié : aucun autre `EmptyState message=` dans le code.
+
+### 🟠 #7 — Inscription : `nom_atelier` ignoré (DÉCISION requise)
+- **Symptôme** : l'atelier créé s'appelle « Atelier de {prénom} » (ex. « Atelier de Test »)
+  alors que l'utilisateur a saisi un **Nom de structure** (ex. « Atelier Test Claude »).
+- **Cause** : `ProprietaireAuthController::verifierOtp()` fait `'nom' => 'Atelier de ' . $prenom`
+  (en dur → viole aussi « ZÉRO hardcoding »). Le champ `nom_atelier` envoyé par le front n'est
+  **ni validé (`InscriptionRequest`) ni stocké ni utilisé** ; `OtpToken` n'a pas de colonne pour le
+  transporter entre l'inscription et la vérification OTP (l'atelier est créé au moment de l'OTP).
+- **Décision à prendre** (non implémenté seul) :
+  - **Option A (reco)** : colonne nullable `nom_atelier_souhaite` sur `proprietaires`, remplie à
+    l'inscription, utilisée à la création de l'atelier ; fallback « Atelier de {prénom} ». (petite migration)
+  - **Option B** : retirer le champ « Nom de structure » de l'inscription (le nom se règle ensuite
+    dans Paramètres › Atelier). Aucun changement backend.
+
 ### ⚠️ #4 — Téléphone stocké/recherché avec espace
 - Le `PhoneInput` compose `"+229 90000099"` (indicatif + espace + numéro). Le backend
   stocke et recherche le téléphone **tel quel** (aucune normalisation). Risque de fragilité :
   OTP SMS, liens WhatsApp, e-MECeF attendent souvent un numéro compact `+22990000099`.
 - **À décider** : normaliser (retirer espaces) à l'inscription ET à la connexion côté backend,
   ou à l'émission côté frontend. À valider avec le client avant de toucher (impacte les comptes existants).
+
+### 🎨 #10 — Design : barres d'onglets qui débordent (onglets coupés)
+- **Symptôme** : sur **Paramètres** (8 onglets) et **Outils créatifs** (5 onglets), la barre
+  d'onglets déborde horizontalement (Paramètres : 918px pour 412px de large) ; le dernier onglet
+  est **coupé au bord droit** sans aucun indicateur de scroll. L'utilisateur croit qu'un onglet
+  « se cache ». (La page elle-même ne déborde pas — `pageOverflow=0` partout, base responsive OK.)
+- **C'est de la refonte visuelle (rôle dev front)** → **DÉCISION/design à trancher** :
+  fondu (gradient) en bord droit + snap-scroll, OU menu déroulant sur mobile, OU onglets sur 2 lignes.
+  Non implémenté ici (choix de design).
+- **Bon point** : le reste des écrans audités (Ma Vitrine, Dashboard, Clients, Commandes, Catalogue,
+  Facturation, Caisse, Fidélité, Équipe, Notifications) n'a **pas** de débordement de page.
 
 ---
 
