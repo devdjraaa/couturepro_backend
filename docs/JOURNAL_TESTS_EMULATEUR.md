@@ -15,6 +15,47 @@
 
 ---
 
+## Passe UX mobile (feedback client) — corrections appliquées (live reload)
+
+Mise en place du **live reload Capacitor** (WebView → serveur Vite `http://localhost:5173` via
+`adb reverse` + `server.url` dans `capacitor.config.json` — **dev-only, NON commité**). Les modifs
+de code sont désormais instantanées, **sans rebuild** (seuls les changements natifs res/manifest
+nécessitent un rebuild).
+
+- ✅ **Carte abonnement sur l'accueil** : `AbonnementCard` (Dashboard) — plan + statut + jours
+  restants, discrète (ambre en essai, danger si ≤3 j), cliquable → `/abonnement`. Données via
+  `useAbonnement()` (`GET /abonnement/current`). Vérifié live (« Standard Mensuel · essai · 13 j »).
+- ✅ **Langues** : `LANGUES_DISPO` réduit à **FR + EN** (ar/wo commentés — pas de fichiers de
+  traduction, tombaient en fallback). `src/contexts/LangContext.jsx`.
+- ✅ **Safe-area / status bar** : `viewport-fit=cover` (index.html) + status bar non-overlay avec
+  fond rouge assorti au header + icônes claires (`ThemeContext`). Corrige le header qui passait
+  « sous le rideau » du téléphone. **Confirmé OK par le client.**
+- ✅ **Import contacts** : la permission **`READ_CONTACTS`** manquait dans l'AndroidManifest
+  (cause du « ça ne marche pas »). Ajoutée. (nécessite rebuild — fait)
+- ✅ **Icône de notification** : `ic_stat_notify` généré depuis `logogextimovectoriel.png` (silhouette
+  blanche, 5 densités) + `smallIcon`/`iconColor` sur les notifs locales + meta-data FCM dans le
+  manifest. (natif — rebuild fait)
+
+### 🟠 Décisions en attente (mobile)
+- **#12 Push FCM non fonctionnel (DÉCISION)** : les **notifications push ne marchent pas** car il
+  n'y a **ni plugin push (`@capacitor/push-notifications`) ni `google-services.json`** (projet
+  Firebase). Le code envoie bien un `fcm_token` au backend mais rien ne le génère. → **Nécessite le
+  projet Firebase du client** (google-services.json + config). Les notifs **locales** fonctionnent.
+- **#13 Safe-area Android 15 (DÉCISION)** : `env(safe-area-inset-*)` renvoie 0 sur le WebView
+  Android (testé). La solution non-overlay actuelle suffit sur Android <15 ; pour l'edge-to-edge
+  forcé d'Android 15, prévoir le plugin **`@capacitor-community/safe-area`**.
+- **#14 Bouton offline/online (sync WiFi) « disparu »** : `NetworkStatusButton` est dans `Header.jsx`,
+  mais le **Dashboard** utilise `noMobileHeader` → le header mobile (donc le bouton) n'y apparaît pas.
+  À rebrancher (ex. l'exposer dans le hero du dashboard). *(à traiter)*
+
+### ⚙️ Environnement de test — leçons (voir mémoire [[reference_mobile_test_setup]])
+- **Émulateur tué par le build Gradle** (pic CPU/RAM) ou par la fin du shell (SIGHUP). Solutions :
+  lancer l'ému **détaché** (`nohup setsid … </dev/null`) et **ne pas builder pendant qu'il tourne**
+  (stopper le daemon Gradle : `./gradlew --stop`). Reset sans reboot : tuer qemu + `rm -rf
+  /run/user/1000/avd/running/*`. Toujours utiliser le **adb du SDK** (v36), pas `/usr/bin/adb` (v34).
+
+---
+
 ## Bugs trouvés & corrigés
 
 ### ✅ #1 — Login : `NotificationSysteme` type `connexion` invalide (500)
