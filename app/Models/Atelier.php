@@ -99,7 +99,10 @@ class Atelier extends Model
 
     public function abonnement(): HasOne
     {
-        return $this->hasOne(Abonnement::class, 'atelier_id')->latestOfMany('timestamp_debut');
+        // atelier_id est UNIQUE sur abonnements → un seul abonnement par atelier.
+        // On évite latestOfMany() qui ajoute un tie-breaker MAX(id) : id étant un UUID,
+        // PostgreSQL n'a pas de fonction max(uuid) (contrairement à MySQL/SQLite).
+        return $this->hasOne(Abonnement::class, 'atelier_id')->latest('timestamp_debut');
     }
 
     public function equipesMembres(): HasMany
