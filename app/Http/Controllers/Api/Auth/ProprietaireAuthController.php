@@ -53,7 +53,9 @@ class ProprietaireAuthController extends Controller
 
     public function verifierOtp(VerifierOtpRequest $request): JsonResponse
     {
-        $proprietaire = Proprietaire::where('telephone', $request->telephone)
+        $telephone = Proprietaire::normalizePhone($request->telephone);
+
+        $proprietaire = Proprietaire::where('telephone', $telephone)
             ->whereNull('telephone_verified_at')
             ->first();
 
@@ -61,7 +63,7 @@ class ProprietaireAuthController extends Controller
             return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
         }
 
-        if (!$this->otpService->verifier($request->telephone, $request->code, 'verification_inscription')) {
+        if (!$this->otpService->verifier($telephone, $request->code, 'verification_inscription')) {
             return response()->json(['message' => 'Code OTP invalide ou expiré.'], 422);
         }
 
@@ -101,7 +103,7 @@ class ProprietaireAuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $proprietaire = Proprietaire::where('telephone', $request->telephone)->first();
+        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($request->telephone))->first();
 
         if (!$proprietaire || !Hash::check($request->password, $proprietaire->password)) {
             return response()->json(['message' => 'Identifiants incorrects.'], 401);
@@ -140,8 +142,9 @@ class ProprietaireAuthController extends Controller
     public function renvoyerOtp(Request $request): JsonResponse
     {
         $data = $request->validate(['telephone' => ['required', 'string']]);
+        $telephone = Proprietaire::normalizePhone($data['telephone']);
 
-        $proprietaire = Proprietaire::where('telephone', $data['telephone'])
+        $proprietaire = Proprietaire::where('telephone', $telephone)
             ->whereNull('telephone_verified_at')
             ->first();
 

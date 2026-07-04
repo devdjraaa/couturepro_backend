@@ -21,7 +21,7 @@ class RecuperationController extends Controller
     public function etape1(RecuperationEtape1Request $request): JsonResponse
     {
         $proprietaire = $request->filled('telephone')
-            ? Proprietaire::where('telephone', $request->telephone)->first()
+            ? Proprietaire::where('telephone', Proprietaire::normalizePhone($request->telephone))->first()
             : Proprietaire::where('email', $request->email)->first();
 
         if (!$proprietaire) {
@@ -170,7 +170,7 @@ class RecuperationController extends Controller
             'telephone' => ['required', 'string'],
         ]);
 
-        $proprietaire = Proprietaire::where('telephone', $request->telephone)->first();
+        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($request->telephone))->first();
 
         if (!$proprietaire) {
             return response()->json(['message' => 'Aucun compte associé à ce numéro.'], 404);
@@ -193,7 +193,7 @@ class RecuperationController extends Controller
             'reponse_secrete' => ['required', 'string'],
         ]);
 
-        $proprietaire = Proprietaire::where('telephone', $request->telephone)->first();
+        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($request->telephone))->first();
 
         if (!$proprietaire) {
             return response()->json(['message' => 'Aucun compte associé à ce numéro.'], 404);

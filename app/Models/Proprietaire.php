@@ -42,6 +42,29 @@ class Proprietaire extends Authenticatable
         'reponse_secrete'       => 'hashed',
     ];
 
+    /**
+     * Forme canonique d'un numéro : « + » initial conservé, uniquement des chiffres ensuite
+     * (ex. « +229 90 00 00 88 » → « +22990000088 »). Évite les échecs de connexion dus à un
+     * espace ou un format différent. Utilisée au stockage (mutateur) ET aux recherches.
+     */
+    public static function normalizePhone(?string $phone): ?string
+    {
+        if ($phone === null) {
+            return null;
+        }
+        $phone   = trim($phone);
+        $hasPlus = str_starts_with($phone, '+');
+        $digits  = preg_replace('/\D/', '', $phone);
+
+        return $digits === '' ? null : ($hasPlus ? '+' : '') . $digits;
+    }
+
+    // Normalise systématiquement le numéro à l'écriture.
+    public function setTelephoneAttribute($value): void
+    {
+        $this->attributes['telephone'] = self::normalizePhone($value);
+    }
+
     public function ateliers(): HasMany
     {
         return $this->hasMany(Atelier::class, 'proprietaire_id');
