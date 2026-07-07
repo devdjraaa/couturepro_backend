@@ -27,15 +27,19 @@ class Vetement extends Model
         'collection_id',
         'created_by',
         'created_by_role',
+        'libelles_mesures',
     ];
 
     protected $appends = ['image_url', 'images_urls'];
 
     protected $casts = [
-        'is_systeme'     => 'boolean',
-        'is_archived'    => 'boolean',
-        'publie_vitrine' => 'boolean',
-        'images'         => 'array',
+        'is_systeme'       => 'boolean',
+        'is_archived'      => 'boolean',
+        'publie_vitrine'   => 'boolean',
+        'images'           => 'array',
+        // Colonne json : sans ce cast, un tableau envoyé par la sync (offline)
+        // provoque « Array to string conversion » à l'insert et le record est perdu.
+        'libelles_mesures' => 'array',
     ];
 
     protected function imageUrl(): Attribute
