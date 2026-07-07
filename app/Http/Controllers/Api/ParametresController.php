@@ -22,7 +22,9 @@ class ParametresController extends Controller
     {
         $data = $request->validate([
             'nom'       => ['required', 'string', 'max:255'],
-            'telephone' => ['required', 'string', 'max:20'],
+            // Format téléphone : sinon une saisie non numérique est normalisée à
+            // vide/null → violation NOT NULL en base → 500 au lieu d'un 422 clair.
+            'telephone' => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s]{6,}$/'],
             'email'     => ['nullable', 'email', 'max:255'],
         ]);
 
