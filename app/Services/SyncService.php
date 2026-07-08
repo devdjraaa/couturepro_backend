@@ -16,6 +16,7 @@ use App\Models\PointsHistorique;
 use App\Models\Vetement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Services\FcmService;
 
 class SyncService
@@ -39,6 +40,15 @@ class SyncService
 
     // Tables sans atelier_id : scopées via la commande parente (whereHas commande).
     private array $tablesScopedByCommande = ['commande_items', 'commande_echeances'];
+
+    // Cache des colonnes réelles par table (introspection schéma).
+    private array $columnCache = [];
+
+    private function tableColumns(string $modelClass): array
+    {
+        $table = (new $modelClass)->getTable();
+        return $this->columnCache[$table] ??= Schema::getColumnListing($table);
+    }
 
     public function push(Atelier $atelier, array $operations, string $actorId, string $actorRole): array
     {
@@ -138,6 +148,11 @@ class SyncService
                 unset($data['created_by'], $data['created_by_role']);
             }
         }
+
+        // Sécurité : ne garder que les colonnes réelles de la table. `forceCreate`
+        // bypasse $fillable → une colonne locale inconnue (client_nom, categorie,
+        // date_creation…) provoquerait SQLSTATE 42703. Filtre robuste, toutes tables.
+        $data = array_intersect_key($data, array_flip($this->tableColumns($modelClass)));
 
         // Récupère un record déjà scopé à l'atelier (direct ou via la commande).
         $findScoped = fn($id) => $scopedByCommande
