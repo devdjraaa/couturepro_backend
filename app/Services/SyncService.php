@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Atelier;
 use App\Models\Client;
+use App\Models\Collection;
 use App\Models\Commande;
+use App\Models\CommandePaiement;
 use App\Models\Mesure;
 use App\Models\NotificationSysteme;
 use App\Models\PointsFidelite;
@@ -16,14 +18,21 @@ use App\Services\FcmService;
 
 class SyncService
 {
-    private array $allowedTables = ['clients', 'commandes', 'mesures', 'vetements'];
+    private array $allowedTables = ['clients', 'commandes', 'mesures', 'vetements', 'collections', 'notifications', 'paiements'];
 
     private array $modelMap = [
-        'clients'   => Client::class,
-        'commandes' => Commande::class,
-        'mesures'   => Mesure::class,
-        'vetements' => Vetement::class,
+        'clients'       => Client::class,
+        'commandes'     => Commande::class,
+        'mesures'       => Mesure::class,
+        'vetements'     => Vetement::class,
+        'collections'   => Collection::class,
+        'notifications' => NotificationSysteme::class,
+        'paiements'     => CommandePaiement::class,
     ];
+
+    // Tables portant les colonnes created_by / created_by_role.
+    // (collections, notifications, paiements ne les ont pas → ne pas les injecter.)
+    private array $tablesWithActor = ['clients', 'commandes', 'mesures', 'vetements'];
 
     public function push(Atelier $atelier, array $operations, string $actorId, string $actorRole): array
     {
@@ -102,9 +111,14 @@ class SyncService
         }
 
         $modelClass = $this->modelMap[$table];
-        $data['atelier_id']    = $atelier->id;
-        $data['created_by']    = $actorId;
-        $data['created_by_role'] = $actorRole;
+        $data['atelier_id'] = $atelier->id;
+        if (in_array($table, $this->tablesWithActor, true)) {
+            $data['created_by']      = $actorId;
+            $data['created_by_role'] = $actorRole;
+        } else {
+            // Ces tables n'ont pas ces colonnes : ne jamais les insérer.
+            unset($data['created_by'], $data['created_by_role']);
+        }
 
         try {
             switch ($operation) {
