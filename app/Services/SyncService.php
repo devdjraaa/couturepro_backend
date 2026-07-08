@@ -6,6 +6,8 @@ use App\Models\Atelier;
 use App\Models\Client;
 use App\Models\Collection;
 use App\Models\Commande;
+use App\Models\CommandeEcheance;
+use App\Models\CommandeItem;
 use App\Models\CommandePaiement;
 use App\Models\Mesure;
 use App\Models\NotificationSysteme;
@@ -18,21 +20,25 @@ use App\Services\FcmService;
 
 class SyncService
 {
-    private array $allowedTables = ['clients', 'commandes', 'mesures', 'vetements', 'collections', 'notifications', 'paiements'];
+    private array $allowedTables = ['clients', 'commandes', 'mesures', 'vetements', 'collections', 'notifications', 'paiements', 'commande_items', 'commande_echeances'];
 
     private array $modelMap = [
-        'clients'       => Client::class,
-        'commandes'     => Commande::class,
-        'mesures'       => Mesure::class,
-        'vetements'     => Vetement::class,
-        'collections'   => Collection::class,
-        'notifications' => NotificationSysteme::class,
-        'paiements'     => CommandePaiement::class,
+        'clients'             => Client::class,
+        'commandes'           => Commande::class,
+        'mesures'             => Mesure::class,
+        'vetements'           => Vetement::class,
+        'collections'         => Collection::class,
+        'notifications'       => NotificationSysteme::class,
+        'paiements'           => CommandePaiement::class,
+        'commande_items'      => CommandeItem::class,
+        'commande_echeances'  => CommandeEcheance::class,
     ];
 
     // Tables portant les colonnes created_by / created_by_role.
-    // (collections, notifications, paiements ne les ont pas → ne pas les injecter.)
     private array $tablesWithActor = ['clients', 'commandes', 'mesures', 'vetements'];
+
+    // Tables sans atelier_id : scopées via la commande parente (whereHas commande).
+    private array $tablesScopedByCommande = ['commande_items', 'commande_echeances'];
 
     public function push(Atelier $atelier, array $operations, string $actorId, string $actorRole): array
     {
@@ -59,9 +65,11 @@ class SyncService
                 class_uses_recursive($model)
             );
 
-            $query = $usesSoftDeletes
-                ? $model::withTrashed()->where('atelier_id', $atelier->id)
-                : $model::where('atelier_id', $atelier->id);
+            $base = $usesSoftDeletes ? $model::withTrashed() : $model::query();
+            $query = in_array($table, $this->tablesScopedByCommande, true)
+                // Tables sans atelier_id : scopées via la commande parente.
+                ? $base->whereHas('commande', fn($q) => $q->where('atelier_id', $atelier->id))
+                : $base->where('atelier_id', $atelier->id);
 
             if ($since) {
                 $query->where('updated_at', '>', $since);
@@ -111,14 +119,30 @@ class SyncService
         }
 
         $modelClass = $this->modelMap[$table];
-        $data['atelier_id'] = $atelier->id;
-        if (in_array($table, $this->tablesWithActor, true)) {
-            $data['created_by']      = $actorId;
-            $data['created_by_role'] = $actorRole;
+        $scopedByCommande = in_array($table, $this->tablesScopedByCommande, true);
+
+        if ($scopedByCommande) {
+            // Pas de colonne atelier_id : on valide via la commande parente.
+            unset($data['atelier_id'], $data['created_by'], $data['created_by_role']);
+            $commandeId = $data['commande_id'] ?? null;
+            if (! $commandeId || ! Commande::where('id', $commandeId)->where('atelier_id', $atelier->id)->exists()) {
+                return ['id' => $id, 'status' => 'error', 'message' => 'Commande parente introuvable pour cet atelier.'];
+            }
         } else {
-            // Ces tables n'ont pas ces colonnes : ne jamais les insérer.
-            unset($data['created_by'], $data['created_by_role']);
+            $data['atelier_id'] = $atelier->id;
+            if (in_array($table, $this->tablesWithActor, true)) {
+                $data['created_by']      = $actorId;
+                $data['created_by_role'] = $actorRole;
+            } else {
+                // Ces tables n'ont pas ces colonnes : ne jamais les insérer.
+                unset($data['created_by'], $data['created_by_role']);
+            }
         }
+
+        // Récupère un record déjà scopé à l'atelier (direct ou via la commande).
+        $findScoped = fn($id) => $scopedByCommande
+            ? $modelClass::whereHas('commande', fn($q) => $q->where('atelier_id', $atelier->id))->findOrFail($id)
+            : $modelClass::where('atelier_id', $atelier->id)->findOrFail($id);
 
         try {
             switch ($operation) {
@@ -129,12 +153,12 @@ class SyncService
                     return ['id' => $record->id, 'status' => 'created'];
 
                 case 'update':
-                    $record = $modelClass::where('atelier_id', $atelier->id)->findOrFail($id);
+                    $record = $findScoped($id);
                     $record->update($data);
                     return ['id' => $id, 'status' => 'updated'];
 
                 case 'delete':
-                    $record = $modelClass::where('atelier_id', $atelier->id)->findOrFail($id);
+                    $record = $findScoped($id);
                     $record->delete();
                     return ['id' => $id, 'status' => 'deleted'];
 
