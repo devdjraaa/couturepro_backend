@@ -36,6 +36,7 @@ class PaiementController extends Controller
 
         return response()->json([
             'paiement_id'  => $paiement->id,
+            'statut'       => $paiement->statut,
             'checkout_url' => $paiement->checkout_url,
             'expires_at'   => $paiement->expires_at,
             'montant'      => $paiement->montant,

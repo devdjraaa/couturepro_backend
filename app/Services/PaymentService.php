@@ -24,6 +24,28 @@ class PaymentService
     {
         $niveau = NiveauConfig::where('cle', $niveauCle)->where('is_actif', true)->firstOrFail();
 
+        // Plan gratuit (prix 0) : rien à encaisser → activation directe, sans passer
+        // par le provider. FedaPay rejette un montant nul (« amount doit être > 0 »),
+        // ce qui provoquait un 500. On enregistre un paiement déjà « completed ».
+        if ((int) $niveau->prix_xof <= 0) {
+            $paiement = Paiement::create([
+                'atelier_id'   => $atelier->id,
+                'niveau_cle'   => $niveau->cle,
+                'duree_jours'  => $niveau->duree_jours,
+                'montant'      => 0,
+                'devise'       => 'XOF',
+                'provider'     => $provider,
+                'statut'       => 'completed',
+                'initiated_at' => now(),
+                'completed_at' => now(),
+                'ip_address'   => request()->ip(),
+            ]);
+
+            $this->activerAbonnement($atelier->id, $niveau->cle, $niveau->duree_jours);
+
+            return $paiement->fresh();
+        }
+
         $paiement = Paiement::create([
             'atelier_id'   => $atelier->id,
             'niveau_cle'   => $niveau->cle,
