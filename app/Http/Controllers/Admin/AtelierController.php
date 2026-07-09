@@ -185,6 +185,40 @@ class AtelierController extends Controller
     }
 
     /**
+     * Bascule le type de compte (artisan ↔ designer). Réservé à l'administrateur :
+     * change ce qui est visible côté app (vitrine, multi-ateliers, outils créatifs)
+     * sans que l'utilisateur puisse le contourner depuis ses propres réglages.
+     */
+    public function changerType(Request $request, Atelier $atelier): JsonResponse
+    {
+        $data = $request->validate([
+            'type' => ['required', 'string', 'in:artisan,designer'],
+        ]);
+
+        $admin      = $this->adminUser();
+        $ancienType = $atelier->type ?: 'artisan';
+
+        if ($ancienType === $data['type']) {
+            return response()->json([
+                'message' => "L'atelier est déjà de type « {$data['type']} ».",
+                'atelier' => $atelier,
+            ], 422);
+        }
+
+        $atelier->update(['type' => $data['type']]);
+
+        $this->audit($admin, 'atelier.changer_type', 'atelier', $atelier->id, [
+            'ancien_type'  => $ancienType,
+            'nouveau_type' => $atelier->type,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => "Type de compte changé en « {$data['type']} ».",
+            'atelier' => $atelier,
+        ]);
+    }
+
+    /**
      * Liste les sous-ateliers d'un atelier maître.
      */
     public function sousAteliers(Atelier $atelier): JsonResponse
