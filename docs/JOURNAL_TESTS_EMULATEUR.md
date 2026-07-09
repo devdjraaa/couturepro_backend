@@ -36,6 +36,20 @@ nécessitent un rebuild).
   blanche, 5 densités) + `smallIcon`/`iconColor` sur les notifs locales + meta-data FCM dans le
   manifest. (natif — rebuild fait)
 
+### ✅ Bascule sur TÉLÉPHONE RÉEL + import contacts réparé
+- **Émulateur abandonné** (instable : tué par le build Gradle / SIGHUP) au profit d'un **vrai
+  téléphone TECNO BF7 (Android 12)** en USB. Émulateur + system-images supprimés (**~7,3 Go libérés**).
+  Live reload via `adb reverse tcp:5173` sur USB — marche parfaitement.
+- **Safe-area** : sur le vrai téléphone, `env(safe-area-inset-top)=36px` (marche, contrairement à
+  l'ému). Repassé en **overlay:true (edge-to-edge)** → status bar sur le header rouge, contenu
+  décalé par `.pt-safe`, **plus de vide en haut**. Vérifié à l'écran.
+- **Import contacts RÉPARÉ** : 2 causes — (1) `capacitor.plugins.json` vide → **`cap sync`** l'a
+  régénéré (plugin `Contacts` enregistré) ; (2) le plugin `@capacitor-community/contacts` exige
+  **`WRITE_CONTACTS`** déclaré dans le manifest (pas juste READ) sinon `requestPermissions()` plante.
+  Ajouté. → **381 contacts détectés, 368 importables** (vérifié sur le vrai téléphone). ✅
+  ⚠️ Note : le plugin est en **v7.2.0** (Capacitor 7) alors que le projet est en Capacitor 8 —
+  fonctionne mais à surveiller (envisager une version alignée Capacitor 8).
+
 ### 🟠 Décisions en attente (mobile)
 - **#12 Push FCM non fonctionnel (DÉCISION)** : les **notifications push ne marchent pas** car il
   n'y a **ni plugin push (`@capacitor/push-notifications`) ni `google-services.json`** (projet
@@ -236,3 +250,33 @@ Flux d'écriture validés (API réelle, même endpoints que l'UI) :
 ### Compte de test créé depuis l'UI (à nettoyer)
 - Tél `+229 90000088` · email `mebag61642@kinws.com` · atelier « Atelier Test Claude » ·
   mdp `TestGextimo2026!` · réponse secrète « bleu ».
+
+## Session — différenciation artisan/designer, galerie, vitrine in-app, rebuild
+
+### ✅ Livré + testé live
+- **Différenciation artisan ↔ designer** (front + back) : inscription stocke le type
+  (`proprietaire.type_atelier` → `atelier.type`), `useAccountType` + `DesignerRoute` filtrent la nav
+  (Ma Vitrine / outils créatifs = designer ; galerie = les deux). Back commit `600d757`. Testé live.
+- **Polish UI mobile** : header rouge réorganisé (switcher sous-ateliers sur 2ᵉ ligne),
+  Commandes en **onglets** (dont Essayage, statut `essai`) au lieu du kanban horizontal coupé,
+  onglet **« Plus »** (menu complet filtré type/rôle) + FAB **« + »** enrichi (commande simple/groupée,
+  client, modèle, encaisser). Portés master.
+- **Galerie** : multi-sélection + **compression client** (`compressImage`, corrige le 422 silencieux
+  des photos > 5 Mo), bouton **supprimer toujours visible** (tactile, + confirm), **tuto 3 slides**
+  affiché une seule fois (flag `gx_galerie_tuto_seen`). Testé par l'utilisateur (« c'est bon »).
+- **« Voir ma vitrine » in-app** : `@capacitor/browser` (Custom Tab) au lieu du navigateur externe.
+  → **rebuild APK** (Java 21 + `ANDROID_HOME`), réinstallée, `hasBrowser: true` vérifié en live (CDP).
+- **master aligné + poussé** : port fichier-par-fichier (deps mobiles hors master), rebase sur
+  l'entrant `5befab2` (skeletons), build OK → poussé (`5de016e`).
+
+### 🔧 Corrigé, en attente de déploiement (NON testé bout-en-bout)
+- **Bug plan gratuit → 500 FedaPay** (`amount doit être > 0`) : `PaymentService::initiate`
+  court-circuite désormais tout plan à prix 0 → paiement `completed` + activation directe, sans passer
+  par FedaPay. `/paiements/initier` expose `statut`. Front : le hook confirme (toast + refresh) quand
+  il n'y a pas de `checkout_url`. Backend `73bae5f`, front android `4d029dc` / master `d73e6c6`.
+  ⚠️ **À pousser + déployer + tester en prod** (blocage push GitHub = keyring verrouillé après coupure).
+
+### ⏳ QA restant (dont sensible = à faire avec l'utilisateur)
+- Équipe (ajout membre → **email**), Récupération flux complet (→ **email**), Avis/devis (données
+  entrantes), Paramètres (préférences/facture/sécurité), Archives, push FCM, Sponsorisation (paiement),
+  vitrine publique.
