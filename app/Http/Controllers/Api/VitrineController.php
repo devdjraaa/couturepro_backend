@@ -28,6 +28,10 @@ class VitrineController extends Controller
     {
         $ateliers = Atelier::query()
             ->where('is_demo', false)
+            // Storefront public = comptes « designer » uniquement. Les artisans
+            // gèrent leur atelier sans vitrine ; ils alimentent la banque de photos,
+            // mais n'ont pas de profil créateur listé ici.
+            ->where('type', 'designer')
             ->with('abonnement')
             ->withCount(['vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true)])
             ->orderBy('nom')
@@ -44,7 +48,8 @@ class VitrineController extends Controller
     /** GET /api/vitrine/createurs/{atelier} */
     public function show(Atelier $atelier): JsonResponse
     {
-        if ($atelier->is_demo) {
+        // Seuls les comptes « designer » ont un profil créateur public.
+        if ($atelier->is_demo || $atelier->type !== 'designer') {
             return response()->json(['message' => 'Créateur introuvable'], 404);
         }
 

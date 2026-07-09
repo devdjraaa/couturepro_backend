@@ -20,6 +20,7 @@ class Proprietaire extends Authenticatable
         'nom',
         'prenom',
         'nom_atelier',
+        'type_atelier',
         'question_secrete',
         'reponse_secrete',
         'password',

@@ -35,6 +35,7 @@ class ProprietaireAuthController extends Controller
             'nom'              => $request->nom,
             'prenom'           => $request->prenom,
             'nom_atelier'      => $request->nom_atelier,
+            'type_atelier'     => $request->type ?: 'artisan',
             'telephone'        => $request->telephone,
             'email'            => $request->email,
             'password'         => $request->password,
@@ -74,6 +75,7 @@ class ProprietaireAuthController extends Controller
             // Nom saisi par l'utilisateur à l'inscription (zéro hardcode) ;
             // repli sur le prénom si absent (comptes anciens), sans préfixe en dur.
             'nom'             => $proprietaire->nom_atelier ?: $proprietaire->prenom,
+            'type'            => $proprietaire->type_atelier ?: 'artisan',
             'is_maitre'       => true,
             'statut'          => 'actif',
             'essai_expire_at' => now()->addDays(14),
@@ -97,7 +99,7 @@ class ProprietaireAuthController extends Controller
             'message'      => 'Compte vérifié avec succès.',
             'token'        => $token,
             'proprietaire' => $proprietaire->only(['id', 'nom', 'prenom', 'email', 'telephone']),
-            'atelier'      => $atelier->only(['id', 'nom', 'is_maitre', 'statut']),
+            'atelier'      => $atelier->only(['id', 'nom', 'type', 'is_maitre', 'statut']),
         ]);
     }
 
