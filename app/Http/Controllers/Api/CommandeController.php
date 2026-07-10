@@ -94,6 +94,7 @@ class CommandeController extends Controller
             'titre'      => 'Nouvelle commande créée',
             'contenu'    => "Commande pour {$clientNom}",
             'type'       => 'commande_cree',
+            'lien'       => '/commandes/' . $commande->id,
             'is_read'    => false,
         ]);
 
@@ -137,6 +138,7 @@ class CommandeController extends Controller
                 'titre'      => $labels[$data['statut']] ?? 'Statut mis à jour',
                 'contenu'    => $commande->client_nom ?? "Commande #{$commande->id}",
                 'type'       => 'statut_commande',
+                'lien'       => '/commandes/' . $commande->id,
                 'is_read'    => false,
             ]);
         }
@@ -175,6 +177,7 @@ class CommandeController extends Controller
             'titre'      => "Commande archivée par {$nom}",
             'contenu'    => "Commande #{$commande->id} — {$commande->client_nom}" . ($note ? " : {$note}" : ''),
             'type'       => 'alerte_archive',
+            'lien'       => '/commandes/' . $commande->id,
             'is_read'    => false,
         ]);
 

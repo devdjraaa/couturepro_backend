@@ -17,7 +17,6 @@ use App\Models\Vetement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use App\Services\FcmService;
 
 class SyncService
 {
@@ -227,36 +226,33 @@ class SyncService
         $titre   = null;
         $contenu = null;
         $type    = null;
+        $lien    = null;
 
         if ($table === 'clients') {
             $titre   = 'Nouveau client ajouté';
             $contenu = trim("{$record->prenom} {$record->nom}");
             $type    = 'client_cree';
+            $lien    = '/clients/' . $record->id;
         } elseif ($table === 'commandes') {
             $titre   = 'Nouvelle commande créée';
             $contenu = "Commande pour {$record->client_nom}";
             $type    = 'commande_cree';
+            $lien    = '/commandes/' . $record->id;
         }
 
         if (!$titre) {
             return;
         }
 
+        // Notification locale uniquement : le rideau du téléphone est alimenté côté
+        // app (notifications locales au sync), plus par push FCM (API legacy fermée).
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
             'titre'      => $titre,
             'contenu'    => $contenu,
             'type'       => $type,
+            'lien'       => $lien,
             'is_read'    => false,
         ]);
-
-        // #41-42 — Push FCM si le propriétaire a un token enregistré
-        $fcmToken = $atelier->proprietaire?->fcm_token;
-        if ($fcmToken) {
-            app(FcmService::class)->sendToToken($fcmToken, $titre, $contenu, [
-                'type'       => $type,
-                'atelier_id' => $atelier->id,
-            ]);
-        }
     }
 }

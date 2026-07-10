@@ -57,6 +57,7 @@ class FideliteController extends Controller
             'titre'      => 'Points convertis',
             'contenu'    => '31 jours de bonus ont été ajoutés à votre abonnement.',
             'type'       => 'points_convertis',
+            'lien'       => '/fidelite',
             'is_read'    => false,
         ]);
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\Avis;
+use App\Models\NotificationSysteme;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,15 @@ class AvisController extends Controller
             'note'       => $data['note'],
             'texte'      => $data['texte'] ?? null,
             'statut'     => 'en_attente',
+        ]);
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Nouvel avis reçu',
+            'contenu'    => $data['auteur_nom'] . ' a laissé un avis ' . $data['note'] . '★ (à valider).',
+            'type'       => 'avis_recu',
+            'lien'       => '/ma-vitrine',
+            'is_read'    => false,
         ]);
 
         return response()->json(['message' => 'Avis soumis, en attente de validation.'], 201);

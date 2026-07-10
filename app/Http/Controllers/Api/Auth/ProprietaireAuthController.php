@@ -117,16 +117,7 @@ class ProprietaireAuthController extends Controller
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
 
-        $atelier = $proprietaire->atelierMaitre;
-        if ($atelier) {
-            NotificationSysteme::create([
-                'atelier_id' => $atelier->id,
-                'titre'      => 'Connexion réussie',
-                'contenu'    => "Bienvenue, {$proprietaire->prenom} !",
-                'type'       => 'info',
-                'is_read'    => false,
-            ]);
-        }
+        // (Plus de notification « Connexion réussie » : c'était du bruit à chaque login.)
 
         return response()->json([
             'token'        => $token,

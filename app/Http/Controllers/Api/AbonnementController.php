@@ -179,9 +179,10 @@ class AbonnementController extends Controller
         // Notification d'activation
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
-            'titre'      => "🎉 Plan {$niveauLabel} activé !",
+            'titre'      => "Plan {$niveauLabel} activé !",
             'contenu'    => "Votre abonnement {$niveauLabel} est actif pour {$duree} jours. Bonne couture !",
             'type'       => 'abonnement_active',
+            'lien'       => '/abonnement',
             'is_read'    => false,
         ]);
 
@@ -192,6 +193,7 @@ class AbonnementController extends Controller
             'titre'      => "Bienvenue sur le plan {$niveauLabel}",
             'contenu'    => $instructions,
             'type'       => 'bienvenue_plan',
+            'lien'       => '/abonnement',
             'is_read'    => false,
         ]);
 

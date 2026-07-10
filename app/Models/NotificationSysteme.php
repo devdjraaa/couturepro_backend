@@ -18,6 +18,7 @@ class NotificationSysteme extends Model
         'titre',
         'contenu',
         'type',
+        'lien',
         'is_read',
     ];
 

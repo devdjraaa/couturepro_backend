@@ -94,6 +94,7 @@ class ClientController extends Controller
             'titre'      => 'Nouveau client ajouté',
             'contenu'    => trim("{$client->prenom} {$client->nom}"),
             'type'       => 'client_cree',
+            'lien'       => '/clients/' . $client->id,
             'is_read'    => false,
         ]);
 
@@ -206,6 +207,7 @@ class ClientController extends Controller
             'titre'      => "Client archivé par {$nom}",
             'contenu'    => "{$client->prenom} {$client->nom}" . ($note ? " — {$note}" : ''),
             'type'       => 'alerte_archive',
+            'lien'       => '/clients/' . $client->id,
             'is_read'    => false,
         ]);
 

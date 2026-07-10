@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\DemandeDevis;
+use App\Models\NotificationSysteme;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,6 +45,15 @@ class DevisController extends Controller
             'budget'      => $data['budget'] ?? null,
             'delai'       => $data['delai'] ?? null,
             'statut'      => 'nouveau',
+        ]);
+
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Nouvelle demande de devis',
+            'contenu'    => $data['nom'] . ' — ' . mb_strimwidth($data['description'], 0, 80, '…'),
+            'type'       => 'devis_recu',
+            'lien'       => '/ma-vitrine',
+            'is_read'    => false,
         ]);
 
         return response()->json(['message' => 'Demande de devis envoyée. Le créateur vous recontactera.'], 201);
