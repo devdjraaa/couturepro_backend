@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\NiveauConfig;
+use App\Models\Vetement;
 use App\Models\VitrineSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -165,6 +166,37 @@ class VitrineController extends Controller
         $s = VitrineSetting::updateOrCreate(['cle' => 'sponsorisation'], ['valeur' => $data]);
 
         return response()->json($s->valeur);
+    }
+
+    /**
+     * Catalogue public de la vitrine : créations publiées de tous les designers
+     * (galerie de la page d'accueil). Alimente getCreations() côté front — sinon
+     * la vitrine retombe sur des modèles de démonstration.
+     */
+    public function creations(): JsonResponse
+    {
+        $creations = Vetement::query()
+            ->where('is_archived', false)
+            ->where('publie_vitrine', true)
+            ->whereHas('atelier', fn ($q) => $q->where('is_demo', false)->where('type', 'designer'))
+            ->with('atelier:id,nom')
+            ->latest()
+            ->limit(24)
+            ->get()
+            ->map(fn ($v) => [
+                'id'          => (string) $v->id,
+                'titre'       => $v->nom,
+                'atelier_nom' => $v->atelier?->nom,
+                'prix'        => null,          // pas de prix en base → « Sur devis » côté front
+                'categorie'   => null,
+                'type'        => 'Sur mesure',
+                'gradient'    => $this->gradient((int) abs(crc32((string) $v->atelier_id))),
+                'image_url'   => $v->image_url,
+                'images_urls' => $v->images_urls,
+            ])
+            ->values();
+
+        return response()->json($creations);
     }
 
     /**
