@@ -105,7 +105,7 @@ class FactureController extends Controller
         $this->authorizeFacture($request, $facture);
 
         $request->validate([
-            'fichier' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'fichier' => ['required', 'file', 'mimes:pdf', 'max:20480'], // 20 Mo (PDF DGI scanné/lourd)
         ]);
 
         if ($facture->dgi_pdf_path) {
