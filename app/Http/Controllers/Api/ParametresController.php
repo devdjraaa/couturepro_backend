@@ -131,7 +131,14 @@ class ParametresController extends Controller
 
         $user->update(['password' => $data['nouveau']]);
 
-        return response()->json(['message' => 'Mot de passe modifié avec succès.']);
+        // Sécurité : un changement de mot de passe révoque toutes les sessions
+        // (y compris le token courant) → l'utilisateur doit se reconnecter.
+        $user->tokens()->delete();
+
+        return response()->json([
+            'message'      => 'Mot de passe modifié avec succès. Veuillez vous reconnecter.',
+            'must_relogin' => true,
+        ]);
     }
 
     public function getPreferences(Request $request): JsonResponse
