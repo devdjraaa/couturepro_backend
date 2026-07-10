@@ -167,6 +167,101 @@ class VitrineController extends Controller
         return response()->json($s->valeur);
     }
 
+    /**
+     * Rendu OG côté serveur pour les robots sociaux (WhatsApp, Facebook, X, LinkedIn…)
+     * qui n'exécutent pas le JavaScript : ils ne verraient sinon que les balises
+     * génériques de la SPA. nginx (côté vitrine) proxifie les User-Agents de robots
+     * vers cette route ; les vrais visiteurs gardent la SPA. Renvoie un HTML minimal
+     * avec les balises Open Graph / Twitter du créateur + une redirection pour les
+     * humains qui atterriraient ici.
+     */
+    public function ogCreateur(Atelier $atelier): \Illuminate\Http\Response
+    {
+        $vitrineUrl = rtrim(config('vitrine.url'), '/');
+        $pageUrl    = $vitrineUrl . '/createurs/' . $atelier->id;
+
+        // Créateur non public (artisan / démo) : on renvoie les balises génériques
+        // et on renvoie l'humain vers l'accueil de la vitrine.
+        if ($atelier->is_demo || $atelier->type !== 'designer') {
+            $title = 'Gextimo — La marketplace des créateurs de mode africains';
+            $desc  = 'Trouvez les meilleurs designers et tailleurs africains.';
+            return $this->ogHtml($title, $desc, config('vitrine.og_image'), $vitrineUrl . '/createurs', 'website');
+        }
+
+        $nom   = $atelier->nom ?: 'Créateur';
+        $ville = $atelier->ville;
+        $spec  = $atelier->specialite ?: 'Atelier de couture';
+
+        $title = $nom . ' · Gextimo';
+        $desc  = $atelier->bio
+            ?: trim($spec . ($ville ? ' à ' . $ville : '') . ' — découvrez ses créations sur Gextimo.');
+        $desc  = mb_strimwidth(trim($desc), 0, 200, '…');
+        $image = $atelier->logo_url ?: config('vitrine.og_image');
+
+        // Données structurées pour Google (rich results).
+        $note  = ($avg = $atelier->avis()->where('statut', 'valide')->avg('note')) ? round($avg, 1) : null;
+        $ld = array_filter([
+            '@context' => 'https://schema.org',
+            '@type'    => 'LocalBusiness',
+            'name'     => $nom,
+            'description' => $atelier->bio ?: null,
+            'image'    => $atelier->logo_url ?: null,
+            'address'  => $ville ? ['@type' => 'PostalAddress', 'addressLocality' => $ville, 'addressCountry' => 'BJ'] : null,
+            'url'      => $pageUrl,
+            'aggregateRating' => $note ? ['@type' => 'AggregateRating', 'ratingValue' => $note, 'ratingCount' => $atelier->avis()->where('statut', 'valide')->count()] : null,
+        ]);
+
+        return $this->ogHtml($title, $desc, $image, $pageUrl, 'profile', $ld);
+    }
+
+    /** Construit la page HTML minimale de rendu OG (tout est échappé au préalable). */
+    private function ogHtml(string $title, string $desc, ?string $image, string $url, string $type, ?array $ld = null): \Illuminate\Http\Response
+    {
+        $enc = fn ($v) => htmlspecialchars((string) $v, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $title = $enc($title);
+        $desc  = $enc($desc);
+        $img   = $enc($image ?: config('vitrine.og_image'));
+        $urlE  = $enc($url);
+        $type  = $enc($type);
+        $urlJs = json_encode($url, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+        $ldTag = $ld
+            ? '<script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . '</script>'
+            : '';
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{$title}</title>
+<meta name="description" content="{$desc}">
+<link rel="canonical" href="{$urlE}">
+<meta property="og:type" content="{$type}">
+<meta property="og:site_name" content="Gextimo">
+<meta property="og:title" content="{$title}">
+<meta property="og:description" content="{$desc}">
+<meta property="og:image" content="{$img}">
+<meta property="og:url" content="{$urlE}">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{$title}">
+<meta name="twitter:description" content="{$desc}">
+<meta name="twitter:image" content="{$img}">
+<meta http-equiv="refresh" content="0; url={$urlE}">
+{$ldTag}
+</head>
+<body>
+<p>Redirection vers <a href="{$urlE}">{$title}</a>…</p>
+<script>location.replace({$urlJs});</script>
+</body>
+</html>
+HTML;
+
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    }
+
     /** Forme « carte créateur » attendue par la vitrine. */
     private function creatorCard(Atelier $a): array
     {

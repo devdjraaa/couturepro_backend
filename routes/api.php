@@ -49,6 +49,8 @@ Route::get('/', fn() => response()->json([
 Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
+    // Rendu OG côté serveur pour les robots sociaux (proxifié par nginx selon l'User-Agent).
+    Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
     Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store']);
     Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
