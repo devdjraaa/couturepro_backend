@@ -43,7 +43,7 @@ class FactureController extends Controller
             'client_nom'             => ['required', 'string', 'max:120'],
             'client_telephone'       => ['nullable', 'string', 'max:40'],
             'date_echeance'          => ['nullable', 'date'],
-            'lignes'                 => ['required', 'array', 'min:1'],
+            'lignes'                 => ['nullable', 'array'], // facture importée (PDF déjà complet) = pas de lignes
             'lignes.*.description'   => ['required', 'string', 'max:255'],
             'lignes.*.quantite'      => ['required', 'numeric', 'min:0'],
             'lignes.*.prix_unitaire' => ['required', 'numeric', 'min:0'],
@@ -68,7 +68,7 @@ class FactureController extends Controller
             'client_telephone' => $data['client_telephone'] ?? null,
             'date_emission'    => now()->toDateString(),
             'date_echeance'    => $data['date_echeance'] ?? null,
-            'lignes'           => $data['lignes'],
+            'lignes'           => $data['lignes'] ?? [],
             'mode_paiement'    => $data['mode_paiement'] ?? null,
             'gabarit'          => $data['gabarit'] ?? 'standard',
             'acompte'          => $data['acompte'] ?? 0,
