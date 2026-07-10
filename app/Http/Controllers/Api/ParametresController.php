@@ -236,7 +236,7 @@ class ParametresController extends Controller
             'facture_rccm'      => ['nullable', 'string', 'max:100'],
             'facture_pied_page' => ['nullable', 'string', 'max:1000'],
             'assujetti_tva'     => ['sometimes', 'boolean'],
-            'emecef_token'      => ['sometimes', 'nullable', 'string', 'max:255'],
+            'emecef_token'      => ['sometimes', 'nullable', 'string', 'max:2000'], // JWT e-MECeF (peut dépasser 255 car.)
         ]);
 
         if ($data['format_facture'] === 'personnalise') {
