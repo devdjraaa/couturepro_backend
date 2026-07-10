@@ -269,14 +269,27 @@ Flux d'écriture validés (API réelle, même endpoints que l'UI) :
 - **master aligné + poussé** : port fichier-par-fichier (deps mobiles hors master), rebase sur
   l'entrant `5befab2` (skeletons), build OK → poussé (`5de016e`).
 
-### 🔧 Corrigé, en attente de déploiement (NON testé bout-en-bout)
-- **Bug plan gratuit → 500 FedaPay** (`amount doit être > 0`) : `PaymentService::initiate`
-  court-circuite désormais tout plan à prix 0 → paiement `completed` + activation directe, sans passer
-  par FedaPay. `/paiements/initier` expose `statut`. Front : le hook confirme (toast + refresh) quand
-  il n'y a pas de `checkout_url`. Backend `73bae5f`, front android `4d029dc` / master `d73e6c6`.
-  ⚠️ **À pousser + déployer + tester en prod** (blocage push GitHub = keyring verrouillé après coupure).
+### ✅ Bug plan gratuit → 500 FedaPay — corrigé, déployé ET vérifié live
+- `PaymentService::initiate` court-circuite tout plan à prix 0 → paiement `completed` + activation
+  directe, sans passer par FedaPay. `/paiements/initier` expose `statut`. Front : le plan gratuit est
+  **retiré des options d'abonnement** (attribué à la création uniquement) + le hook confirme sans
+  redirection. Backend `73bae5f`, front `0959c6f`/master `aaab56e`. **Déployé** (VPS : code servi =
+  origin/master, route/config recachées).
+- **Vérifié sur le téléphone** (compte de test designer, Master Annuel actif) : section Abonnement →
+  **aucun plan « Free » dans la liste** ✅ ; plus d'onglet « Type de compte » dans Paramètres ✅ ;
+  nav designer complète (Ma Vitrine / Outils créatifs / Mes ateliers) ✅.
 
-### ⏳ QA restant (dont sensible = à faire avec l'utilisateur)
+### ✅ QA on-device complémentaire (compte de test, données restaurées)
+- **Paramètres › Préférences** : changement d'unité de mesure (cm → pouces) → Enregistrer →
+  **persistance serveur vérifiée après reload** → remis à cm. Validé de bout en bout. ✅
+- **Archives** : rend correctement l'état vide (« Aucun élément archivé »). ✅
+
+### ✅ SEO vitrine
+- Client-side déjà complet (JSON-LD LocalBusiness, OG/Twitter par designer). OG statiques d'`index.html`
+  pointent désormais le **vrai domaine** `gextimo.novafriq.africa`. Restent (pour l'équipe) : image
+  `og-cover.png` 1200×630 à fournir + SSR/prerender pour les previews des robots sociaux.
+
+### ⏳ QA restant (sensible = à faire avec l'utilisateur)
 - Équipe (ajout membre → **email**), Récupération flux complet (→ **email**), Avis/devis (données
-  entrantes), Paramètres (préférences/facture/sécurité), Archives, push FCM, Sponsorisation (paiement),
-  vitrine publique.
+  entrantes), Paramètres › sécurité (mot de passe) + réglages de facture, push FCM,
+  Sponsorisation (paiement), vitrine publique.
