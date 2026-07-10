@@ -83,7 +83,7 @@ class PaiementController extends Controller
 
         // Si déjà complété (webhook reçu avant la redirect), on retourne direct
         if ($paiement->statut === 'completed') {
-            return response()->json(['paiement_id' => $paiement->id, 'statut' => 'completed']);
+            return response()->json(['paiement_id' => $paiement->id, 'statut' => 'completed', 'type' => $paiement->type]);
         }
 
         // Sinon on vérifie le statut réel auprès de FedaPay et on active si approuvé
@@ -95,7 +95,7 @@ class PaiementController extends Controller
 
         $paiement->refresh();
 
-        return response()->json(['paiement_id' => $paiement->id, 'statut' => $paiement->statut]);
+        return response()->json(['paiement_id' => $paiement->id, 'statut' => $paiement->statut, 'type' => $paiement->type]);
     }
 
 }
