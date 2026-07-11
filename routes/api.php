@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\EquipeMembreAuthController;
 use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
+use App\Http\Controllers\Api\AppVersionController;
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
 use App\Http\Controllers\Api\AvisController;
@@ -62,6 +63,12 @@ Route::prefix('vitrine')->group(function () {
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
+});
+
+// ─── Mises à jour de l'app (version-gate natif + OTA bundle web) ─────────────
+Route::prefix('app')->group(function () {
+    Route::get('version',  [AppVersionController::class, 'version']);   // grosse MAJ (APK)
+    Route::post('updates', [AppVersionController::class, 'updates']);   // OTA self-hosted (Capgo)
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
