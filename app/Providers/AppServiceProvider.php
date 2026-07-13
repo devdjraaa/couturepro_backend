@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\NiveauConfig;
+use App\Models\NotificationSysteme;
 use App\Observers\NiveauConfigObserver;
+use App\Observers\NotificationSystemeObserver;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         NiveauConfig::observe(NiveauConfigObserver::class);
+        NotificationSysteme::observe(NotificationSystemeObserver::class);
 
         Mail::extend('brevo', function () {
             return (new BrevoTransportFactory())->create(

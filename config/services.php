@@ -36,7 +36,9 @@ return [
     ],
 
     'fcm' => [
-        'server_key' => env('FCM_SERVER_KEY', ''),
+        // API HTTP v1 : chemin du JSON de compte de service (hors git) + ID projet Firebase.
+        'credentials' => env('FCM_CREDENTIALS', storage_path('app/firebase/service-account.json')),
+        'project_id'  => env('FCM_PROJECT_ID', 'gextimo-28a49'),
     ],
 
 ];
