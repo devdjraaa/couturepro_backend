@@ -1,3 +1,9 @@
+> ⛔ **PÉRIMÉ — NE PLUS UTILISER.** Ce document (avril 2026, ancien nom « CouturePro », cadrage par
+> sprints) est **remplacé** par **[`SUIVI_NOVAFRIQ.md`](SUIVI_NOVAFRIQ.md)**, le fichier de suivi
+> maître de l'écosystème NovAfriq (7 blocs, statuts audités). Conservé uniquement pour historique.
+
+---
+
 # CouturePro — Roadmap & Ce qui reste à faire
 
 > Référence unique remplaçant `etat-avancement.md` et `sprints-restants-mvp1.md`.
