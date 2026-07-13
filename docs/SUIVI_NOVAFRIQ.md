@@ -25,8 +25,8 @@ valider par la direction avant de lancer les corrections.
 | 1 | **Codes promo / ambassadeurs** (table dédiée, API validée + rate-limit, panel admin, 1×/tél, expiry) — le `activer-code` actuel ne couvre que l'activation d'abonnement, pas ce système | ⬜ | 1/3 | V1-P1, P153-158 |
 | 2 | **Dashboard admin temps réel** (auto-refresh, bouton rafraîchir, delta) — aucun `refetchInterval`/bouton trouvé | ⬜ | 3 | V1-P92-103 |
 | 3 | **Slogan à l'infinitif** « Créer · Gérer · Rayonner » → doit être **impératif** « Créez, Gérez, Rayonnez » | ⚠️ | 1 | SUG-2 |
-| 4 | **« novafrique » encore présent** (fr.json, VitrineChrome, VitrineInfoPages) → doit être **« novafriq »** | ⚠️ | 6 | V1-P127, P188 |
-| 5 | **Indicateur de langue** affiche la cible au lieu de la langue courante (FR affiche EN) | ⚠️ | 1 | V1-P37/145, SUG-3 |
+| 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
+| 5 | **Page inscription en anglais** malgré l'indicateur FR (i18n manquant) — l'indicateur lui-même est corrigé | ⚠️ | 1 | V1-P145 |
 | 6 | **Menus header vitrine** Solutions / Tarifs / Documentation (déroulants façon Kkiapay) — absents | ⬜ | 6 | V1-P181-184 |
 | 7 | **Barre de contact fine** au-dessus du header (tél + WhatsApp +229) — absente | ⬜ | 6 | V1-P180 |
 | 8 | **Likes (cœur) + 4 boutons** sur chaque création (❤️/💬/📩/🛒) — absents du profil créateur | ⬜ | 1 | V1-P159-160 |
@@ -233,7 +233,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P29-34 | Compteur caractères tickets (255/5000 + blocage) | 1 | ✅ |
 | P35 | Timeout 15000 ms envoi ticket | 1 | ⚠️ |
 | P36 | Tickets avec photos → timeout | 1 | ⚠️ |
-| P37 | Langue affiche EN au lieu de FR | 1 | ⚠️ |
+| P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
 | P38 | Gamification défaillante | 1 | ⚠️ à re-tester |
 | P39 | Points de fidélité peu visibles | 1 | ⚠️ |
 | P40 | Meilleur affichage des points | 1 | 🟡 |
@@ -274,7 +274,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P119-124 | Comptes gelés/expirés/récupération (bugs) | 3 | ⚠️ |
 | P125 | Point après « gextimo » sur l'accueil | 1 | ⚠️ à confirmer |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
-| P127 | « novafrique » → « novafriq » | 6 | ⚠️ |
+| P127 | « novafrique » → « novafriq » | 6 | ✅ |
 | P128 | Police gothique cohérente (nom stylisé) | 6 | 🟡 |
 | P129 | Logo ciseaux (login) → logo officiel | 1 | ✅/🟡 |
 | P130 | Favicon violet → logo officiel | 1 | ✅ |
@@ -323,7 +323,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P185 | APK sur le site + guide d'installation | 7 | ✅ (guide à confirmer) |
 | P186 | PWA (manifest + SW + bannière) | 7 | ⬜ |
 | P187 | Texte d'accueil page inscription | 6 | 🟡 |
-| P188 | Remplacer « novafrique » (Qui sommes-nous, footer) | 6 | ⚠️ |
+| P188 | Remplacer « novafrique » (Qui sommes-nous, footer) | 6 | ✅ |
 | P189 | E-mail `support@gextimo.africa` erroné | 5 | ⬜ |
 | P190 | Contenu footer depuis doc APDP | 6 | 🟡 |
 | P191 | Bouton « Se connecter » dépasse sur mobile | 6 | ⚠️ |
@@ -350,7 +350,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 |---|---|---|---|
 | SUG-1 | Splash screen (favicon → logo → connexion) | 7 | 🟡 |
 | SUG-2 | Slogan à l'impératif (Créez, Gérez, Rayonnez) | 1 | ⚠️ |
-| SUG-3 | Indicateur de langue (FR/EN) | 1 | ⚠️ |
+| SUG-3 | Indicateur de langue (FR/EN) | 1 | ✅ |
 | SUG-4 | Checkbox CGU obligatoire à l'inscription | 1 | ✅ |
 | SUG-5 | Lien CGU ouvre le site web | 1 | 🟡 |
 | SUG-6 | Bug : clic CGU renvoie à la connexion | 1 | ⚠️ |
