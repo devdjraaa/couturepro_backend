@@ -40,7 +40,7 @@ valider par la direction avant de lancer les corrections.
 | 16 | **Veille technique SEO hebdo** (PageSpeed + Search Console + HTTPS + alertes), 2 sites | ⬜ | 2 | V1-P200 |
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
 | 18 | **Sauvegardes VPS** chiffrées quotidiennes off-site + test de restauration mensuel | ⬜ | 4 | V1-P203 |
-| 19 | **Push FCM** (notifs commande même app fermée) — seule la notif locale existe | ⬜ | 7 | V1-P42-43, P168 |
+| 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
 | 20 | **Format numéro de reçu** auto-majuscules + tirets automatiques | ⬜ | 1 | V1-P144 |
 | 21 | **e-mail `support@gextimo.africa`** erroné (FAQ) → mettre la bonne adresse | ⬜ | 5 | V1-P189 |
 
@@ -238,8 +238,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P39 | Points de fidélité peu visibles | 1 | ⚠️ |
 | P40 | Meilleur affichage des points | 1 | 🟡 |
 | P41 | Badge auto au changement de niveau | 1 | 🟡 |
-| P42 | Notifs commande même app fermée | 7 | ⬜ (FCM) |
-| P43 | Notifs seulement à l'ouverture | 7 | ⬜ (FCM) |
+| P42 | Notifs commande même app fermée | 7 | ✅ |
+| P43 | Notifs seulement à l'ouverture | 7 | ✅ |
 | P44 | Galerie photos annoncée absente | 1 | ✅ (existe) |
 | P45 | Espace galerie jamais activé | 1 | ✅ |
 | P46 | Module abonnement peu visible | 1 | 🟡 |
@@ -306,7 +306,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P165 | Paiement 2 phases (mise en relation → commission 15%) | 1 | 🔵 (business) |
 | P166 | Tickets = canal support créateur | 1 | ✅ |
 | P167 | Messages = communications officielles (lecture) | 1 | 🟡 |
-| P168 | Notifications temps réel + purge 30j | 1/7 | 🟡 |
+| P168 | Notifications temps réel + purge 30j | 1/7 | ✅ |
 | P169 | Photo de profil créateur | 1 | ✅ |
 | P170 | Nom/prénom internes, pseudo public | 1 | ⬜/🟡 |
 | P171 | 4 compteurs publics (abonnés/avis/publi/commandes) | 1 | ⬜ |
