@@ -40,53 +40,78 @@ class SuiviSprintController extends Controller
         @file_put_contents($this->path(), json_encode($d, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
 
+    private function payload(array $d): array
+    {
+        return [
+            'checked'     => (object) ($d['checked'] ?? []),
+            'priorities'  => array_values($d['priorities'] ?? []),
+            'updated_at'  => $d['updated_at'] ?? null,
+            'locked'      => ! empty($d['code_hash']),        // volet validations (propriétaire)
+            'prio_locked' => ! empty($d['prio_code_hash']),   // volet priorités (chef)
+        ];
+    }
+
     /** GET /api/suivi-sprints */
     public function show(): JsonResponse
     {
-        $d = $this->read();
-
-        return response()->json([
-            'checked'    => (object) ($d['checked'] ?? []),
-            'updated_at' => $d['updated_at'] ?? null,
-            'locked'     => ! empty($d['code_hash']),
-        ]);
+        return response()->json($this->payload($this->read()));
     }
 
-    /** POST /api/suivi-sprints */
+    /**
+     * POST /api/suivi-sprints
+     *
+     * Deux volets INDÉPENDANTS, chacun protégé par son propre code à 6 chiffres :
+     *   { code, checked }        → validations « fait/pas fait » (propriétaire)
+     *   { prio_code, priorities} → corrections prioritaires (chef)
+     * Le code de chaque volet est posé à sa première sauvegarde, puis exigé.
+     */
     public function save(Request $request): JsonResponse
     {
-        $code = (string) $request->input('code', '');
-        if (! preg_match('/^\d{6}$/', $code)) {
-            return response()->json(['message' => 'Code à 6 chiffres requis.'], 422);
-        }
-
         $d = $this->read();
 
-        if (empty($d['code_hash'])) {
-            $d['code_hash'] = Hash::make($code);          // première utilisation : on pose le code
-        } elseif (! Hash::check($code, $d['code_hash'])) {
-            return response()->json(['message' => 'Code incorrect.'], 403);
-        }
-
-        // On ne garde que des clés valides « sNtM » à true.
-        $clean = [];
-        $checked = $request->input('checked', []);
-        if (is_array($checked)) {
-            foreach ($checked as $k => $v) {
+        // ── Volet 1 : validations (propriétaire) ──────────────────────────────
+        if ($request->has('checked')) {
+            $code = (string) $request->input('code', '');
+            if (! preg_match('/^\d{6}$/', $code)) {
+                return response()->json(['message' => 'Code à 6 chiffres requis.'], 422);
+            }
+            if (empty($d['code_hash'])) {
+                $d['code_hash'] = Hash::make($code);
+            } elseif (! Hash::check($code, $d['code_hash'])) {
+                return response()->json(['message' => 'Code incorrect.'], 403);
+            }
+            $clean = [];
+            foreach ((array) $request->input('checked', []) as $k => $v) {
                 if (is_string($k) && preg_match('/^s\d+t\d+$/', $k) && $v) {
                     $clean[$k] = true;
                 }
             }
+            $d['checked'] = $clean;
         }
 
-        $d['checked']    = $clean;
+        // ── Volet 2 : priorités (chef) ────────────────────────────────────────
+        if ($request->has('priorities')) {
+            $pcode = (string) $request->input('prio_code', '');
+            if (! preg_match('/^\d{6}$/', $pcode)) {
+                return response()->json(['message' => 'Code priorité à 6 chiffres requis.'], 422);
+            }
+            if (empty($d['prio_code_hash'])) {
+                $d['prio_code_hash'] = Hash::make($pcode);
+            } elseif (! Hash::check($pcode, $d['prio_code_hash'])) {
+                return response()->json(['message' => 'Code priorité incorrect.'], 403);
+            }
+            $pr = [];
+            foreach ((array) $request->input('priorities', []) as $k) {
+                if (is_string($k) && preg_match('/^s\d+t\d+$/', $k)) {
+                    $pr[] = $k;
+                }
+            }
+            $d['priorities'] = array_values(array_unique($pr));
+        }
+
         $d['updated_at'] = now()->toIso8601String();
         $this->write($d);
 
-        return response()->json([
-            'checked'    => (object) $clean,
-            'updated_at' => $d['updated_at'],
-            'locked'     => true,
-        ]);
+        return response()->json($this->payload($d));
     }
 }
