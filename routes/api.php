@@ -229,6 +229,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('notifications',                   [NotificationController::class, 'index']);
     Route::post('notifications/mark-as-read',     [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/delete',           [NotificationController::class, 'destroy']);
     Route::post('notifications/fcm-token',        [NotificationController::class, 'registerFcmToken']);
     Route::delete('notifications/fcm-token',      [NotificationController::class, 'removeFcmToken']);
 

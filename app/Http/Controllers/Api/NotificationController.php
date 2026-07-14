@@ -54,6 +54,23 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Notifications marquées comme lues.']);
     }
 
+    /** Supprime des notifications : { ids: [...] } ou { all: true }. */
+    public function destroy(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if ($request->boolean('all')) {
+            NotificationSysteme::where('atelier_id', $atelier->id)->delete();
+        } elseif ($request->has('ids')) {
+            $ids = (array) $request->input('ids');
+            NotificationSysteme::where('atelier_id', $atelier->id)
+                ->whereIn('id', $ids)
+                ->delete();
+        }
+
+        return response()->json(['message' => 'Notifications supprimées.']);
+    }
+
     // #41-42 — Enregistrer le token FCM de l'appareil
     public function registerFcmToken(Request $request): JsonResponse
     {
