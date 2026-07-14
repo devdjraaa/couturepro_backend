@@ -8,6 +8,7 @@ use App\Models\Atelier;
 use App\Models\Commande;
 use App\Models\CommandePaiement;
 use App\Models\EquipeMembre;
+use App\Models\NotificationSysteme;
 use App\Models\QuotaMensuel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,6 +53,17 @@ class CommandePaiementController extends Controller
         // Met à jour le total des avances
         $commande->increment('acompte', $data['montant']);
         $commande->refresh();
+
+        // Notification interne « paiement reçu » → push FCM temps réel au propriétaire.
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Paiement reçu',
+            'contenu'    => number_format((float) $data['montant'], 0, '.', ' ') . ' FCFA'
+                            . ($commande->client_nom ? " — {$commande->client_nom}" : ''),
+            'type'       => 'paiement',
+            'lien'       => '/commandes/' . $commande->id,
+            'is_read'    => false,
+        ]);
 
         $whatsappUrl = null;
         $config = $atelier->abonnement?->getConfigEffective() ?? [];
