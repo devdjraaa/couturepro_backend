@@ -64,7 +64,8 @@ class FcmService
                         'android'      => [
                             'priority'     => 'HIGH',
                             'notification' => [
-                                'channel_id'              => 'gextimo_push',
+                                // Pas de channel_id fixe : une notif vers un canal inexistant
+                                // est ignorée par Android. On laisse le canal par défaut FCM.
                                 'sound'                   => 'default',
                                 'default_vibrate_timings' => true,
                                 'notification_priority'   => 'PRIORITY_MAX',
