@@ -64,6 +64,7 @@ class FcmService
                         'android'      => [
                             'priority'     => 'HIGH',
                             'notification' => [
+                                'channel_id'              => 'gextimo_push',
                                 'sound'                   => 'default',
                                 'default_vibrate_timings' => true,
                                 'notification_priority'   => 'PRIORITY_MAX',
