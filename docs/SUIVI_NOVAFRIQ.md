@@ -155,7 +155,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
   (`useSubscriptionGate`) prend en compte `atelier.statut` (le gel admin ne touchait que ce champ, pas
   l'abonnement → le compte gelé gardait l'accès) → **mur plein écran** (portail, couvre FAB/nav), message
   FR adapté (gelé → contacter support ; expiré → abonnement), `/support` accessible pour les tickets.
-  ✅ V1-P119 (dégel restaure essai/actif). ⚠️ Reste V1-P120-123 (réactivation admin page blanche, etc.).
+  ✅ V1-P119 (dégel restaure essai/actif). ✅ V1-P120 (page détail atelier admin blanche corrigée →
+  la réactivation/dégel est de nouveau accessible). ⚠️ Reste V1-P121-123.
 - ⬜ **Espace création de codes** d'activation/promo côté admin — V1-P1.
 - ⬜ **Dashboard admin temps réel** (auto-refresh configurable, bouton rafraîchir, delta, filtre atelier,
   perf multi-ateliers) — V1-P92-103.
@@ -280,7 +281,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P118 | Séparation stricte + sync fiable (synthèse) | 1 | 🟡 |
 | P119 | Dégel restaure essai/actif valide (ne force plus « expire ») | 3 | ✅ |
 | P124 | Récup : format tél normalisé (espaces strippés à l'écriture + lookup) | 3 | ✅ |
-| P120-123 | Réactivation compte dégelé (page blanche), tél dé-enregistré, OTP e-mail fictif | 3 | ⚠️ runtime |
+| P120 | Page détail atelier admin **blanche** pour comptes non-actifs — **corrigé** (`UNITE_OPTIONS` hors scope → ReferenceError ; la réactivation/dégel se fait sur cette page) | 3 | ✅ |
+| P121-123 | Tél dé-enregistré (vérif), OTP e-mail fictif → compte bloqué | 3 | ⚠️ |
 | P125 | Point après « gextimo » sur l'accueil — retiré | 1 | ✅ |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
 | P127 | « novafrique » → « novafriq » | 6 | ✅ |
