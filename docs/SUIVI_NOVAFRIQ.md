@@ -75,7 +75,7 @@ valider par la direction avant de lancer les corrections.
 - ⬜ PWA — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
 - 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
 - 🟡 Localisation pays/devise auto + message — V1-P135 ; 🟡 phrases d'accroche — V1-P192/193.
-- ⬜ Bannière profil (photo/GIF/vidéo) — V1-P134 ; ⚠️ profil s'ouvre au milieu — V1-P133.
+- ⬜ Bannière profil (photo/GIF/vidéo) — V1-P134 ; ✅ profil s'ouvre en haut (P133, master).
 
 ### 1.2 App mobile artisan/designer
 - ✅ Checkbox CGU obligatoire à l'inscription (`RegisterPage`) — V1-P141/SUG-4.
@@ -291,7 +291,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P130 | Favicon violet → logo officiel | 1 | ✅ |
 | P131 | Bouton « S'inscrire » absent sur mobile | 6 | 🟡 à confirmer |
 | P132 | Header/retour sur pages inscription-connexion | 6 | ⬜ |
-| P133 | Profil créateur s'ouvre au milieu | 1 | ⚠️ |
+| P133 | Profil créateur s'ouvre en haut (scrollTo(0,0) au changement de slug, master) | 1 | ✅ |
 | P134 | Bannière profil : photo/GIF/vidéo | 1 | ⬜ |
 | P135 | Détection pays/devise + message | 1/6 | 🟡 |
 | P136 | Bandeau cookies + personnalisation | 6 | ✅/🟡 |
