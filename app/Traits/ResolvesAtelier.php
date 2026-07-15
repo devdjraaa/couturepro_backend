@@ -27,4 +27,22 @@ trait ResolvesAtelier
 
         return $user->atelierMaitre;
     }
+
+    /**
+     * Ids des ateliers auxquels l'utilisateur courant a légitimement accès.
+     * - Propriétaire : tous ses ateliers (support multi-ateliers P72-73 : une commande peut
+     *   viser un client/vêtement de n'importe lequel de SES ateliers, sans ressaisie).
+     * - Membre d'équipe : uniquement son atelier.
+     * Sert de garde-fou anti-IDOR : on ne référence jamais les données d'un autre propriétaire.
+     */
+    protected function ateliersAutorises(Request $request): array
+    {
+        $user = $request->user();
+
+        if ($user instanceof EquipeMembre) {
+            return [$user->atelier_id];
+        }
+
+        return Atelier::where('proprietaire_id', $user->id)->pluck('id')->all();
+    }
 }

@@ -7,8 +7,10 @@ use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreCommandeRequest;
 use App\Http\Requests\Api\UpdateCommandeRequest;
 use App\Models\Atelier;
+use App\Models\Client;
 use App\Models\Commande;
 use App\Models\EquipeMembre;
+use App\Models\Vetement;
 use App\Models\NotificationSysteme;
 use App\Services\AtelierLimitsService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -45,6 +47,19 @@ class CommandeController extends Controller
             return response()->json([
                 'message' => 'Limite de commandes du mois atteinte pour votre plan. Passez à un plan supérieur ou renouvelez votre abonnement.',
             ], 403);
+        }
+
+        // Garde-fou anti-IDOR + support multi-ateliers (P72-73) : le client et le vêtement doivent
+        // appartenir à l'un des ateliers du propriétaire (ou catalogue global pour le vêtement).
+        // La commande, elle, est toujours rattachée à l'atelier actif ($atelier).
+        $atelierIds = $this->ateliersAutorises($request);
+        if (!Client::where('id', $request->client_id)->whereIn('atelier_id', $atelierIds)->exists()) {
+            return response()->json(['message' => 'Client introuvable pour vos ateliers.'], 422);
+        }
+        if (!Vetement::where('id', $request->vetement_id)
+                ->where(fn ($q) => $q->whereIn('atelier_id', $atelierIds)->orWhereNull('atelier_id'))
+                ->exists()) {
+            return response()->json(['message' => 'Vêtement introuvable pour vos ateliers.'], 422);
         }
 
         $user = $request->user();

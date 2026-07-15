@@ -9,6 +9,7 @@ use App\Models\Commande;
 use App\Models\CommandeGroupe;
 use App\Models\EquipeMembre;
 use App\Models\NotificationSysteme;
+use App\Models\Vetement;
 use App\Services\AtelierLimitsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -57,12 +58,23 @@ class CommandeGroupeController extends Controller
             'sous_commandes.*.photo_tissu'           => ['nullable', 'image', 'max:4096'], // P24 : photo tissu par article
         ]);
 
+        // Anti-IDOR + multi-ateliers (P72-73) : client pris dans l'un des ateliers du propriétaire.
+        $atelierIds = $this->ateliersAutorises($request);
         $client = Client::where('id', $data['client_id'])
-            ->where('atelier_id', $atelier->id)
+            ->whereIn('atelier_id', $atelierIds)
             ->first();
 
         if (!$client) {
-            return response()->json(['message' => 'Client introuvable pour cet atelier.'], 422);
+            return response()->json(['message' => 'Client introuvable pour vos ateliers.'], 422);
+        }
+
+        // Chaque vêtement doit appartenir à un de mes ateliers (ou au catalogue global).
+        $vetementIds = collect($data['sous_commandes'])->pluck('vetement_id')->unique();
+        $vetementsOk = Vetement::whereIn('id', $vetementIds)
+            ->where(fn ($q) => $q->whereIn('atelier_id', $atelierIds)->orWhereNull('atelier_id'))
+            ->count();
+        if ($vetementsOk !== $vetementIds->count()) {
+            return response()->json(['message' => 'Un vêtement est introuvable pour vos ateliers.'], 422);
         }
 
         $user = $request->user();
