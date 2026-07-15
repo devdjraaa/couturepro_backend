@@ -23,7 +23,7 @@ valider par la direction avant de lancer les corrections.
 | # | Sujet | Statut | Bloc | Réf |
 |---|---|---|---|---|
 | 1 | **Codes promo / ambassadeurs** (table dédiée, API validée + rate-limit, panel admin, 1×/tél, expiry) — le `activer-code` actuel ne couvre que l'activation d'abonnement, pas ce système | ⬜ | 1/3 | V1-P1, P153-158 |
-| 2 | **Dashboard admin temps réel** (auto-refresh, bouton rafraîchir, delta) — aucun `refetchInterval`/bouton trouvé | ⬜ | 3 | V1-P92-103 |
+| 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
 | 3 | **Slogan à l'infinitif** « Créer · Gérer · Rayonner » → doit être **impératif** « Créez, Gérez, Rayonnez » | ⚠️ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
 | 5 | **Page inscription en anglais** malgré l'indicateur FR (i18n manquant) — l'indicateur lui-même est corrigé | ⚠️ | 1 | V1-P145 |
@@ -270,7 +270,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P68-77 | Recherche client cross-ateliers + mesures partagées | 1 | ⬜/🟡 |
 | P78-81 | WhatsApp preuve de paiement (PDF/image attaché) | 1 | ⚠️ |
 | P82-91 | Module facturation par plan + modèles + preview | 1 | ✅/🟡 |
-| P92-103 | Dashboard admin temps réel (refresh, filtres) | 3 | ⬜ |
+| P92-95 | Dashboard admin : auto-refresh 30s + bouton Actualiser | 3 | ✅ |
+| P96-103 | Dashboard admin : delta/graphiques/filtres avancés | 3 | ⬜ |
 | P104-106 | Permissions au changement de plan — snapshot régénéré au sync + à l'activation ; immédiateté UI/P106 à re-tester | 1 | 🟡 |
 | P107 | Transitions d'écran plus fluides | 1 | 🟡 |
 | P108 | Skeleton loaders | 1 | ✅ |
