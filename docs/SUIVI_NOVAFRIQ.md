@@ -398,7 +398,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | ID | Sujet | Bloc | Statut |
 |---|---|---|---|
 | SUG-1 | Splash screen (favicon → logo → connexion) | 7 | 🟡 |
-| SUG-2 | Slogan à l'impératif (alt corrigé ; **visuel dans l'image `logoforlogin.png` à refaire côté design**) | 1 | 🟡 |
+| SUG-2 | Slogan à l'impératif « Créez, Gérez, Rayonnez » : image `logoforlogin.png` corrigée (glyphe z) + alt | 1 | ✅ |
 | SUG-3 | Indicateur de langue (FR/EN) | 1 | ✅ |
 | SUG-4 | Checkbox CGU obligatoire à l'inscription | 1 | ✅ |
 | SUG-5 | Lien CGU ouvre le site web (page /cgu publiée par l'équipe) | 1 | ✅ |
