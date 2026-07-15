@@ -397,7 +397,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-11 | Placeholders Nom/Prénom béninois (i18n, plus de dur) | 1 | ✅ |
 | SUG-12 | Champ Prénom dans le profil | 1 | ✅ |
 | SUG-13 | Import contacts : timeout 60 s par lot — fini l'« erreur »' fantôme | 1 | ✅ |
-| SUG-14 | PDF : pied de page marketing (logo/slogan/site) | 1 | 🟡 |
+| SUG-14 | PDF : pied de page marketing Gextimo (logo, slogan, site, pitch) | 1 | ✅ |
 | SUG-15 | Coordonnées artisan (tél/e-mail/adresse) sur toutes les factures | 1 | ✅ |
 | SUG-16 | Export WhatsApp mesures : message construit localement (offline-first) | 1 | ✅ |
 | SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
