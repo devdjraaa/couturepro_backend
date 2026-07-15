@@ -223,7 +223,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P10 | Clic avatar client → modifier | 1 | 🟡 |
 | P11 | Export mesures depuis la fiche | 1 | ✅ |
 | P12 | Export WhatsApp / CSV | 1 | 🟡 (CSV ?) |
-| P13 | Animation ajout commande peu fluide | 1 | ⚠️ |
+| P13 | Ajout commande sans animation (noAnimation sur les pages de saisie) | 1 | ✅ |
 | P14 | Acompte > total → bloc auto | 1 | ⬜ |
 | P15 | Bloc différence calculée + raison obligatoire | 1 | ⬜ |
 | P16 | Acompte ne dépasse pas total sans raison | 1 | ⬜ |
@@ -234,7 +234,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P21 | Sélecteur de quantité par vêtement | 1 | 🟡 à confirmer |
 | P22 | Plusieurs catégories, une seule facture | 1 | ✅ |
 | P23 | Échéances multiples + note | 1 | ✅ |
-| P24 | Photos tissu plus grandes (groupées) | 1 | ⚠️ |
+| P24 | Photo du tissu **par article** en commande groupée (grande zone, multipart, backend + app) — vérifié device | 1 | ✅ |
 | P25 | Mode « commande groupée » | 1 | ✅ |
 | P26 | Tri auto par date livraison | 1 | 🟡 |
 | P27 | Urgentes en premier | 1 | 🟡 |
