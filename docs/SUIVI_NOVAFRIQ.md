@@ -87,8 +87,8 @@ valider par la direction avant de lancer les corrections.
 - ✅ Multi-items / échéances multiples / commande groupée — V1-P17/20/22/23/25.
 - ⚠️ Slogan à l'infinitif — SUG-2.
 - ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
-- ✅ Champ Quantité éditable (SUG-18). ⚠️ Bugs UX **à re-tester dans l'app** : onglet Mesures blanc (SUG-19), Historique vide (SUG-20),
-  profil client `/`/`Key` (SUG-21), icône module « nouveau modèle » (SUG-17),
+- ✅ Champ Quantité éditable (SUG-18) ; ✅ Historique alimenté + au menu (SUG-20) ; ✅ Mesures wizard obsolète (SUG-19) ; ✅ profil client `/`/`Key` non reproduit (SUG-21) ; ✅ recherche clients live (P9).
+- ⚠️ Reste à vérifier device : icône module « nouveau modèle » (SUG-17),
   bouton « déjà inscrit » (SUG-7), bouton se connecter trop bas (SUG-8).
 - ⬜ Placeholders adaptés au profil + **références béninoises** — SUG-9/10/11.
 - 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61 ; 🟡 PDF pied de page
@@ -211,7 +211,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P6 | Import avec confirmation (jamais auto) | 1 | ✅ |
 | P7 | Bouton « Importer des contacts » (multi) | 1 | ✅ |
 | P8 | Clients « 0 commande » erroné | 1 | ✅ |
-| P9 | Recherche clients live | 1 | ⚠️ à re-tester |
+| P9 | Recherche clients live (filtre au fil de la frappe) — vérifié device | 1 | ✅ |
 | P10 | Clic avatar client → modifier | 1 | 🟡 |
 | P11 | Export mesures depuis la fiche | 1 | ✅ |
 | P12 | Export WhatsApp / CSV | 1 | 🟡 (CSV ?) |
@@ -370,9 +370,9 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-16 | Export WhatsApp avec toutes les mesures | 1 | ⚠️ |
 | SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
 | SUG-18 | Champ Quantité éditable (effaçable, borné 1–999, select au focus) | 1 | ✅ |
-| SUG-19 | Onglet « Mesures » (page blanche) | 1 | ⚠️ |
-| SUG-20 | Onglet « Historique » vide | 1 | ⚠️ |
-| SUG-21 | Profil client affiche `/` ou `Key` | 1 | ⚠️ |
+| SUG-19 | Mesures : plus d'étape Mesures dans le wizard commande (obsolète) ; mesures client OK | 1 | ✅ |
+| SUG-20 | Historique alimenté (logAction branché app) + entrée menu ajoutée — vérifié device | 1 | ✅ |
+| SUG-21 | Profil client `/`/`Key` : non reproduit (form + mesures propres) | 1 | ✅ |
 | SUG-22 | Abonnements en 2 onglets (Mensuel/Annuel) | 1 | ✅ |
 | SUG-23 | Mieux valoriser les cartes d'abonnement | 1 | 🟡 |
 | SUG-24 | Revue UX générale (cohérence, sécu Android) | 1 | 🟡 |
