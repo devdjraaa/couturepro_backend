@@ -112,7 +112,12 @@ class ProprietaireAuthController extends Controller
         }
 
         if (!$proprietaire->telephone_verified_at) {
-            return response()->json(['message' => 'Téléphone non vérifié. Veuillez valider votre OTP.'], 403);
+            // P147 : le front redirige vers la page OTP (renvoi + saisie) au lieu de laisser bloqué.
+            return response()->json([
+                'message'   => 'Téléphone non vérifié. Veuillez valider votre OTP.',
+                'code'      => 'telephone_non_verifie',
+                'telephone' => $proprietaire->telephone,
+            ], 403);
         }
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;

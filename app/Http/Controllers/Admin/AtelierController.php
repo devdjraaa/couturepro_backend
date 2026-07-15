@@ -132,8 +132,14 @@ class AtelierController extends Controller
 
         $admin = $this->adminUser();
 
-        $abonnement  = $atelier->abonnement;
-        $nouveauStatut = ($abonnement && $abonnement->statut === 'actif') ? 'actif' : 'expire';
+        // P119 : au dégel, on restaure le vrai statut de l'abonnement s'il est ENCORE valide
+        // (actif OU essai non expiré) — sinon seulement on repasse en « expire ».
+        $abonnement = $atelier->abonnement;
+        $abonnementValide = $abonnement
+            && in_array($abonnement->statut, ['actif', 'essai'], true)
+            && $abonnement->timestamp_expiration
+            && $abonnement->timestamp_expiration->isFuture();
+        $nouveauStatut = $abonnementValide ? $abonnement->statut : 'expire';
 
         $atelier->update(['statut' => $nouveauStatut]);
 
