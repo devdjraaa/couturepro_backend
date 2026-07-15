@@ -338,7 +338,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P142 | Footer page confidentialité (liens légaux) | 6 | 🟡 |
 | P143 | Nom du menu « Galerie des artisans » | 1 | 🟡 |
 | P144 | Code d'activation : majuscules + tirets automatiques (XXXX-XXXX-XXXX) | 1 | ✅ |
-| P145 | Indicateur « FR » mais texte EN | 1 | ⚠️ |
+| P145 | Indicateur « FR » mais texte EN — **audit code OK** (i18n défaut/ fallback FR, LangContext synchro i18n via cp_lang, 0 clé FR manquante, 0 EN en dur en auth) ; re-test visuel chef sur l'écran précis | 1 | 🟡 audit |
 | P147 | Login non vérifié → redirige vers l'OTP (renvoi + saisie), fini le blocage | 1 | ✅ |
 | P146 | OTP par e-mail **et** SMS — **bloqué : passerelle SMS payante à choisir** (Twilio/Vonage/agrégateur local Bénin) ; OtpService actuel = e-mail seul | 1 | ⚠️ décision |
 | P157 | Import contacts gratuit pour tous — vérifié : aucun verrou de plan (front ni back) | 1 | ✅ |
