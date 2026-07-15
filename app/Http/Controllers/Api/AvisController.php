@@ -25,13 +25,23 @@ class AvisController extends Controller
             'auteur_nom' => ['required', 'string', 'max:80'],
             'note'       => ['required', 'integer', 'min:1', 'max:5'],
             'texte'      => ['nullable', 'string', 'max:600'],
+            'photos'     => ['nullable', 'array', 'max:3'],   // P137 : jusqu'à 3 photos
+            'photos.*'   => ['image', 'max:4096'],            // 4 Mo par photo
         ]);
+
+        $photos = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $photos[] = $photo->store('avis', 'public');
+            }
+        }
 
         Avis::create([
             'atelier_id' => $atelier->id,
             'auteur_nom' => $data['auteur_nom'],
             'note'       => $data['note'],
             'texte'      => $data['texte'] ?? null,
+            'photos'     => $photos ?: null,
             'statut'     => 'en_attente',
         ]);
 

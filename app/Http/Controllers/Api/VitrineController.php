@@ -140,7 +140,7 @@ class VitrineController extends Controller
             'abonne'         => $visitorKey ? $atelier->abonnes()->where('visitor_key', $visitorKey)->exists() : false, // P173
             'merites'        => $badges,             // P174-176
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
-            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'created_at']),
+            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
             'creations'   => $creations,
             // RBAC : la demande de devis est-elle incluse dans le plan du créateur ?
             'devis'       => (bool) ($atelier->abonnement?->getConfigEffective()['devis_vitrine'] ?? false),
