@@ -17,16 +17,19 @@ class Mesure extends Model
     protected static function booted(): void
     {
         static::saved(function (Mesure $mesure) {
-            if (! $mesure->wasRecentlyCreated && ! $mesure->wasChanged('champs')) {
+            $derniere = $mesure->versions()->orderByDesc('version')->first();
+
+            // On ne fige une version que si les mesures diffèrent réellement de la dernière.
+            // NB : on compare les tableaux `champs` (== ignore l'ordre des clés) plutôt que
+            // wasChanged('champs') — peu fiable sur colonne JSON (faux positifs à chaque save).
+            if ($derniere && $derniere->champs == $mesure->champs) {
                 return;
             }
-
-            $version = (int) $mesure->versions()->max('version') + 1;
 
             $mesure->versions()->create([
                 'client_id'       => $mesure->client_id,
                 'atelier_id'      => $mesure->atelier_id,
-                'version'         => $version,
+                'version'         => ($derniere->version ?? 0) + 1,
                 'champs'          => $mesure->champs,
                 'created_by'      => $mesure->created_by,
                 'created_by_role' => $mesure->created_by_role,
