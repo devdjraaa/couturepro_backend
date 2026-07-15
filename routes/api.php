@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\EquipeMembreAuthController;
 use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
+use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\AbonnementController;
 use App\Http\Controllers\Api\CodePromoController;
 use App\Http\Controllers\Api\AppVersionController;
@@ -96,6 +97,11 @@ Route::prefix('auth')->group(function () {
         ->middleware('throttle:5,1');
     Route::post('login',         [ProprietaireAuthController::class, 'login']);
     Route::post('equipe/login',  [EquipeMembreAuthController::class, 'login']);
+
+    // P150 : connexion sociale (Google/Facebook/Apple) — actifs selon les clés .env.
+    Route::get('social/providers',          [SocialAuthController::class, 'providers']);
+    Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect']);
+    Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback']);
 
     Route::prefix('recuperation')->group(function () {
         Route::post('initier',              [RecuperationController::class, 'etape1']);

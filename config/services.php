@@ -48,4 +48,27 @@ return [
         'psi_key' => env('PSI_API_KEY'),
     ],
 
+    // P150 : connexion sociale (Laravel Socialite). Chaque provider n'est ACTIF que si
+    // ses client_id + client_secret sont renseignés dans .env → le jour où le boss a les
+    // clés, il les colle ici (via .env) + `config:cache` et les boutons s'activent seuls.
+    // redirect par défaut = callback backend {APP_URL}/api/auth/social/{provider}/callback.
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect'      => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/api/auth/social/google/callback'),
+    ],
+
+    'facebook' => [
+        'client_id'     => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect'      => env('FACEBOOK_REDIRECT_URI', env('APP_URL') . '/api/auth/social/facebook/callback'),
+    ],
+
+    // Apple : client_id = Services ID ; client_secret = JWT généré (clé .p8 + team_id + key_id).
+    'apple' => [
+        'client_id'     => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'redirect'      => env('APPLE_REDIRECT_URI', env('APP_URL') . '/api/auth/social/apple/callback'),
+    ],
+
 ];
