@@ -57,9 +57,22 @@ class PatronPublicController extends Controller
     /** GET /api/vitrine/patrons/achats/{code} — statut de la transaction + contenu (P162). */
     public function statut(string $code): JsonResponse
     {
-        $achat = PatronAchat::with('patron')->where('code_transaction', $code)->first();
+        $achat = PatronAchat::with('patron', 'paiement')->where('code_transaction', $code)->first();
 
         abort_unless($achat, 404, 'Aucune transaction pour ce code.');
+
+        // Réconciliation : si le paiement est encore « pending », on vérifie directement
+        // auprès de FedaPay (le webhook peut tarder ou ne pas arriver) et on active si réglé.
+        // Ainsi l'acheteur n'est jamais bloqué sur « en attente » en rafraîchissant son reçu.
+        $paiement = $achat->paiement;
+        if (! $achat->estPaye() && $paiement && $paiement->statut === 'pending' && $paiement->provider_transaction_id) {
+            try {
+                $this->payments->handleRetour($paiement->provider, $paiement);
+                $achat->refresh();
+            } catch (\Throwable $e) {
+                // On ne casse pas la consultation du statut si le provider est injoignable.
+            }
+        }
 
         return response()->json([
             'code_transaction' => $achat->code_transaction,
