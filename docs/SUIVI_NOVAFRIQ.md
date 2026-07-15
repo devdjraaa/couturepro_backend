@@ -360,7 +360,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
 | P156 | Expiration → repli **mode gratuit** : plus de mur, bannière « Renouveler », données visibles, quotas/features free (getConfigEffective) — **vérifié device** | 1 | ✅ |
-| P159-160 | Likes cœur + 4 boutons par création | 1 | 🟡 (backend : like public anonyme `POST vitrine/creations/{v}/like` + compteur/`liked` par création ; avis/contacter(whatsapp)/devis déjà présents. Reste câblage affichage vitrine — front collègue) |
+| P159-160 | Likes cœur + 4 boutons par création | 1 | ✅ (full-stack déployé : like ❤️ public anonyme + rangée 4 boutons ❤️/💬/📩/🛒 sur chaque création dans `CreateurProfilPage`. Nuance restante : 💬 renvoie à la section avis ; commentaire **par création + photo** = P137/P160, à part) |
 | P161-163 | Téléchargement patrons payants + récup code | 1 | ⬜ (dépend du paiement en ligne = Phase 2 non activée, P165) |
 | P164 | Formulaire « passer commande » en 3 étapes | 1 | 🟡 (devis existe) |
 | P165 | Paiement 2 phases (mise en relation → commission 15%) | 1 | 🔵 (business) |
@@ -368,12 +368,12 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P167 | Messages = communications officielles (lecture) | 1 | 🟡 |
 | P168 | Notifications temps réel + purge 30j | 1/7 | ✅ |
 | P169 | Photo de profil créateur | 1 | ✅ |
-| P170 | Nom/prénom internes, pseudo public | 1 | ⬜ (différé : le `nom` d'atelier sert de nom public aujourd'hui ; ajouter un vrai `pseudo` = changement sémantique vitrine, à décider) |
-| P171 | 4 compteurs publics (abonnés/avis/publi/commandes) | 1 | 🟡 (backend : les 4 exposés dans `creatorCard`/`show` — abonnés+commandes ajoutés, avis+publications existaient. Affichage vitrine = front collègue) |
-| P172 | Date d'inscription intelligente | 1 | 🟡 (backend : `inscrit_depuis` calculé jours/mois/ans selon P172. Affichage vitrine) |
-| P173 | Bouton « S'abonner / Enregistrer » | 1 | 🟡 (backend : `POST vitrine/createurs/{a}/abonnement` toggle anonyme + compteur + flag `abonne`. Bouton vitrine = front collègue) |
-| P174-176 | Espace Mérites (6 catégories × niveaux) | 1 | 🟡 (backend : `config/merites.php` + `MeritesService` + `merites` dans `show` avec niveau atteint & badges grisés. ⚠️ noms P175 à valider ; « Rayonnant » dédoublonné → niv5 vues = « Éclatant ». Affichage vitrine) |
-| P177 | Liens réseaux sociaux du profil | 1 | ✅ (6 réseaux : instagram/facebook/site_web + linkedin/youtube/tiktok ajoutés, exposés dans `reseaux`) |
+| P170 | Nom/prénom internes, pseudo public | 1 | ✅ **décidé boss** : on garde le **nom public** (nom d'atelier), pas de pseudo séparé. Clos. |
+| P171 | 4 compteurs publics (abonnés/avis/publi/commandes) | 1 | ✅ (full-stack : les 4 exposés backend + affichés dans la carte profil vitrine) |
+| P172 | Date d'inscription intelligente | 1 | ✅ (full-stack : `inscrit_depuis` jours/mois/ans, affiché sous la ville) |
+| P173 | Bouton « S'abonner / Enregistrer » | 1 | ✅ (full-stack : toggle anonyme backend + bouton S'abonner/Abonné câblé + compteur abonnés live) |
+| P174-176 | Espace Mérites (6 catégories × niveaux) | 1 | ✅ (full-stack : `config/merites.php` + `MeritesService` + section Mérites vitrine, niveau atteint + niveaux non obtenus grisés. Noms P175 **validés boss** ; niv5 vues = « Éclatant ») |
+| P177 | Liens réseaux sociaux du profil | 1 | ✅ (full-stack : 6 réseaux instagram/facebook/site_web + linkedin/youtube/tiktok, exposés + affichés en pastilles) |
 | P178 | Mention « Bientôt / Soon » sur non-prêt | 1 | 🟡 |
 | P179 | Rappel du header existant | 6 | ℹ️ |
 | P180 | Barre de contact fine (tél + WhatsApp) | 6 | ⬜ |
