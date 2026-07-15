@@ -101,7 +101,11 @@ valider par la direction avant de lancer les corrections.
   synchrone + re-render au switch) sur `useClients`, `useCommandes`, `useVetements` (+ modèles système gardés)
   et `useCommandeStats`. **Vérifié sur device** : maître 359 clients / sous-atelier « carnet vierge », commandes
   idem, aucun mélange, aucune perte au retour. Données enfant (mesures/paiements) isolées via leur parent.
-- ⬜ Recherche cross-ateliers intelligente (P68-77). ⚠️ Web/master (hooks service) : scoping serveur à confirmer.
+- 🟡 **Recherche cross-ateliers (P68-71/76) livrée** : toggle « Cet atelier / Tous mes ateliers »
+  (comptes multi-ateliers), badge d'atelier d'origine sur chaque client, fiche consultable (infos +
+  mesures). App (local) + web (API `scope=tous`, réservé propriétaire). Reste ⬜ : commande
+  cross-atelier sans ressaisie (P72-73), versionnage des mesures (P74), déduplication (P75), partage
+  explicite (P77).
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
