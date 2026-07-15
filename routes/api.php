@@ -81,6 +81,9 @@ Route::prefix('auth')->group(function () {
     Route::post('inscription',   [ProprietaireAuthController::class, 'inscription']);
     Route::post('verifier-otp',  [ProprietaireAuthController::class, 'verifierOtp']);
     Route::post('renvoyer-otp',  [ProprietaireAuthController::class, 'renvoyerOtp']);
+    // P123 : corriger l'e-mail d'un compte non vérifié (tél + mot de passe) puis renvoi OTP
+    Route::post('corriger-email', [ProprietaireAuthController::class, 'corrigerEmail'])
+        ->middleware('throttle:5,1');
     Route::post('login',         [ProprietaireAuthController::class, 'login']);
     Route::post('equipe/login',  [EquipeMembreAuthController::class, 'login']);
 

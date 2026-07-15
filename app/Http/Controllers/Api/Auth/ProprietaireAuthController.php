@@ -159,6 +159,38 @@ class ProprietaireAuthController extends Controller
         ]));
     }
 
+    // P123 : e-mail fictif saisi à l'inscription → l'OTP n'arrive jamais → compte bloqué.
+    // Sortie de secours : corriger son e-mail (authentifié par téléphone + mot de passe,
+    // uniquement pour un compte NON vérifié) puis renvoi de l'OTP sur le nouvel e-mail.
+    public function corrigerEmail(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'telephone' => ['required', 'string'],
+            'password'  => ['required', 'string'],
+            'email'     => ['required', 'email', 'max:190'],
+        ]);
+
+        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($data['telephone']))
+            ->whereNull('telephone_verified_at')
+            ->first();
+
+        if (!$proprietaire || !Hash::check($data['password'], $proprietaire->password)) {
+            return response()->json(['message' => 'Identifiants incorrects ou compte déjà vérifié.'], 422);
+        }
+
+        if (Proprietaire::where('email', $data['email'])->where('id', '!=', $proprietaire->id)->exists()) {
+            return response()->json(['message' => 'Cet e-mail est déjà utilisé par un autre compte.'], 422);
+        }
+
+        $proprietaire->update(['email' => $data['email']]);
+        $otp = $this->otpService->generer($proprietaire->telephone, 'verification_inscription', $data['email']);
+
+        return response()->json(array_filter([
+            'message'   => 'E-mail corrigé. Un nouveau code OTP a été envoyé.',
+            'otp_debug' => $this->otpService->debugCode($otp),
+        ]));
+    }
+
     public function me(Request $request): JsonResponse
     {
         $proprietaire = $request->user()->load('atelierMaitre.abonnement', 'atelierMaitre.parametres');
