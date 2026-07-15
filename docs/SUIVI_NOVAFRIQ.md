@@ -22,7 +22,7 @@ valider par la direction avant de lancer les corrections.
 
 | # | Sujet | Statut | Bloc | Réf |
 |---|---|---|---|---|
-| 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; reste P156 (mode gratuit à l'expiration) | ✅ | 1/3 | V1-P1, P153-158 |
+| 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; P156 mode gratuit ✅ aussi | ✅ | 1/3 | V1-P1, P153-158 |
 | 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
 | 3 | **Slogan à l'infinitif** « Créer · Gérer · Rayonner » → doit être **impératif** « Créez, Gérez, Rayonnez » | ⚠️ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
@@ -334,7 +334,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
-| P156 | Expiration → repli mode gratuit lecture seule | 1 | ⬜ |
+| P156 | Expiration → repli **mode gratuit** : plus de mur, bannière « Renouveler », données visibles, quotas/features free (getConfigEffective) — **vérifié device** | 1 | ✅ |
 | P159-160 | Likes cœur + 4 boutons par création | 1 | ⬜ |
 | P161-163 | Téléchargement patrons payants + récup code | 1 | ⬜ |
 | P164 | Formulaire « passer commande » en 3 étapes | 1 | 🟡 (devis existe) |
