@@ -151,8 +151,11 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
 - ✅ App admin (flavor Android « admin » interne, appId distinct) + panel web admin complet (ateliers, plans, transactions,
   tickets, signalements, bannière, audit).
-- ✅ Gel/dégel de compte (`Admin/AtelierController`, `AtelierDetailPage`) — ⚠️ bugs V1-P2 (message EN
-  après gel), V1-P119-124 (dégelé repasse en expiration, page récup blanche, format récupération).
+- ✅ Gel/dégel de compte (`Admin/AtelierController`, `AtelierDetailPage`). ✅ V1-P2 corrigé : le gate
+  (`useSubscriptionGate`) prend en compte `atelier.statut` (le gel admin ne touchait que ce champ, pas
+  l'abonnement → le compte gelé gardait l'accès) → **mur plein écran** (portail, couvre FAB/nav), message
+  FR adapté (gelé → contacter support ; expiré → abonnement), `/support` accessible pour les tickets.
+  ✅ V1-P119 (dégel restaure essai/actif). ⚠️ Reste V1-P120-123 (réactivation admin page blanche, etc.).
 - ⬜ **Espace création de codes** d'activation/promo côté admin — V1-P1.
 - ⬜ **Dashboard admin temps réel** (auto-refresh configurable, bouton rafraîchir, delta, filtre atelier,
   perf multi-ateliers) — V1-P92-103.
@@ -207,7 +210,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | ID | Sujet | Bloc | Statut |
 |---|---|---|---|
 | P1 | Espace admin : créer codes d'activation/promo | 3 | ⬜ |
-| P2 | Message EN après gel de compte | 3 | ⚠️ |
+| P2 | Compte gelé : message **FR** « Compte suspendu » + compte réellement **bloqué** (mur), CTA support (pas abonnement), tickets accessibles — vérifié device | 3 | ✅ |
 | P3 | Icône profil cliquable → paramètres du profil | 1 | ✅ |
 | P4 | Bouton « Retour » Android = « Annuler » | 1 | ⚠️ |
 | P5 | Accès aux contacts du téléphone | 1 | ✅ |
