@@ -119,7 +119,16 @@ valider par la direction avant de lancer les corrections.
   `ResolvesAtelier::ateliersAutorises()` (avant : n'importe quel client/vêtement d'un autre propriétaire
   était référençable). Effet voulu : le backend accepte désormais une commande pour un client d'un
   **autre de mes ateliers** sans ressaisie. Reste ⬜ : parcours front « créer commande depuis la fiche
-  cross-atelier » (P72-73 UX), partage explicite (P77).
+  cross-atelier » (P72-73 UX) ✅ **livré** : sélecteur de client cross-atelier (toggle « Tous mes
+  ateliers » + badge d'origine) dans la création de commande + fiche client agrégeant ses commandes
+  par client_id + badge d'atelier d'origine. Vérifié device. Reste ⬜ : partage explicite (P77).
+
+- 🐛→✅ **Bugs de sync CRITIQUES (trouvés en testant P72-73, pré-lancement)** : aucune commande
+  créée **offline** ne se synchronisait au serveur. Cause : `commandes.date_commande` absent du
+  schéma WatermelonDB → INSERT NULL → NOT NULL violation qui **bloquait toute la file de sync**
+  (WatermelonDB retente le lot entier). Corrigé (`DEFAULT CURRENT_DATE`). Idem `commandes.vetement_id`
+  était NOT NULL alors que l'UI autorise les commandes sans vêtement → rendu nullable. **Vérifié
+  device** : commande fraîche `status:created`, date auto.
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
