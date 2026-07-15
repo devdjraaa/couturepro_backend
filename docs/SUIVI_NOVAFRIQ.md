@@ -362,7 +362,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P156 | Expiration → repli **mode gratuit** : plus de mur, bannière « Renouveler », données visibles, quotas/features free (getConfigEffective) — **vérifié device** | 1 | ✅ |
 | P159-160 | Likes cœur + 4 boutons par création | 1 | ✅ (full-stack déployé : like ❤️ public anonyme + rangée 4 boutons ❤️/💬/📩/🛒 sur chaque création dans `CreateurProfilPage`. Nuance restante : 💬 renvoie à la section avis (avec **photos** ✅ P137) — les avis restent **par créateur**, pas par création) |
 | P161-163 | Téléchargement patrons payants + récup code | 1 | ✅ **full-stack** (backend : tables patrons/patron_achats, `PaymentService::initiatePatron` FedaPay **sandbox** + webhook, `PatronController` CRUD upload privé, endpoints acheter/statut/télécharger par code ; **acheteur vitrine** : bouton Télécharger + modale achat → paiement + page reçu `/patrons/recu/:code` + menu `/patrons/recuperer` (footer) ; **créateur** : `PatronManager` dans le catalogue (mise en vente fichier+prix). Gate plan `patrons_payants` défaut inclus. **À vérifier** : parcours paiement sandbox de bout en bout sur données réelles) |
-| P164 | Formulaire « passer commande » en 3 étapes | 1 | 🟡 (devis existe) |
+| P164 | Formulaire « passer commande » en 3 étapes | 1 | ✅ (DevisModal refait en 3 étapes : coordonnées → détails (modèle/type/taille/particularités) → récapitulatif ; envoi créateur + WhatsApp) |
 | P165 | Paiement 2 phases (mise en relation → commission 15%) | 1 | 🔵 (business) |
 | P166 | Tickets = canal support créateur | 1 | ✅ |
 | P167 | Messages = communications officielles (lecture) | 1 | 🟡 |
