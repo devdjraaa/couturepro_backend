@@ -24,7 +24,7 @@ valider par la direction avant de lancer les corrections.
 |---|---|---|---|---|
 | 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; P156 mode gratuit ✅ aussi | ✅ | 1/3 | V1-P1, P153-158 |
 | 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
-| 3 | **Slogan à l'infinitif** « Créer · Gérer · Rayonner » → doit être **impératif** « Créez, Gérez, Rayonnez » | ⚠️ | 1 | SUG-2 |
+| 3 | Slogan du logo à l'impératif « Créez, Gérez, Rayonnez » (le logo login avait « Créer ») | ✅ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
 | 5 | **Page inscription en anglais** malgré l'indicateur FR (i18n manquant) — l'indicateur lui-même est corrigé | ⚠️ | 1 | V1-P145 |
 | 6 | **Menus header vitrine** Solutions / Tarifs / Documentation (déroulants façon Kkiapay) — absents | ⬜ | 6 | V1-P181-184 |
@@ -85,7 +85,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ Galerie photos (FeatureGate + quota) — V1-P44/45.
 - ✅ Champ Prénom (profil + register) — SUG-12/V1-P152.
 - ✅ Multi-items / échéances multiples / commande groupée — V1-P17/20/22/23/25.
-- ⚠️ Slogan à l'infinitif — SUG-2.
+- ✅ Slogan du logo corrigé à l'impératif « Créez » (glyphe z) — SUG-2.
 - ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
 - ✅ Champ Quantité éditable (SUG-18) ; ✅ Historique alimenté + au menu (SUG-20) ; ✅ Mesures wizard obsolète (SUG-19) ; ✅ profil client `/`/`Key` non reproduit (SUG-21) ; ✅ recherche clients live (P9).
 - ⚠️ Reste à vérifier device : icône module « nouveau modèle » (SUG-17),
