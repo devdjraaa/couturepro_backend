@@ -79,7 +79,7 @@ valider par la direction avant de lancer les corrections.
 
 ### 1.2 App mobile artisan/designer
 - ✅ Checkbox CGU obligatoire à l'inscription (`RegisterPage`) — V1-P141/SUG-4.
-- ✅ Import de contacts (multi-sélection) — V1-P5-7/SUG-13 (⚠️ bug « erreur puis import » à corriger).
+- ✅ Import de contacts (multi-sélection) — V1-P5-7/SUG-13 (bug « erreur puis import » corrigé : timeout par lot).
 - ✅ Dates de livraison passées bloquées (`min=TODAY`) — V1-P18/19.
 - ✅ Compteur de caractères tickets (255 / 5000 + blocage) — V1-P29-34.
 - ✅ Galerie photos (FeatureGate + quota) — V1-P44/45.
@@ -240,8 +240,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P27 | Urgentes en premier | 1 | 🟡 |
 | P28 | Défilement horizontal des catégories | 1 | 🟡 |
 | P29-34 | Compteur caractères tickets (255/5000 + blocage) | 1 | ✅ |
-| P35 | Timeout 15000 ms envoi ticket | 1 | ⚠️ |
-| P36 | Tickets avec photos → timeout | 1 | ⚠️ |
+| P35 | Timeout uploads étendu à 120 s (multipart) | 1 | ✅ |
+| P36 | Tickets avec photos : plus de timeout (couvert par P35) | 1 | ✅ |
 | P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
 | P38 | Gamification défaillante | 1 | ⚠️ à re-tester |
 | P39 | Points de fidélité peu visibles | 1 | ⚠️ |
@@ -268,7 +268,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P62-65 | Isolation stricte des ateliers — **corrigé & vérifié device** (filtre local par atelier actif sur clients/commandes/catalogue) | 1 | ✅ |
 | P66-67 | Validation champ téléphone (chiffres + « + ») | 1 | 🟡 |
 | P68-77 | Recherche client cross-ateliers + mesures partagées | 1 | ⬜/🟡 |
-| P78-81 | WhatsApp preuve de paiement (PDF/image attaché) | 1 | ⚠️ |
+| P78-81 | WhatsApp preuve de paiement : PDF auto + partage natif (déjà OK) + toast « génération en cours » (P81) | 1 | ✅ |
 | P82-91 | Module facturation par plan + modèles + preview | 1 | ✅/🟡 |
 | P92-95 | Dashboard admin : auto-refresh 30s + bouton Actualiser | 3 | ✅ |
 | P96-103 | Dashboard admin : delta/graphiques/filtres avancés | 3 | ⬜ |
@@ -374,10 +374,10 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-10 | Références béninoises (noms) | 1 | ⬜ |
 | SUG-11 | Placeholders Nom/Prénom béninois | 1 | ⬜ |
 | SUG-12 | Champ Prénom dans le profil | 1 | ✅ |
-| SUG-13 | Bug import contacts (erreur puis import) | 1 | ⚠️ |
+| SUG-13 | Import contacts : timeout 60 s par lot — fini l'« erreur »' fantôme | 1 | ✅ |
 | SUG-14 | PDF : pied de page marketing (logo/slogan/site) | 1 | 🟡 |
 | SUG-15 | Coordonnées artisan dans les exports | 1 | 🟡 |
-| SUG-16 | Export WhatsApp avec toutes les mesures | 1 | ⚠️ |
+| SUG-16 | Export WhatsApp mesures : message construit localement (offline-first) | 1 | ✅ |
 | SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
 | SUG-18 | Champ Quantité éditable (effaçable, borné 1–999, select au focus) | 1 | ✅ |
 | SUG-19 | Mesures : plus d'étape Mesures dans le wizard commande (obsolète) ; mesures client OK | 1 | ✅ |
