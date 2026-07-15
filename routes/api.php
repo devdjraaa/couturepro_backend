@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\EquipeMembreAuthController;
 use App\Http\Controllers\Api\Auth\ProprietaireAuthController;
 use App\Http\Controllers\Api\Auth\RecuperationController;
 use App\Http\Controllers\Api\AbonnementController;
+use App\Http\Controllers\Api\CodePromoController;
 use App\Http\Controllers\Api\AppVersionController;
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
@@ -225,6 +226,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('abonnement/current',       [AbonnementController::class, 'current']);
     Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
     Route::post('abonnement/sponsoriser',  [AbonnementController::class, 'sponsoriser']);
+
+    // Codes promo / ambassadeurs (P153-158) — rate-limité (anti brute-force)
+    Route::post('codes-promo/utiliser', [CodePromoController::class, 'utiliser'])
+        ->middleware('throttle:5,1');
 
     // Notifications
     Route::get('notifications',                   [NotificationController::class, 'index']);

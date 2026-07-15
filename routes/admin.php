@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminsController;
 use App\Http\Controllers\Admin\AtelierController;
+use App\Http\Controllers\Admin\CodePromoController as AdminCodePromoController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\FideliteController;
@@ -96,6 +97,16 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::post('offres',          [OffreSpecialeController::class, 'store']);
         Route::put('offres/{offre}',   [OffreSpecialeController::class, 'update']);
         Route::delete('offres/{offre}',[OffreSpecialeController::class, 'destroy']);
+    });
+
+    // Codes promo / ambassadeurs (P153-158)
+    Route::middleware('admin.permission:promo.view')->group(function () {
+        Route::get('codes-promo',              [AdminCodePromoController::class, 'index']);
+        Route::get('codes-promo/{codePromo}',  [AdminCodePromoController::class, 'show']);
+    });
+    Route::middleware('admin.permission:promo.manage')->group(function () {
+        Route::post('codes-promo',                     [AdminCodePromoController::class, 'store']);
+        Route::post('codes-promo/{codePromo}/toggle',  [AdminCodePromoController::class, 'toggle']);
     });
 
     // Liste noire
