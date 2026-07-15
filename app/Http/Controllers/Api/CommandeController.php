@@ -30,6 +30,8 @@ class CommandeController extends Controller
         $atelier = $this->getAtelier($request);
 
         $commandes = Commande::where('atelier_id', $atelier->id)
+            // P72-73 : filtre optionnel par client (fiche client web).
+            ->when($request->filled('client_id'), fn ($q) => $q->where('client_id', $request->query('client_id')))
             ->with(['client', 'vetement'])
             ->orderByRaw("CASE WHEN statut = 'en_cours' THEN 0 ELSE 1 END")
             ->orderBy('date_livraison_prevue')
