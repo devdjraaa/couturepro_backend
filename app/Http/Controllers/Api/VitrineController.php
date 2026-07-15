@@ -4,12 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
+use App\Models\AtelierAbonne;
 use App\Models\Commande;
+use App\Models\CreationLike;
 use App\Models\NiveauConfig;
 use App\Models\Vetement;
+use App\Models\VitrineEvenement;
 use App\Models\VitrineSetting;
+use App\Services\MeritesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * API PUBLIQUE de la vitrine (marketplace) — sans authentification.
@@ -34,7 +39,11 @@ class VitrineController extends Controller
             // mais n'ont pas de profil créateur listé ici.
             ->where('type', 'designer')
             ->with('abonnement')
-            ->withCount(['vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true)])
+            ->withCount([
+                'vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true),
+                'abonnes',   // P171 👥
+                'commandes', // P171 🛒
+            ])
             ->orderBy('nom')
             ->get()
             // Plan « Free » (visible_galerie = false) : profil accessible par lien direct,
@@ -46,29 +55,46 @@ class VitrineController extends Controller
         );
     }
 
-    /** GET /api/vitrine/createurs/{atelier} */
-    public function show(Atelier $atelier): JsonResponse
+    /** GET /api/vitrine/createurs/{atelier}?visitor_key=... */
+    public function show(Request $request, Atelier $atelier, MeritesService $merites): JsonResponse
     {
         // Seuls les comptes « designer » ont un profil créateur public.
         if ($atelier->is_demo || $atelier->type !== 'designer') {
             return response()->json(['message' => 'Créateur introuvable'], 404);
         }
 
-        $creations = $atelier->vetements()
+        // Clé visiteur anonyme (localStorage côté front) : sert à savoir ce que CE visiteur
+        // a déjà liké / s'il est abonné (P159/P173). Absente = visiteur non identifié.
+        $visitorKey = trim((string) $request->query('visitor_key', ''));
+
+        $creationsModels = $atelier->vetements()
             ->where('is_archived', false)
             ->where('publie_vitrine', true)
             ->latest()
-            ->get()
-            ->map(fn ($v) => [
-                'id'        => $v->id,
-                'nom'       => $v->nom,
-                'image_url' => $v->image_url,
-                'images'    => $v->images_urls,
-                'prix'          => null,        // pas de prix en base -> « Sur devis » côté front
-                'categorie'     => null,
-                'type'          => 'Sur mesure',
-                'collection_id' => $v->collection_id,
-            ])->values();
+            ->get();
+        $creationIds = $creationsModels->pluck('id');
+
+        // Likes agrégés en 2 requêtes (pas de N+1) : total par création + ce que j'ai liké.
+        $likeCounts = CreationLike::whereIn('vetement_id', $creationIds)
+            ->selectRaw('vetement_id, count(*) as c')
+            ->groupBy('vetement_id')
+            ->pluck('c', 'vetement_id');
+        $likedByMe = $visitorKey
+            ? CreationLike::whereIn('vetement_id', $creationIds)->where('visitor_key', $visitorKey)->pluck('vetement_id')->flip()
+            : collect();
+
+        $creations = $creationsModels->map(fn ($v) => [
+            'id'        => $v->id,
+            'nom'       => $v->nom,
+            'image_url' => $v->image_url,
+            'images'    => $v->images_urls,
+            'prix'          => null,        // pas de prix en base -> « Sur devis » côté front
+            'categorie'     => null,
+            'type'          => 'Sur mesure',
+            'collection_id' => $v->collection_id,
+            'likes'     => (int) ($likeCounts[$v->id] ?? 0),          // P159
+            'liked'     => $likedByMe->has($v->id),                    // like du visiteur courant
+        ])->values();
 
         // Contact WhatsApp — uniquement si le créateur a activé l'opt-in.
         $whatsapp = null;
@@ -79,6 +105,17 @@ class VitrineController extends Controller
             }
         }
 
+        // Compteurs pour les mérites (P174-176).
+        $vues = VitrineEvenement::where('atelier_id', $atelier->id)->where('type', 'visite')->count();
+        $badges = $merites->pour([
+            'likes'           => (int) $likeCounts->sum(),
+            'avis'            => $atelier->avis()->where('statut', 'valide')->count(),
+            'telechargements' => 0, // patrons payants = Phase 2 (non activée), P161-165
+            'commandes'       => $atelier->commandes()->count(),
+            'vues'            => $vues,
+            'anciennete_mois' => $atelier->created_at ? (int) $atelier->created_at->diffInMonths(now()) : 0,
+        ]);
+
         return response()->json(array_merge($this->creatorCard($atelier), [
             'bio'       => $atelier->bio,
             'whatsapp'  => $whatsapp,
@@ -86,7 +123,13 @@ class VitrineController extends Controller
                 'instagram' => $atelier->instagram,
                 'facebook'  => $atelier->facebook,
                 'site_web'  => $atelier->site_web,
+                'linkedin'  => $atelier->linkedin,   // P177
+                'youtube'   => $atelier->youtube,    // P177
+                'tiktok'    => $atelier->tiktok,     // P177
             ],
+            'inscrit_depuis' => $atelier->created_at ? $this->inscritDepuis($atelier->created_at) : null, // P172
+            'abonne'         => $visitorKey ? $atelier->abonnes()->where('visitor_key', $visitorKey)->exists() : false, // P173
+            'merites'        => $badges,             // P174-176
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'created_at']),
             'creations'   => $creations,
@@ -294,6 +337,83 @@ HTML;
         return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
     }
 
+    /** POST /api/vitrine/creations/{vetement}/like  { visitor_key } — like/unlike public (P159-160). */
+    public function toggleLike(Request $request, Vetement $vetement): JsonResponse
+    {
+        if ($vetement->is_archived || ! $vetement->publie_vitrine) {
+            return response()->json(['message' => 'Création introuvable'], 404);
+        }
+
+        $data = $request->validate(['visitor_key' => ['required', 'string', 'max:64']]);
+
+        $existant = CreationLike::where('vetement_id', $vetement->id)
+            ->where('visitor_key', $data['visitor_key'])->first();
+
+        if ($existant) {
+            $existant->delete();
+            $liked = false;
+        } else {
+            CreationLike::create(['vetement_id' => $vetement->id, 'visitor_key' => $data['visitor_key']]);
+            $liked = true;
+        }
+
+        return response()->json([
+            'liked' => $liked,
+            'likes' => CreationLike::where('vetement_id', $vetement->id)->count(),
+        ]);
+    }
+
+    /** POST /api/vitrine/createurs/{atelier}/abonnement  { visitor_key } — suivre/ne plus suivre (P173). */
+    public function toggleAbonnement(Request $request, Atelier $atelier): JsonResponse
+    {
+        if ($atelier->is_demo || $atelier->type !== 'designer') {
+            return response()->json(['message' => 'Créateur introuvable'], 404);
+        }
+
+        $data = $request->validate(['visitor_key' => ['required', 'string', 'max:64']]);
+
+        $existant = AtelierAbonne::where('atelier_id', $atelier->id)
+            ->where('visitor_key', $data['visitor_key'])->first();
+
+        if ($existant) {
+            $existant->delete();
+            $abonne = false;
+        } else {
+            AtelierAbonne::create(['atelier_id' => $atelier->id, 'visitor_key' => $data['visitor_key']]);
+            $abonne = true;
+        }
+
+        return response()->json([
+            'abonne'  => $abonne,
+            'abonnes' => AtelierAbonne::where('atelier_id', $atelier->id)->count(),
+        ]);
+    }
+
+    /**
+     * P172 — libellé d'ancienneté « intelligent » (FR ; la vitrine est francophone).
+     * < 1 mois → jours ; 1-12 mois → mois et jours ; ≥ 1 an → an(s) et mois.
+     */
+    private function inscritDepuis(Carbon $date): string
+    {
+        $now   = now();
+        $jours = (int) $date->diffInDays($now);
+
+        if ($jours < 30) {
+            return "Inscrit depuis {$jours} jour" . ($jours > 1 ? 's' : '');
+        }
+
+        $mois = (int) $date->diffInMonths($now);
+        if ($mois < 12) {
+            $reste = (int) $date->copy()->addMonths($mois)->diffInDays($now);
+            return "Inscrit depuis {$mois} mois" . ($reste > 0 ? " et {$reste} jour" . ($reste > 1 ? 's' : '') : '');
+        }
+
+        $ans       = intdiv($mois, 12);
+        $moisReste = $mois % 12;
+        return "Inscrit depuis {$ans} an" . ($ans > 1 ? 's' : '')
+            . ($moisReste > 0 ? " et {$moisReste} mois" : '');
+    }
+
     /** Forme « carte créateur » attendue par la vitrine. */
     private function creatorCard(Atelier $a): array
     {
@@ -304,7 +424,9 @@ HTML;
             'specialite'   => $a->specialite ?: 'Atelier de couture',
             'ville'        => $a->ville,
             'note'         => ($avgNote = $a->avis()->where('statut', 'valide')->avg('note')) ? round($avgNote, 1) : null,
-            'avis'         => $a->avis()->where('statut', 'valide')->count(),
+            'avis'         => $a->avis()->where('statut', 'valide')->count(), // P171 ⭐
+            'abonnes'      => $a->abonnes_count   ?? $a->abonnes()->count(),   // P171 👥
+            'commandes'    => $a->commandes_count ?? $a->commandes()->count(), // P171 🛒
             'verifie'      => (bool) $a->verifie,
             'experience'   => null,
             'gradient'     => $this->gradient((int) $a->id),

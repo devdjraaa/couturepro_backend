@@ -53,6 +53,10 @@ Route::prefix('vitrine')->group(function () {
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
     // Catalogue public (galerie de l'accueil vitrine) — alimente getCreations() côté front.
     Route::get('creations',            [VitrineController::class, 'creations']);
+    // P159-160 : like public d'une création (anonyme, dé-doublonné par visitor_key).
+    Route::post('creations/{vetement}/like', [VitrineController::class, 'toggleLike']);
+    // P173 : s'abonner / se désabonner d'un créateur (anonyme).
+    Route::post('createurs/{atelier}/abonnement', [VitrineController::class, 'toggleAbonnement']);
     // Rendu OG côté serveur pour les robots sociaux (proxifié par nginx selon l'User-Agent).
     Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
     Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store']);

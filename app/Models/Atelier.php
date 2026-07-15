@@ -33,6 +33,9 @@ class Atelier extends Model
         'instagram',
         'facebook',
         'site_web',
+        'linkedin',
+        'youtube',
+        'tiktok',
         'latitude',
         'longitude',
         'sponsor_jusqu_a',
@@ -84,6 +87,12 @@ class Atelier extends Model
     public function avis(): HasMany
     {
         return $this->hasMany(Avis::class, 'atelier_id');
+    }
+
+    // P173 : abonnés (visiteurs anonymes qui suivent le créateur).
+    public function abonnes(): HasMany
+    {
+        return $this->hasMany(AtelierAbonne::class, 'atelier_id');
     }
 
     public function proprietaire(): BelongsTo
