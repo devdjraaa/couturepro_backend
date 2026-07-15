@@ -37,7 +37,7 @@ valider par la direction avant de lancer les corrections.
 | 13 | **Photos dans les avis** clients | ⬜ | 1 | V1-P137 |
 | 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
-| 16 | **Veille technique SEO hebdo** (PageSpeed + Search Console + HTTPS + alertes), 2 sites | ⬜ | 2 | V1-P200 |
+| 16 | **Veille technique SEO hebdo** — ✅ livrée : `veille:seo` (PSI mobile+desktop, HTTPS, dispo, alertes, 2 sites), lundi 7h. 🟡 Search Console API (OAuth à configurer) ; e-mail : définir `VEILLE_SEO_EMAIL` | 🟡 | 2 | V1-P200 |
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
 | 18 | **Sauvegardes VPS** chiffrées quotidiennes off-site + test de restauration mensuel | ⬜ | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
@@ -54,7 +54,7 @@ valider par la direction avant de lancer les corrections.
 | Bloc | Domaine | Priorité | État résumé |
 |---|---|---|---|
 | **1** | Backlog produit Gextimo (requêtes antérieures) | 🔴 | Majorité **faite** ; restent des bugs ⚠️ (multi-ateliers, OTP) + features vitrine/créateur ⬜ |
-| **2** | Veille auto (SEO/technique) | 🔴 urgent | ⬜ à construire (script + cron hebdo, 2 sites) |
+| **2** | Veille auto (SEO/technique) | 🟡 | ✅ `veille:seo` hebdo livrée (PSI+HTTPS+dispo, 2 sites) ; reste Search Console + destinataire e-mail |
 | **3** | Volet APK Admin | 🟡 | App admin existe ; codes promo + dashboard temps réel ⬜ ; gel/dégel ⚠️ |
 | **4** | Gestion VPS | 🟡 | Durcissement ✅ ; **sauvegardes** ⬜ (prioritaire) |
 | **5** | Gestion mailing | 🟡 | Archi + queue ✅ ; Brevo/délivrabilité + adresses ⬜ |
@@ -141,15 +141,23 @@ valider par la direction avant de lancer les corrections.
 
 ---
 
-## Bloc 2 — Veille auto (SEO / technique) ⬜ — *urgent (V1-P200)*
+## Bloc 2 — Veille auto (SEO / technique) 🟡 — *livrée, 2 compléments à configurer*
 
-À construire : **script + cron hebdo**, **2 sites séparés** (novafriq.africa + gextimo.novafriq.africa).
-1. **Performance & Core Web Vitals** via API PageSpeed Insights (mobile + desktop).
-2. **Indexation & crawl** via API Google Search Console (pages non indexées, 404, sitemap).
-3. **Validité HTTPS** (expiration certificat).
-4. **Alertes** (e-mail/Discord) sous un seuil à définir ou erreur critique.
+✅ **Livré** : commande `veille:seo` planifiée **chaque lundi 07:00** (2 sites séparés) —
+PageSpeed Insights mobile+desktop, validité/expiration du certificat HTTPS (alerte < 14 j),
+disponibilité HTTP, rapport `storage/app/veille/DATE.txt` + e-mail avec préfixe ⚠/✓.
+✅ **Au passage : cron scheduler installé** (`/etc/cron.d/gextimo-scheduler`) — le scheduler Laravel
+ne tournait **pas du tout** en prod (purge paiements, notifs d'expiration, bonus fidélité inactifs).
+
+**Premier rapport (15/07/2026)** — trouvailles :
+- 🔴 **novafriq.africa ne résout pas (pas de DNS)** — le site mère est injoignable (cf. Bloc 6).
+- ✅ gextimo.novafriq.africa : HTTP 200, certificat OK (60 j).
+
+**À configurer (direction)** :
+- ⬜ `PSI_API_KEY` (clé Google Cloud gratuite, sinon quota PSI anonyme → 429).
+- ⬜ `VEILLE_SEO_EMAIL` (destinataire du rapport hebdo).
+- ⬜ Search Console API (OAuth) pour l'indexation/404/sitemap — après P199 (Bloc 6).
 Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
-*Implémentation après validation de ce fichier (voir Bloc 6 pour Search Console/sitemap prérequis).*
 
 ---
 
