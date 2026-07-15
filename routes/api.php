@@ -133,6 +133,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Mesures
     Route::get('clients/{clientId}/mesures',             [MesureController::class, 'index']);
+    Route::get('clients/{clientId}/mesures/historique',  [MesureController::class, 'historique']); // P74
+
     Route::get('clients/{clientId}/mesures/export-csv',  [MesureController::class, 'exportCsv']);
     Route::get('clients/{clientId}/mesures/whatsapp',    [MesureController::class, 'exportWhatsApp']);
     Route::post('mesures',                               [MesureController::class, 'store']);

@@ -6,10 +6,34 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Mesure extends Model
 {
     use HasFactory, HasUuids;
+
+    // P74 : à chaque fois que les mesures (champs) changent, on fige une version dans
+    // l'historique (date, atelier, auteur, n° de version). Couvre toutes les voies d'écriture.
+    protected static function booted(): void
+    {
+        static::saved(function (Mesure $mesure) {
+            if (! $mesure->wasRecentlyCreated && ! $mesure->wasChanged('champs')) {
+                return;
+            }
+
+            $version = (int) $mesure->versions()->max('version') + 1;
+
+            $mesure->versions()->create([
+                'client_id'       => $mesure->client_id,
+                'atelier_id'      => $mesure->atelier_id,
+                'version'         => $version,
+                'champs'          => $mesure->champs,
+                'created_by'      => $mesure->created_by,
+                'created_by_role' => $mesure->created_by_role,
+                'created_at'      => now(),
+            ]);
+        });
+    }
 
     protected $fillable = [
         'client_id',
@@ -37,5 +61,10 @@ class Mesure extends Model
     public function atelier(): BelongsTo
     {
         return $this->belongsTo(Atelier::class, 'atelier_id');
+    }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(MesureVersion::class, 'mesure_id');
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\EquipeMembre;
 use App\Models\Mesure;
 use App\Models\NotificationSysteme;
+use App\Models\Proprietaire;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,41 @@ class MesureController extends Controller
             ->first();
 
         return response()->json($mesure);
+    }
+
+    // P74 : historique versionné des séries de mesures d'une cliente (dans l'atelier actif).
+    // Renvoie chaque version avec sa date, son n°, l'atelier et l'auteur.
+    public function historique(Request $request, string $clientId): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        $mesure = Mesure::where('atelier_id', $atelier->id)
+            ->where('client_id', $clientId)
+            ->first();
+
+        if (! $mesure) {
+            return response()->json([]);
+        }
+
+        // Résolution des noms d'auteurs (propriétaire ou membre d'équipe) en une passe.
+        $versions = $mesure->versions()->orderByDesc('version')->get();
+        $auteurIds = $versions->pluck('created_by')->filter()->unique();
+        $noms = Proprietaire::whereIn('id', $auteurIds)->pluck('nom', 'id')
+            ->union(EquipeMembre::whereIn('id', $auteurIds)->get()
+                ->mapWithKeys(fn ($m) => [$m->id => trim("{$m->prenom} {$m->nom}") ?: $m->nom]));
+
+        return response()->json(
+            $versions->map(fn ($v) => [
+                'id'         => $v->id,
+                'version'    => $v->version,
+                'champs'     => $v->champs,
+                'date'       => $v->created_at,
+                'atelier_id' => $v->atelier_id,
+                'atelier'    => $atelier->nom,
+                'auteur'     => $noms[$v->created_by] ?? ($v->created_by_role === 'assistant' ? 'Assistant' : 'Propriétaire'),
+                'auteur_role' => $v->created_by_role,
+            ])
+        );
     }
 
     public function store(StoreMesureRequest $request): JsonResponse
