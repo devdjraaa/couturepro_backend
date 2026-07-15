@@ -105,6 +105,11 @@ valider par la direction avant de lancer les corrections.
 - 🟡 **Recherche cross-ateliers (P68-71/76) livrée** : toggle « Cet atelier / Tous mes ateliers »
   (comptes multi-ateliers), badge d'atelier d'origine sur chaque client, fiche consultable (infos +
   mesures). App (local) + web (API `scope=tous`, réservé propriétaire).
+- ✅ **Bug multi-ateliers policies (P72-77)** : les policies Client/Commande/Mesure/Vetement
+  limitaient le **propriétaire à son atelier maître** → 403 en ouvrant/éditant/supprimant toute donnée
+  d'un **sous-atelier** (ou d'une fiche cross-atelier). Corrigé via `ownsAtelier()` (le proprio possède
+  l'entité si l'atelier est l'un des SIENS). Vérifié en prod : view/update/delete/archive sous-atelier OK,
+  cross-propriétaire toujours refusé.
 - ✅ **Sécurité + backend commande cross-atelier (P72-73/75)** : correctif IDOR — `client_id`/`vetement_id`
   des commandes (simples + groupées) scopés aux ateliers du propriétaire via
   `ResolvesAtelier::ateliersAutorises()` (avant : n'importe quel client/vêtement d'un autre propriétaire
