@@ -124,7 +124,7 @@ valider par la direction avant de lancer les corrections.
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
   normalisation téléphone (migration dédiée) — V1-P66/67 (front à confirmer).
-- ⚠️ À corriger : OTP par e-mail **et** SMS + bouton « Renvoyer l'OTP » (V1-P146/147), OTP sur e-mail
+- ✅ SMS abandonné (décision chef) : OTP **e-mail uniquement** ; bouton « Renvoyer l'OTP » (V1-P147) ; OTP sur e-mail
   ✅ e-mail fictif débloqué : « E-mail incorrect ? Corrigez-le » sur la page OTP (tél + mdp → correction + renvoi, V1-P123). Format récup OK (V1-P124). ✅ Double œil corrigé (P148).
 - ⬜ Connexion sociale Google/FB/Apple — V1-P150.
 
@@ -340,7 +340,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P144 | Code d'activation : majuscules + tirets automatiques (XXXX-XXXX-XXXX) | 1 | ✅ |
 | P145 | Indicateur « FR » mais texte EN — **audit code OK** (i18n défaut/ fallback FR, LangContext synchro i18n via cp_lang, 0 clé FR manquante, 0 EN en dur en auth) ; re-test visuel chef sur l'écran précis | 1 | 🟡 audit |
 | P147 | Login non vérifié → redirige vers l'OTP (renvoi + saisie), fini le blocage | 1 | ✅ |
-| P146 | OTP par e-mail **et** SMS — **bloqué : passerelle SMS payante à choisir** (Twilio/Vonage/agrégateur local Bénin) ; OtpService actuel = e-mail seul | 1 | ⚠️ décision |
+| P146 | OTP par e-mail **et** SMS — **ABANDONNÉ (décision chef)** : pas de SMS, l'OTP reste **e-mail uniquement**. Rien à faire. | 1 | ❌ abandonné |
 | P157 | Import contacts gratuit pour tous — vérifié : aucun verrou de plan (front ni back) | 1 | ✅ |
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
