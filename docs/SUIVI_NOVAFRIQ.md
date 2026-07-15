@@ -307,7 +307,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P144 | Code d'activation : majuscules + tirets automatiques (XXXX-XXXX-XXXX) | 1 | ✅ |
 | P145 | Indicateur « FR » mais texte EN | 1 | ⚠️ |
 | P147 | Login non vérifié → redirige vers l'OTP (renvoi + saisie), fini le blocage | 1 | ✅ |
-| P146 | OTP par e-mail **et** SMS (fiabilité de livraison) | 1 | ⚠️ infra |
+| P146 | OTP par e-mail **et** SMS — **bloqué : passerelle SMS payante à choisir** (Twilio/Vonage/agrégateur local Bénin) ; OtpService actuel = e-mail seul | 1 | ⚠️ décision |
+| P157 | Import contacts gratuit pour tous — vérifié : aucun verrou de plan (front ni back) | 1 | ✅ |
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
 | P150 | Connexion Google/Facebook/Apple | 1 | ⬜ |
