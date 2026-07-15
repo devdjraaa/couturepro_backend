@@ -261,8 +261,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P35 | Timeout uploads étendu à 120 s (multipart) | 1 | ✅ |
 | P36 | Tickets avec photos : plus de timeout (couvert par P35) | 1 | ✅ |
 | P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
-| P38 | Gamification défaillante | 1 | ⚠️ à re-tester |
-| P39 | Points de fidélité peu visibles | 1 | ⚠️ |
+| P38 | Gamification : chaîne vérifiée (attribution au sync, config 1-2 pts/action tous plans, solde test 367 pts accumulés) — fonctionne | 1 | ✅ |
+| P39 | Visibilité des gains par action (toast ?) — choix produit (risque de bruit) | 1 | ℹ️ décision |
 | P40 | Meilleur affichage des points | 1 | 🟡 |
 | P41 | Badge auto au changement de niveau | 1 | 🟡 |
 | P42 | Notifs commande même app fermée | 7 | ✅ |
