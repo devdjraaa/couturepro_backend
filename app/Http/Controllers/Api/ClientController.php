@@ -29,7 +29,15 @@ class ClientController extends Controller
 
         $search = $request->query('search');
 
-        $clients = Client::where('atelier_id', $atelier->id)
+        // P69-70/76 : scope=tous → recherche dans TOUS les ateliers du propriétaire
+        // (réservé au propriétaire — un membre d'équipe reste limité à son atelier).
+        $user = $request->user();
+        $atelierIds = [$atelier->id];
+        if ($request->query('scope') === 'tous' && ! $user instanceof EquipeMembre) {
+            $atelierIds = Atelier::where('proprietaire_id', $user->id)->pluck('id')->all();
+        }
+
+        $clients = Client::whereIn('atelier_id', $atelierIds)
             ->actif()
             ->when($search, fn ($q) => $q->where(function ($q2) use ($search) {
                 $q2->where('nom', 'like', "%{$search}%")
