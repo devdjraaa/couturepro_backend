@@ -110,12 +110,16 @@ valider par la direction avant de lancer les corrections.
   d'un **sous-atelier** (ou d'une fiche cross-atelier). Corrigé via `ownsAtelier()` (le proprio possède
   l'entité si l'atelier est l'un des SIENS). Vérifié en prod : view/update/delete/archive sous-atelier OK,
   cross-propriétaire toujours refusé.
+- ✅ **Historique versionné des mesures (P74)** : chaque changement de mesures fige une version
+  (date, atelier, auteur, n°) via `Mesure::saved` → table `mesure_versions` (comparaison fiable des
+  `champs`, pas de faux positif JSON). Endpoint `GET /clients/{id}/mesures/historique` + visualiseur
+  « Historique » sur la fiche mesures (BottomSheet, lecture seule en ligne). Vérifié en prod.
 - ✅ **Sécurité + backend commande cross-atelier (P72-73/75)** : correctif IDOR — `client_id`/`vetement_id`
   des commandes (simples + groupées) scopés aux ateliers du propriétaire via
   `ResolvesAtelier::ateliersAutorises()` (avant : n'importe quel client/vêtement d'un autre propriétaire
   était référençable). Effet voulu : le backend accepte désormais une commande pour un client d'un
   **autre de mes ateliers** sans ressaisie. Reste ⬜ : parcours front « créer commande depuis la fiche
-  cross-atelier » (P72-73 UX), versionnage des mesures (P74), partage explicite (P77).
+  cross-atelier » (P72-73 UX), partage explicite (P77).
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
