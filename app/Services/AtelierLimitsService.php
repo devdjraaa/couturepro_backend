@@ -31,11 +31,20 @@ class AtelierLimitsService
     {
         $abonnement = $atelier->abonnement;
 
-        if (!$abonnement || $abonnement->statut === 'expire') {
+        if (!$abonnement) {
             return false;
         }
 
-        return true;
+        // P156 : un abonnement expiré ne bloque plus tout — l'utilisateur continue avec les
+        // limites du plan GRATUIT (getConfigEffective retombe sur la config free quand expiré).
+        $config = $abonnement->getConfigEffective();
+        $max = $config['max_commandes_par_mois'] ?? null;
+
+        if ($max === null || (int) $max === -1) {
+            return true;
+        }
+
+        return QuotaMensuel::courant($atelier->id)->nb_commandes_creees < $max;
     }
 
     public function canPublishVetement(Atelier $atelier): bool

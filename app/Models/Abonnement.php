@@ -52,8 +52,18 @@ class Abonnement extends Model
 
     // Helper : retourne la config effective (snapshot ou plan direct)
     // Le plan live remplit les clés absentes du snapshot (ajoutées après activation)
+    // P156 : un abonnement EXPIRÉ retombe automatiquement sur les limites du plan GRATUIT
+    // (données visibles, features premium verrouillées, usage possible sous limites free).
     public function getConfigEffective(): array
     {
+        if ($this->statut === 'expire') {
+            $free = NiveauConfig::where('cle', 'free')->first();
+            $freeConfig = is_array($free?->config) ? $free->config : (json_decode($free?->config ?? '', true) ?: []);
+            if (! empty($freeConfig)) {
+                return $freeConfig;
+            }
+        }
+
         $snapshot = $this->config_snapshot;
 
         if (is_string($snapshot)) {

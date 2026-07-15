@@ -38,7 +38,7 @@ class CommandeGroupeController extends Controller
 
         if (!$this->limitsService->canCreateCommande($atelier)) {
             return response()->json([
-                'message' => 'Abonnement expiré. Veuillez renouveler votre abonnement.',
+                'message' => 'Limite de commandes du mois atteinte pour votre plan. Passez à un plan supérieur ou renouvelez votre abonnement.',
             ], 403);
         }
 
