@@ -58,7 +58,7 @@ valider par la direction avant de lancer les corrections.
 | **3** | Volet APK Admin | 🟡 | App admin existe ; codes promo + dashboard temps réel ⬜ ; gel/dégel ⚠️ |
 | **4** | Gestion VPS | 🟡 | Durcissement ✅ ; **sauvegardes** ⬜ (prioritaire) |
 | **5** | Gestion mailing | 🟡 | Archi + queue ✅ ; Brevo/délivrabilité + adresses ⬜ |
-| **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ⚠️, header/SEO/Cloudflare ⬜, lancement commun |
+| **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ✅, header/SEO/Cloudflare ⬜, lancement commun |
 | **7** | Updates Gextimo (release/OTA) | ✅ | Système complet livré ; FCM + PWA ⬜ |
 
 ---
@@ -69,8 +69,8 @@ valider par la direction avant de lancer les corrections.
 - ✅ Overscroll/pull-to-refresh bloqués (`src/index.css`) — V1-P195.
 - ✅ Bandeau cookies (VitrineChrome) — V1-P136 (personnalisation fine à confirmer).
 - ✅ Favicon officiel (notre travail) — V1-P130 ; ✅ logo officiel #5 partout — V1-P126/129.
-- ⚠️ « novafrique » encore présent — V1-P127/188.
-- ⚠️ Indicateur langue (affiche la cible) — V1-P37/145.
+- ✅ « novafrique » → « novafriq » (footer/Qui sommes-nous, master) — V1-P127/188.
+- ✅ Indicateur langue affiche bien la langue **courante** (FR en FR) — V1-P37.
 - ⬜ Menus header Solutions/Tarifs/Documentation — V1-P181-184 ; ⬜ barre contact — V1-P180.
 - ⬜ PWA — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
 - 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
@@ -87,7 +87,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ Multi-items / échéances multiples / commande groupée — V1-P17/20/22/23/25.
 - ⚠️ Slogan à l'infinitif — SUG-2.
 - ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
-- ⚠️ Bugs UX à re-tester : quantité (SUG-18), onglet Mesures blanc (SUG-19), Historique vide (SUG-20),
+- ✅ Champ Quantité éditable (SUG-18). ⚠️ Bugs UX **à re-tester dans l'app** : onglet Mesures blanc (SUG-19), Historique vide (SUG-20),
   profil client `/`/`Key` (SUG-21), icône module « nouveau modèle » (SUG-17),
   bouton « déjà inscrit » (SUG-7), bouton se connecter trop bas (SUG-8).
 - ⬜ Placeholders adaptés au profil + **références béninoises** — SUG-9/10/11.
@@ -178,7 +178,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
 ## Bloc 6 — Gestion NovAfriq (site mère novafriq.africa)
 
-- ⚠️ Cohérence du nom « **novafriq** » (recherche/remplacement « novafrique », Qui sommes-nous, footer) — V1-P127/188.
+- ✅ Cohérence du nom « **novafriq** » (footer + Qui sommes-nous corrigés sur master) — V1-P127/188.
 - ⬜ **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC — compte déjà créé) — V1-P197.
 - ⬜ **Search Console + Bing + sitemap.xml** (novafriq.africa) — V1-P199.
 - ⬜ Menus header vitrine + barre contact (partagés avec Bloc 1) — V1-P180-184.
@@ -252,7 +252,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P52 | Magnat mensuel : points OK | 1 | ✅ |
 | P53-55 | Comportement changement/downgrade de plan | 1 | ⬜ à définir |
 | P56 | Caisse : message plan insuffisant | 1 | ✅ |
-| P57 | Bouton « voir les plans » mal redirigé | 1 | ⚠️ |
+| P57 | Bouton « voir les plans » → ouvre l'onglet Abonnement | 1 | ✅ |
 | P58 | Bouton → page abonnements/plan conseillé | 1 | 🟡 |
 | P59 | Consulter mesures enregistrées | 1 | ✅ |
 | P60 | Modifier les mesures | 1 | ✅ |
@@ -268,7 +268,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P108 | Skeleton loaders | 1 | ✅ |
 | P109 | Expérience mobile (petits écrans, réseau lent) | 1 | 🟡 |
 | P110-111 | Logs + outil de diagnostic admin | 3 | ⬜ |
-| P112-113 | Ne pas montrer les erreurs techniques brutes | 1 | ⚠️ |
+| P112-113 | Erreurs techniques jamais brutes (messages i18n, 500 masqué) | 1 | ✅ |
 | P114 | Tâches longues en arrière-plan | 1 | 🟡 |
 | P115-117 | Offline / file de sync « en attente » | 1 | ✅/🟡 |
 | P118 | Séparation stricte + sync fiable (synthèse) | 1 | 🟡 |
@@ -350,7 +350,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | ID | Sujet | Bloc | Statut |
 |---|---|---|---|
 | SUG-1 | Splash screen (favicon → logo → connexion) | 7 | 🟡 |
-| SUG-2 | Slogan à l'impératif (Créez, Gérez, Rayonnez) | 1 | ⚠️ |
+| SUG-2 | Slogan à l'impératif (alt corrigé ; **visuel dans l'image `logoforlogin.png` à refaire côté design**) | 1 | 🟡 |
 | SUG-3 | Indicateur de langue (FR/EN) | 1 | ✅ |
 | SUG-4 | Checkbox CGU obligatoire à l'inscription | 1 | ✅ |
 | SUG-5 | Lien CGU ouvre le site web | 1 | 🟡 |
@@ -366,7 +366,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-15 | Coordonnées artisan dans les exports | 1 | 🟡 |
 | SUG-16 | Export WhatsApp avec toutes les mesures | 1 | ⚠️ |
 | SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
-| SUG-18 | Champ Quantité (défaut 1, bug « 12 ») | 1 | ⚠️ |
+| SUG-18 | Champ Quantité éditable (effaçable, borné 1–999, select au focus) | 1 | ✅ |
 | SUG-19 | Onglet « Mesures » (page blanche) | 1 | ⚠️ |
 | SUG-20 | Onglet « Historique » vide | 1 | ⚠️ |
 | SUG-21 | Profil client affiche `/` ou `Key` | 1 | ⚠️ |
