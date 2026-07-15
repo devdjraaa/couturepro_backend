@@ -41,7 +41,7 @@ valider par la direction avant de lancer les corrections.
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
 | 18 | **Sauvegardes VPS** chiffrées quotidiennes off-site + test de restauration mensuel | ⬜ | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
-| 20 | **Format numéro de reçu** auto-majuscules + tirets automatiques | ⬜ | 1 | V1-P144 |
+| 20 | **Format numéro de reçu** — ✅ majuscules + tirets automatiques livrés | ✅ | 1 | V1-P144 |
 | 21 | **e-mail `support@gextimo.africa`** erroné (FAQ) → mettre la bonne adresse | ⬜ | 5 | V1-P189 |
 
 > Beaucoup d'autres bugs signalés (⚠️) portent sur du code **existant** (multi-ateliers, OTP, gel de
@@ -89,8 +89,8 @@ valider par la direction avant de lancer les corrections.
 - ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
 - ✅ Champ Quantité éditable (SUG-18) ; ✅ Historique alimenté + au menu (SUG-20) ; ✅ Mesures wizard obsolète (SUG-19) ; ✅ profil client `/`/`Key` non reproduit (SUG-21) ; ✅ recherche clients live (P9).
 - ⚠️ Reste à vérifier device : icône module « nouveau modèle » (SUG-17),
-  bouton « déjà inscrit » (SUG-7), bouton se connecter trop bas (SUG-8).
-- ⬜ Placeholders adaptés au profil + **références béninoises** — SUG-9/10/11.
+  bouton « déjà inscrit » (SUG-7). ✅ Bouton se connecter : safe-area (SUG-8).
+- ✅ Placeholders adaptés au profil + références béninoises (Sèna/Hounkpatin/Tofa) — SUG-9/10/11.
 - 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61 ; 🟡 PDF pied de page
   marketing Gextimo (logo/slogan/site) — SUG-14/15, V1-P14.
 
@@ -304,7 +304,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P141 | Checkbox CGU à l'inscription | 1 | ✅ |
 | P142 | Footer page confidentialité (liens légaux) | 6 | 🟡 |
 | P143 | Nom du menu « Galerie des artisans » | 1 | 🟡 |
-| P144 | Format numéro reçu (majuscules + tirets auto) | 1 | ⬜ |
+| P144 | Code d'activation : majuscules + tirets automatiques (XXXX-XXXX-XXXX) | 1 | ✅ |
 | P145 | Indicateur « FR » mais texte EN | 1 | ⚠️ |
 | P147 | Login non vérifié → redirige vers l'OTP (renvoi + saisie), fini le blocage | 1 | ✅ |
 | P146 | OTP par e-mail **et** SMS (fiabilité de livraison) | 1 | ⚠️ infra |
@@ -369,10 +369,10 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-5 | Lien CGU ouvre le site web | 1 | 🟡 |
 | SUG-6 | Bug : clic CGU renvoie à la connexion | 1 | ⚠️ |
 | SUG-7 | Bouton « Déjà inscrit ? Se connecter » | 1 | ⚠️ |
-| SUG-8 | Bouton « Se connecter » trop bas | 1 | ⚠️ |
-| SUG-9 | Placeholders selon le profil (artisan/designer) | 1 | ⬜ |
-| SUG-10 | Références béninoises (noms) | 1 | ⬜ |
-| SUG-11 | Placeholders Nom/Prénom béninois | 1 | ⬜ |
+| SUG-8 | Bouton « Se connecter » : safe-area bas (ne colle plus la barre système) | 1 | ✅ |
+| SUG-9 | Placeholders atelier adaptés au type (artisan/designer) | 1 | ✅ |
+| SUG-10 | Références béninoises (Sèna, Hounkpatin, Tofa) partout | 1 | ✅ |
+| SUG-11 | Placeholders Nom/Prénom béninois (i18n, plus de dur) | 1 | ✅ |
 | SUG-12 | Champ Prénom dans le profil | 1 | ✅ |
 | SUG-13 | Import contacts : timeout 60 s par lot — fini l'« erreur »' fantôme | 1 | ✅ |
 | SUG-14 | PDF : pied de page marketing (logo/slogan/site) | 1 | 🟡 |
