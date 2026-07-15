@@ -381,7 +381,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P182 | Menu déroulant « Tarifs » | 6 | ⬜ |
 | P183-184 | Menu « Documentation » (cartes) + page | 6 | ⬜ |
 | P185 | APK sur le site + guide d'installation | 7 | ✅ (guide à confirmer) |
-| P186 | PWA (manifest + SW + bannière) | 7 | ⬜ |
+| P186 | PWA (manifest + SW + bannière) | 7 | ✅ **déjà fait** (audit code) : `public/manifest.webmanifest` complet (icônes 192/512/maskable), `public/sw.js` (SW conservateur : navigations réseau-d'abord, assets hashés cache-d'abord, API non interceptée), `src/utils/pwa.js` (register web-only + `beforeinstallprompt` + `promptInstall`), `PwaInstallBanner` rendu dans `main.jsx`, i18n `pwa.*`. Web uniquement (désactivé dans Capacitor pour ne pas gêner l'OTA) |
 | P187 | Texte d'accueil page inscription | 6 | 🟡 |
 | P188 | Remplacer « novafrique » (Qui sommes-nous, footer) | 6 | ✅ |
 | P189 | E-mail `support@gextimo.africa` erroné | 5 | ⬜ |
