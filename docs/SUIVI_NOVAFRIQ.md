@@ -244,11 +244,11 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P44 | Galerie photos annoncée absente | 1 | ✅ (existe) |
 | P45 | Espace galerie jamais activé | 1 | ✅ |
 | P46 | Module abonnement peu visible | 1 | 🟡 |
-| P47 | Cumul temps restant essai + abonnement | 1 | ⚠️ à re-tester |
+| P47 | Cumul temps restant essai + abonnement (prolonge depuis l'expiration si statut essai) | 1 | ✅ |
 | P48 | MAJ abonnement sur tous les ateliers | 1 | 🟡 |
 | P49 | Points + bienvenue après souscription | 1 | 🟡 |
-| P50 | Premium annuel : assistants/viewers | 1 | ⚠️ |
-| P51 | Magnat annuel : 7 ateliers mais 3 max | 1 | ⚠️ |
+| P50 | Premium annuel assistants/viewers — **config DB correcte** (assistants=2, membres=5) → re-tester runtime | 1 | 🟡 |
+| P51 | Magnat annuel 7 ateliers — **config DB correcte** (max_sous_ateliers=7) → re-tester runtime | 1 | 🟡 |
 | P52 | Magnat mensuel : points OK | 1 | ✅ |
 | P53-55 | Comportement changement/downgrade de plan | 1 | ⬜ à définir |
 | P56 | Caisse : message plan insuffisant | 1 | ✅ |
@@ -263,7 +263,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P78-81 | WhatsApp preuve de paiement (PDF/image attaché) | 1 | ⚠️ |
 | P82-91 | Module facturation par plan + modèles + preview | 1 | ✅/🟡 |
 | P92-103 | Dashboard admin temps réel (refresh, filtres) | 3 | ⬜ |
-| P104-106 | Permissions synchronisées au changement de plan | 1 | 🟡/⚠️ |
+| P104-106 | Permissions au changement de plan — snapshot régénéré au sync + à l'activation ; immédiateté UI/P106 à re-tester | 1 | 🟡 |
 | P107 | Transitions d'écran plus fluides | 1 | 🟡 |
 | P108 | Skeleton loaders | 1 | ✅ |
 | P109 | Expérience mobile (petits écrans, réseau lent) | 1 | 🟡 |
@@ -272,7 +272,9 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P114 | Tâches longues en arrière-plan | 1 | 🟡 |
 | P115-117 | Offline / file de sync « en attente » | 1 | ✅/🟡 |
 | P118 | Séparation stricte + sync fiable (synthèse) | 1 | 🟡 |
-| P119-124 | Comptes gelés/expirés/récupération (bugs) | 3 | ⚠️ |
+| P119 | Dégel restaure essai/actif valide (ne force plus « expire ») | 3 | ✅ |
+| P124 | Récup : format tél normalisé (espaces strippés à l'écriture + lookup) | 3 | ✅ |
+| P120-123 | Réactivation compte dégelé (page blanche), tél dé-enregistré, OTP e-mail fictif | 3 | ⚠️ runtime |
 | P125 | Point après « gextimo » sur l'accueil — retiré | 1 | ✅ |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
 | P127 | « novafrique » → « novafriq » | 6 | ✅ |
@@ -294,7 +296,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P143 | Nom du menu « Galerie des artisans » | 1 | 🟡 |
 | P144 | Format numéro reçu (majuscules + tirets auto) | 1 | ⬜ |
 | P145 | Indicateur « FR » mais texte EN | 1 | ⚠️ |
-| P146-147 | OTP e-mail+SMS + bouton « Renvoyer » | 1 | ⚠️ |
+| P147 | Login non vérifié → redirige vers l'OTP (renvoi + saisie), fini le blocage | 1 | ✅ |
+| P146 | OTP par e-mail **et** SMS (fiabilité de livraison) | 1 | ⚠️ infra |
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
 | P150 | Connexion Google/Facebook/Apple | 1 | ⬜ |
