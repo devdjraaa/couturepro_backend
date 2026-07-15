@@ -22,7 +22,7 @@ valider par la direction avant de lancer les corrections.
 
 | # | Sujet | Statut | Bloc | Réf |
 |---|---|---|---|---|
-| 1 | **Codes promo / ambassadeurs** (table dédiée, API validée + rate-limit, panel admin, 1×/tél, expiry) — le `activer-code` actuel ne couvre que l'activation d'abonnement, pas ce système | ⬜ | 1/3 | V1-P1, P153-158 |
+| 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; reste P156 (mode gratuit à l'expiration) | ✅ | 1/3 | V1-P1, P153-158 |
 | 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
 | 3 | **Slogan à l'infinitif** « Créer · Gérer · Rayonner » → doit être **impératif** « Créez, Gérez, Rayonnez » | ⚠️ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
@@ -107,7 +107,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
   normalisation téléphone (migration dédiée) — V1-P66/67 (front à confirmer).
 - ⚠️ À corriger : OTP par e-mail **et** SMS + bouton « Renvoyer l'OTP » (V1-P146/147), OTP sur e-mail
-  fictif = compte bloqué (V1-P123), format espace indicatif en récupération (V1-P124). ✅ Double œil corrigé (P148).
+  ✅ e-mail fictif débloqué : « E-mail incorrect ? Corrigez-le » sur la page OTP (tél + mdp → correction + renvoi, V1-P123). Format récup OK (V1-P124). ✅ Double œil corrigé (P148).
 - ⬜ Connexion sociale Google/FB/Apple — V1-P150.
 
 ### 1.5 Abonnements / plans
@@ -129,8 +129,14 @@ valider par la direction avant de lancer les corrections.
   ⬜ 4 compteurs + pseudo public + date intelligente + bouton s'abonner — V1-P170-173 ;
   ⬜ téléchargement patrons payants — V1-P161-163 ; ⬜ photos dans avis — V1-P137.
 
-### 1.8 Codes promo / ambassadeurs ⬜
-- ⬜ Système complet (table, API validée + rate-limit, panel admin, 1×/tél, expiry auto) — V1-P153-158.
+### 1.8 Codes promo / ambassadeurs ✅ (livré & testé prod)
+- ✅ **Système complet (V1-P153-155, P157-158)** : tables `codes_promo` + `code_promo_utilisations`
+  (unique code+téléphone), `POST /codes-promo/utiliser` (throttle 5/min, message générique
+  anti-énumération, transaction + verrous anti-course), les jours s'AJOUTENT au restant (P155 —
+  vérifié en prod : 365→382 j, puis nettoyé), panel admin `/admin/codes-promo` (création, compteur
+  d'utilisations par code, activer/désactiver), saisie dédiée dans Réglages → Abonnement,
+  10 codes ambassadeurs GEXT-AMB-001→010 seedés (+17 j, sans expiration). Import contacts non gated (P157).
+- ⬜ P156 : expiration → repli mode gratuit lecture seule (chantier produit à part).
   `abonnement/activer-code` existe mais ≠ codes promo/ambassadeurs. Voir aussi Bloc 3.
 
 ---
@@ -284,7 +290,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P119 | Dégel restaure essai/actif valide (ne force plus « expire ») | 3 | ✅ |
 | P124 | Récup : format tél normalisé (espaces strippés à l'écriture + lookup) | 3 | ✅ |
 | P120 | Page détail atelier admin **blanche** pour comptes non-actifs — **corrigé** (`UNITE_OPTIONS` hors scope → ReferenceError ; la réactivation/dégel se fait sur cette page) | 3 | ✅ |
-| P121-123 | Tél dé-enregistré (vérif), OTP e-mail fictif → compte bloqué | 3 | ⚠️ |
+| P123 | E-mail fictif : « E-mail incorrect ? Corrigez-le » sur la page OTP (tél + mdp → renvoi) | 3 | ✅ |
+| P121-122 | Tél dé-enregistré (vérif) ; compte expiré non réutilisable (voulu, P122) | 3 | ⚠️/ℹ️ |
 | P125 | Point après « gextimo » sur l'accueil — retiré | 1 | ✅ |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
 | P127 | « novafrique » → « novafriq » | 6 | ✅ |
@@ -314,7 +321,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P150 | Connexion Google/Facebook/Apple | 1 | ⬜ |
 | P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
-| P153-158 | Codes promo + ambassadeurs (système complet) | 1/3 | ⬜ |
+| P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
+| P156 | Expiration → repli mode gratuit lecture seule | 1 | ⬜ |
 | P159-160 | Likes cœur + 4 boutons par création | 1 | ⬜ |
 | P161-163 | Téléchargement patrons payants + récup code | 1 | ⬜ |
 | P164 | Formulaire « passer commande » en 3 étapes | 1 | 🟡 (devis existe) |
