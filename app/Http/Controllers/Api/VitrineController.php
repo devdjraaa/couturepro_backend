@@ -8,6 +8,7 @@ use App\Models\AtelierAbonne;
 use App\Models\Commande;
 use App\Models\CreationLike;
 use App\Models\NiveauConfig;
+use App\Models\Patron;
 use App\Models\Vetement;
 use App\Models\VitrineEvenement;
 use App\Models\VitrineSetting;
@@ -83,6 +84,9 @@ class VitrineController extends Controller
             ? CreationLike::whereIn('vetement_id', $creationIds)->where('visitor_key', $visitorKey)->pluck('vetement_id')->flip()
             : collect();
 
+        // P161 : patron payant éventuel attaché à chaque création (bouton « Télécharger »).
+        $patrons = Patron::whereIn('vetement_id', $creationIds)->where('actif', true)->get()->keyBy('vetement_id');
+
         $creations = $creationsModels->map(fn ($v) => [
             'id'        => $v->id,
             'nom'       => $v->nom,
@@ -94,6 +98,11 @@ class VitrineController extends Controller
             'collection_id' => $v->collection_id,
             'likes'     => (int) ($likeCounts[$v->id] ?? 0),          // P159
             'liked'     => $likedByMe->has($v->id),                    // like du visiteur courant
+            'patron'    => isset($patrons[$v->id]) ? [                 // P161 : contenu payant
+                'id'    => $patrons[$v->id]->id,
+                'titre' => $patrons[$v->id]->titre,
+                'prix'  => $patrons[$v->id]->prix,
+            ] : null,
         ])->values();
 
         // Contact WhatsApp — uniquement si le créateur a activé l'opt-in.

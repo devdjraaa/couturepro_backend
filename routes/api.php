@@ -31,6 +31,8 @@ use App\Http\Controllers\Api\ParametresController;
 use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
+use App\Http\Controllers\Api\PatronController;
+use App\Http\Controllers\Api\PatronPublicController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
@@ -57,6 +59,10 @@ Route::prefix('vitrine')->group(function () {
     Route::post('creations/{vetement}/like', [VitrineController::class, 'toggleLike']);
     // P173 : s'abonner / se désabonner d'un créateur (anonyme).
     Route::post('createurs/{atelier}/abonnement', [VitrineController::class, 'toggleAbonnement']);
+    // P161-163 : patrons payants — achat (→ paiement), récupération par code, téléchargement.
+    Route::post('patrons/{patron}/acheter',              [PatronPublicController::class, 'acheter']);
+    Route::get('patrons/achats/{code}',                  [PatronPublicController::class, 'statut']);
+    Route::get('patrons/achats/{code}/telecharger',      [PatronPublicController::class, 'telecharger']);
     // Rendu OG côté serveur pour les robots sociaux (proxifié par nginx selon l'User-Agent).
     Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
     Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store']);
@@ -194,6 +200,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('vetements/{vetement}/publication', [VetementController::class, 'togglePublication']);
     Route::post('vetements/{vetement}/collection',  [VetementController::class, 'setCollection']);
     Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
+
+    // P161-163 : patrons payants (côté créateur) — CRUD + upload fichier privé.
+    Route::get('patrons',              [PatronController::class, 'index']);
+    Route::post('patrons',             [PatronController::class, 'store']);
+    Route::match(['PUT', 'POST'], 'patrons/{patron}', [PatronController::class, 'update']);
+    Route::delete('patrons/{patron}',  [PatronController::class, 'destroy']);
 
     // Collections (regroupement de créations)
     Route::get('collections',                 [CollectionController::class, 'index']);

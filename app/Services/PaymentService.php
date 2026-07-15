@@ -7,6 +7,7 @@ use App\Models\Abonnement;
 use App\Models\Atelier;
 use App\Models\NiveauConfig;
 use App\Models\Paiement;
+use App\Models\PatronAchat;
 use App\Models\TransactionAbonnement;
 use App\Models\VitrineSetting;
 use App\Services\Payment\FedaPayProvider;
@@ -126,6 +127,64 @@ class PaymentService
         return $paiement->fresh();
     }
 
+    /**
+     * P161-163 : achat d'un patron par un visiteur. Réutilise le même provider FedaPay.
+     * L'atelier vendeur porte le paiement (atelier_id) ; l'acheteur (anonyme) fournit ses
+     * coordonnées, transmises au provider pour le reçu.
+     */
+    public function initiatePatron(PatronAchat $achat, ?string $returnUrl = null, string $provider = 'fedapay'): Paiement
+    {
+        $patron  = $achat->patron;
+        $atelier = $patron->atelier;
+
+        $paiement = Paiement::create([
+            'atelier_id'   => $atelier->id,
+            'type'         => 'patron',
+            'meta'         => ['patron_achat_id' => $achat->id],
+            // niveau_cle est requis (FK) : plan courant du vendeur à titre indicatif.
+            'niveau_cle'   => $atelier->abonnement?->niveau_cle ?? NiveauConfig::query()->value('cle'),
+            'duree_jours'  => 0,
+            'montant'      => $achat->montant,
+            'devise'       => 'XOF',
+            'provider'     => $provider,
+            'statut'       => 'pending',
+            'initiated_at' => now(),
+            'expires_at'   => now()->addHours(2),
+            'ip_address'   => request()->ip(),
+        ]);
+
+        $result = $this->resolveProvider($provider)->initiate($paiement, [
+            'email'      => $achat->acheteur_email ?: ($atelier->proprietaire->email ?? 'client@gextimo.africa'),
+            'nom'        => $achat->acheteur_nom,
+            'prenom'     => '',
+            'return_url' => $returnUrl,
+        ]);
+
+        $paiement->update([
+            'checkout_url'            => $result->checkoutUrl,
+            'provider_transaction_id' => $result->providerTransactionId,
+            'provider_metadata'       => $result->providerMetadata,
+        ]);
+
+        $achat->update(['paiement_id' => $paiement->id]);
+
+        return $paiement->fresh();
+    }
+
+    private function activerPatron(Paiement $paiement): void
+    {
+        DB::transaction(function () use ($paiement) {
+            $achatId = $paiement->meta['patron_achat_id'] ?? null;
+            $achat   = $achatId ? PatronAchat::find($achatId) : null;
+
+            if ($achat && $achat->statut !== 'paye') {
+                $achat->update(['statut' => 'paye', 'paye_at' => now()]);
+            }
+
+            $paiement->update(['statut' => 'completed', 'completed_at' => now()]);
+        });
+    }
+
     private function activerSponsorisation(Paiement $paiement): void
     {
         DB::transaction(function () use ($paiement) {
@@ -150,6 +209,11 @@ class PaymentService
     {
         if ($paiement->type === 'sponsorisation') {
             $this->activerSponsorisation($paiement);
+            return;
+        }
+
+        if ($paiement->type === 'patron') {
+            $this->activerPatron($paiement);
             return;
         }
 
