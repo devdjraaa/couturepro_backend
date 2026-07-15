@@ -128,7 +128,9 @@ valider par la direction avant de lancer les corrections.
   schéma WatermelonDB → INSERT NULL → NOT NULL violation qui **bloquait toute la file de sync**
   (WatermelonDB retente le lot entier). Corrigé (`DEFAULT CURRENT_DATE`). Idem `commandes.vetement_id`
   était NOT NULL alors que l'UI autorise les commandes sans vêtement → rendu nullable. **Vérifié
-  device** : commande fraîche `status:created`, date auto.
+  device** : commande fraîche `status:created`, date auto. **Audit sync complet** des 9 tables
+  synchronisées : seule `commandes` avait le piège (date_commande) ; toutes les autres colonnes
+  NOT NULL sont fournies (schéma local, défaut DB, SyncService, ou requises à la saisie). Sync saine.
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
