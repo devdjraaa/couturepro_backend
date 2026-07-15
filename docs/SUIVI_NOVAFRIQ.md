@@ -213,7 +213,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P1 | Espace admin : créer codes d'activation/promo | 3 | ⬜ |
 | P2 | Compte gelé : message **FR** « Compte suspendu » + compte réellement **bloqué** (mur), CTA support (pas abonnement), tickets accessibles — vérifié device | 3 | ✅ |
 | P3 | Icône profil cliquable → paramètres du profil | 1 | ✅ |
-| P4 | Bouton « Retour » Android = « Annuler » | 1 | ⚠️ |
+| P4 | Bouton « Retour » Android ferme les modales (= Annuler) avant de naviguer — pile de handlers (BottomSheet/Modal), vérifié device | 1 | ✅ |
+| — | **Bug i18n accueil** (`abonnement.statut.undefined`) : entête API `X-Atelier-Id` restait sur un ancien atelier → requêtes serveur mal ciblées. Fix : re-sync au reload + garde-fou badge. Vérifié device | 1 | ✅ |
 | P5 | Accès aux contacts du téléphone | 1 | ✅ |
 | P6 | Import avec confirmation (jamais auto) | 1 | ✅ |
 | P7 | Bouton « Importer des contacts » (multi) | 1 | ✅ |
