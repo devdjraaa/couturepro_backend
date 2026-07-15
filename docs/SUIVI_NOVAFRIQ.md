@@ -29,10 +29,10 @@ valider par la direction avant de lancer les corrections.
 | 5 | ~~Page inscription en anglais malgré l'indicateur FR~~ ✅ **résolu** : audit code — `i18n.js` démarre en `fr` par défaut (`lng: cp_lang \|\| 'fr'`, `fallbackLng: 'fr'`), toutes les clés `auth.inscription.*` présentes et traduites en fr.json ; l'indicateur était déjà corrigé | ✅ | 1 | V1-P145 |
 | 6 | **Menus header vitrine** Solutions / Tarifs / Documentation (déroulants façon Kkiapay) — absents | ⬜ | 6 | V1-P181-184 |
 | 7 | **Barre de contact fine** au-dessus du header (tél + WhatsApp +229) — absente | ⬜ | 6 | V1-P180 |
-| 8 | **Likes (cœur) + 4 boutons** sur chaque création (❤️/💬/📩/🛒) — absents du profil créateur | ⬜ | 1 | V1-P159-160 |
-| 9 | **Badges / Mérites** (6 catégories × 5 niveaux) sur le profil créateur — absents | ⬜ | 1 | V1-P174-176 |
-| 10 | **Profil créateur public** : 4 compteurs, pseudo public, date d'inscription intelligente, bouton s'abonner | ⬜ | 1 | V1-P170-173 |
-| 11 | **Téléchargement de patrons payants** (bouton payant, récup par code transaction) | ⬜ | 1 | V1-P161-163 |
+| 8 | ~~Likes (cœur) + 4 boutons sur chaque création~~ ✅ **fait** (full-stack) | ✅ | 1 | V1-P159-160 |
+| 9 | ~~Badges / Mérites (6 catégories × 5 niveaux)~~ ✅ **fait** (config + service + vitrine) | ✅ | 1 | V1-P174-176 |
+| 10 | ~~Profil créateur public (4 compteurs, date intelligente, s'abonner)~~ ✅ **fait** (pseudo = nom public, décidé) | ✅ | 1 | V1-P170-173 |
+| 11 | ~~Téléchargement de patrons payants (récup par code)~~ ✅ **fait & testé sandbox** (FedaPay) | ✅ | 1 | V1-P161-163 |
 | 12 | **Connexion sociale** Google / Facebook / Apple | ⬜ | 1 | V1-P150 |
 | 13 | ~~**Photos dans les avis** clients~~ ✅ **fait** (upload ≤3 photos + affichage vitrine) | ✅ | 1 | V1-P137 |
 | 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
