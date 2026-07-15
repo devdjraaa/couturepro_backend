@@ -338,7 +338,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P131 | Bouton « S'inscrire » absent sur mobile | 6 | 🟡 à confirmer |
 | P132 | Header/retour sur pages inscription-connexion | 6 | ⬜ |
 | P133 | Profil créateur s'ouvre en haut (scrollTo(0,0) au changement de slug, master) | 1 | ✅ |
-| P134 | Bannière profil : photo/GIF/vidéo | 1 | ⬜ |
+| P134 | Bannière profil : photo/GIF/vidéo | 1 | ✅ (full-stack : `ateliers.banniere_path/type`, upload image≤4Mo/vidéo≤15Mo dans Ma Vitrine, affichée en couverture du profil vitrine ; sinon dégradé) |
 | P135 | Détection pays/devise + message | 1/6 | 🟡 |
 | P136 | Bandeau cookies + personnalisation | 6 | ✅/🟡 |
 | P137 | Photos dans les avis | 1 | ✅ (full-stack : `avis.photos` json, upload public ≤3 dans `AvisForm`, miniatures cliquables dans le profil vitrine) |
