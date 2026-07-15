@@ -15,7 +15,7 @@ class VetementPolicy
 
     public function view(Proprietaire|EquipeMembre $user, Vetement $vetement): bool
     {
-        return $vetement->atelier_id === $this->getAtelierId($user)
+        return $this->ownsAtelier($user, $vetement->atelier_id)
             || $vetement->is_systeme;
     }
 
@@ -27,21 +27,31 @@ class VetementPolicy
     public function update(Proprietaire|EquipeMembre $user, Vetement $vetement): bool
     {
         return $user instanceof Proprietaire
-            && $vetement->atelier_id === $user->atelierMaitre?->id
+            && $this->ownsAtelier($user, $vetement->atelier_id)
             && !$vetement->is_systeme;
     }
 
     public function delete(Proprietaire|EquipeMembre $user, Vetement $vetement): bool
     {
         return $user instanceof Proprietaire
-            && $vetement->atelier_id === $user->atelierMaitre?->id
+            && $this->ownsAtelier($user, $vetement->atelier_id)
             && !$vetement->is_systeme;
     }
 
-    private function getAtelierId(Proprietaire|EquipeMembre $user): ?string
+    /**
+     * Le vêtement appartient-il à un atelier de l'utilisateur ?
+     * - Propriétaire : n'importe lequel de SES ateliers (support multi-ateliers P72-77 :
+     *   un vêtement créé dans un sous-atelier reste éditable par le propriétaire).
+     * - Membre d'équipe : uniquement son atelier.
+     */
+    private function ownsAtelier(Proprietaire|EquipeMembre $user, ?string $atelierId): bool
     {
+        if ($atelierId === null) {
+            return false;
+        }
+
         return $user instanceof EquipeMembre
-            ? $user->atelier_id
-            : $user->atelierMaitre?->id;
+            ? $user->atelier_id === $atelierId
+            : $user->ateliers()->whereKey($atelierId)->exists();
     }
 }

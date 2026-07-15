@@ -15,7 +15,7 @@ class CommandePolicy
 
     public function view(Proprietaire|EquipeMembre $user, Commande $commande): bool
     {
-        return $commande->atelier_id === $this->getAtelierId($user);
+        return $this->ownsAtelier($user, $commande->atelier_id);
     }
 
     public function create(Proprietaire|EquipeMembre $user): bool
@@ -25,7 +25,7 @@ class CommandePolicy
 
     public function update(Proprietaire|EquipeMembre $user, Commande $commande): bool
     {
-        return $commande->atelier_id === $this->getAtelierId($user);
+        return $this->ownsAtelier($user, $commande->atelier_id);
     }
 
     public function archive(Proprietaire|EquipeMembre $user, Commande $commande): bool
@@ -33,7 +33,7 @@ class CommandePolicy
         if ($user instanceof EquipeMembre) {
             return $commande->atelier_id === $user->atelier_id && $user->role === 'assistant';
         }
-        return $commande->atelier_id === $this->getAtelierId($user);
+        return $this->ownsAtelier($user, $commande->atelier_id);
     }
 
     public function delete(Proprietaire|EquipeMembre $user, Commande $commande): bool
@@ -41,13 +41,21 @@ class CommandePolicy
         if ($user instanceof EquipeMembre) {
             return false;
         }
-        return $commande->atelier_id === $user->atelierMaitre?->id;
+        return $this->ownsAtelier($user, $commande->atelier_id);
     }
 
-    private function getAtelierId(Proprietaire|EquipeMembre $user): ?string
+    /**
+     * L'entité appartient-elle à un atelier de l'utilisateur ?
+     * Propriétaire : n'importe lequel de SES ateliers (multi-ateliers P72-77) ;
+     * membre d'équipe : son atelier uniquement.
+     */
+    private function ownsAtelier(Proprietaire|EquipeMembre $user, ?string $atelierId): bool
     {
+        if ($atelierId === null) {
+            return false;
+        }
         return $user instanceof EquipeMembre
-            ? $user->atelier_id
-            : $user->atelierMaitre?->id;
+            ? $user->atelier_id === $atelierId
+            : $user->ateliers()->whereKey($atelierId)->exists();
     }
 }
