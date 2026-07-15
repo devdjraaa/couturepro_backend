@@ -34,7 +34,7 @@ valider par la direction avant de lancer les corrections.
 | 10 | **Profil créateur public** : 4 compteurs, pseudo public, date d'inscription intelligente, bouton s'abonner | ⬜ | 1 | V1-P170-173 |
 | 11 | **Téléchargement de patrons payants** (bouton payant, récup par code transaction) | ⬜ | 1 | V1-P161-163 |
 | 12 | **Connexion sociale** Google / Facebook / Apple | ⬜ | 1 | V1-P150 |
-| 13 | **Photos dans les avis** clients | ⬜ | 1 | V1-P137 |
+| 13 | ~~**Photos dans les avis** clients~~ ✅ **fait** (upload ≤3 photos + affichage vitrine) | ✅ | 1 | V1-P137 |
 | 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
 | 16 | **Veille technique SEO hebdo** — ✅ livrée : `veille:seo` (PSI mobile+desktop, HTTPS, dispo, alertes, 2 sites), lundi 7h. 🟡 Search Console API (OAuth à configurer) ; e-mail : définir `VEILLE_SEO_EMAIL` | 🟡 | 2 | V1-P200 |
@@ -341,7 +341,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P134 | Bannière profil : photo/GIF/vidéo | 1 | ⬜ |
 | P135 | Détection pays/devise + message | 1/6 | 🟡 |
 | P136 | Bandeau cookies + personnalisation | 6 | ✅/🟡 |
-| P137 | Photos dans les avis | 1 | ⬜ |
+| P137 | Photos dans les avis | 1 | ✅ (full-stack : `avis.photos` json, upload public ≤3 dans `AvisForm`, miniatures cliquables dans le profil vitrine) |
 | P138 | Footer « devenir créateur » : tarif | 6 | ⬜ |
 | P139 | CGV complètes (marketplace) | 6 | 🟡 |
 | P140 | Renommer Mentions→CGU, page légale unique | 6 | 🟡 |
@@ -360,7 +360,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
 | P156 | Expiration → repli **mode gratuit** : plus de mur, bannière « Renouveler », données visibles, quotas/features free (getConfigEffective) — **vérifié device** | 1 | ✅ |
-| P159-160 | Likes cœur + 4 boutons par création | 1 | ✅ (full-stack déployé : like ❤️ public anonyme + rangée 4 boutons ❤️/💬/📩/🛒 sur chaque création dans `CreateurProfilPage`. Nuance restante : 💬 renvoie à la section avis ; commentaire **par création + photo** = P137/P160, à part) |
+| P159-160 | Likes cœur + 4 boutons par création | 1 | ✅ (full-stack déployé : like ❤️ public anonyme + rangée 4 boutons ❤️/💬/📩/🛒 sur chaque création dans `CreateurProfilPage`. Nuance restante : 💬 renvoie à la section avis (avec **photos** ✅ P137) — les avis restent **par créateur**, pas par création) |
 | P161-163 | Téléchargement patrons payants + récup code | 1 | ✅ **full-stack** (backend : tables patrons/patron_achats, `PaymentService::initiatePatron` FedaPay **sandbox** + webhook, `PatronController` CRUD upload privé, endpoints acheter/statut/télécharger par code ; **acheteur vitrine** : bouton Télécharger + modale achat → paiement + page reçu `/patrons/recu/:code` + menu `/patrons/recuperer` (footer) ; **créateur** : `PatronManager` dans le catalogue (mise en vente fichier+prix). Gate plan `patrons_payants` défaut inclus. **À vérifier** : parcours paiement sandbox de bout en bout sur données réelles) |
 | P164 | Formulaire « passer commande » en 3 étapes | 1 | 🟡 (devis existe) |
 | P165 | Paiement 2 phases (mise en relation → commission 15%) | 1 | 🔵 (business) |
