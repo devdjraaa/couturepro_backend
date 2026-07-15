@@ -86,9 +86,10 @@ valider par la direction avant de lancer les corrections.
 - ✅ Champ Prénom (profil + register) — SUG-12/V1-P152.
 - ✅ Multi-items / échéances multiples / commande groupée — V1-P17/20/22/23/25.
 - ⚠️ Slogan à l'infinitif — SUG-2.
+- ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
 - ⚠️ Bugs UX à re-tester : quantité (SUG-18), onglet Mesures blanc (SUG-19), Historique vide (SUG-20),
-  profil client `/`/`Key` (SUG-21), icône module « nouveau modèle » (SUG-17), double icône œil MDP (V1-P148),
-  bouton « déjà inscrit » (SUG-7), bouton se connecter trop bas / dépasse (SUG-8/V1-P191).
+  profil client `/`/`Key` (SUG-21), icône module « nouveau modèle » (SUG-17),
+  bouton « déjà inscrit » (SUG-7), bouton se connecter trop bas (SUG-8).
 - ⬜ Placeholders adaptés au profil + **références béninoises** — SUG-9/10/11.
 - 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61 ; 🟡 PDF pied de page
   marketing Gextimo (logo/slogan/site) — SUG-14/15, V1-P14.
@@ -103,7 +104,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
   normalisation téléphone (migration dédiée) — V1-P66/67 (front à confirmer).
 - ⚠️ À corriger : OTP par e-mail **et** SMS + bouton « Renvoyer l'OTP » (V1-P146/147), OTP sur e-mail
-  fictif = compte bloqué (V1-P123), format espace indicatif en récupération (V1-P124), double œil (P148).
+  fictif = compte bloqué (V1-P123), format espace indicatif en récupération (V1-P124). ✅ Double œil corrigé (P148).
 - ⬜ Connexion sociale Google/FB/Apple — V1-P150.
 
 ### 1.5 Abonnements / plans
@@ -204,7 +205,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 |---|---|---|---|
 | P1 | Espace admin : créer codes d'activation/promo | 3 | ⬜ |
 | P2 | Message EN après gel de compte | 3 | ⚠️ |
-| P3 | Icône profil non cliquable → paramètres | 1 | ⚠️ |
+| P3 | Icône profil cliquable → paramètres du profil | 1 | ✅ |
 | P4 | Bouton « Retour » Android = « Annuler » | 1 | ⚠️ |
 | P5 | Accès aux contacts du téléphone | 1 | ✅ |
 | P6 | Import avec confirmation (jamais auto) | 1 | ✅ |
@@ -272,7 +273,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P115-117 | Offline / file de sync « en attente » | 1 | ✅/🟡 |
 | P118 | Séparation stricte + sync fiable (synthèse) | 1 | 🟡 |
 | P119-124 | Comptes gelés/expirés/récupération (bugs) | 3 | ⚠️ |
-| P125 | Point après « gextimo » sur l'accueil | 1 | ⚠️ à confirmer |
+| P125 | Point après « gextimo » sur l'accueil — retiré | 1 | ✅ |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
 | P127 | « novafrique » → « novafriq » | 6 | ✅ |
 | P128 | Police gothique cohérente (nom stylisé) | 6 | 🟡 |
@@ -294,7 +295,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P144 | Format numéro reçu (majuscules + tirets auto) | 1 | ⬜ |
 | P145 | Indicateur « FR » mais texte EN | 1 | ⚠️ |
 | P146-147 | OTP e-mail+SMS + bouton « Renvoyer » | 1 | ⚠️ |
-| P148 | Double icône « œil » mot de passe | 1 | ⚠️ |
+| P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
 | P150 | Connexion Google/Facebook/Apple | 1 | ⬜ |
 | P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
@@ -326,7 +327,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P188 | Remplacer « novafrique » (Qui sommes-nous, footer) | 6 | ✅ |
 | P189 | E-mail `support@gextimo.africa` erroné | 5 | ⬜ |
 | P190 | Contenu footer depuis doc APDP | 6 | 🟡 |
-| P191 | Bouton « Se connecter » dépasse sur mobile | 6 | ⚠️ |
+| P191 | Bouton « Se connecter » dépasse sur mobile — burger mobile, ne dépasse plus | 6 | ✅ |
 | P192 | Nouvelle phrase d'accroche | 6 | 🟡 |
 | P193 | Phrase « né en Afrique, pour le monde » | 6 | 🟡 |
 | P194 | Logo à gauche / bouton connexion à droite | 6 | 🟡 |
