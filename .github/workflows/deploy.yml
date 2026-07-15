@@ -51,13 +51,8 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.env' \
-            --exclude='storage/app/public/*' \
-            --exclude='storage/app/suivi-sprints.json' \
-            --exclude='storage/logs/*' \
-            --exclude='storage/framework/cache/*' \
-            --exclude='storage/framework/sessions/*' \
-            --exclude='storage/framework/views/*' \
-            --exclude='bootstrap/cache/*' \
+            --exclude='storage/' \
+            --exclude='bootstrap/cache/' \
             -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/
 
