@@ -55,8 +55,21 @@ class CommandeGroupeController extends Controller
             'sous_commandes.*.description'           => ['nullable', 'string', 'max:2000'],
             'sous_commandes.*.urgence'               => ['nullable', 'boolean'],
             'sous_commandes.*.mode_paiement_acompte' => ['nullable', 'in:especes,mobile_money,virement'],
+            'sous_commandes.*.motif_surplus_acompte' => ['nullable', 'string', 'max:500'], // P14-16 : motif si acompte > total
             'sous_commandes.*.photo_tissu'           => ['nullable', 'image', 'max:4096'], // P24 : photo tissu par article
         ]);
+
+        // P14-16 : un acompte ne peut dépasser le total d'un article (prix × quantité) sans motif.
+        foreach ($data['sous_commandes'] as $i => $sc) {
+            $total   = (float) ($sc['prix'] ?? 0) * (int) ($sc['quantite'] ?? 1);
+            $acompte = (float) ($sc['acompte'] ?? 0);
+            if ($acompte > $total && empty($sc['motif_surplus_acompte'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    "sous_commandes.$i.motif_surplus_acompte" =>
+                        "L'acompte de l'article " . ($i + 1) . " dépasse son total. Veuillez indiquer le motif.",
+                ]);
+            }
+        }
 
         // Anti-IDOR + multi-ateliers (P72-73) : client pris dans l'un des ateliers du propriétaire.
         $atelierIds = $this->ateliersAutorises($request);
@@ -111,6 +124,7 @@ class CommandeGroupeController extends Controller
                     'date_commande'         => now()->toDateString(),
                     'date_livraison_prevue' => $sc['date_livraison_prevue'] ?? null,
                     'description'           => $sc['description'] ?? null,
+                    'motif_surplus_acompte' => $sc['motif_surplus_acompte'] ?? null, // P14-16
                     'urgence'               => $sc['urgence'] ?? false,
                     'photo_tissu_path'      => $photoPath,
                 ]);

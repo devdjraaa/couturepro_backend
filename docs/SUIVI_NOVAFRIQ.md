@@ -26,7 +26,7 @@ valider par la direction avant de lancer les corrections.
 | 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
 | 3 | Slogan du logo à l'impératif « Créez, Gérez, Rayonnez » (le logo login avait « Créer ») | ✅ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
-| 5 | **Page inscription en anglais** malgré l'indicateur FR (i18n manquant) — l'indicateur lui-même est corrigé | ⚠️ | 1 | V1-P145 |
+| 5 | ~~Page inscription en anglais malgré l'indicateur FR~~ ✅ **résolu** : audit code — `i18n.js` démarre en `fr` par défaut (`lng: cp_lang \|\| 'fr'`, `fallbackLng: 'fr'`), toutes les clés `auth.inscription.*` présentes et traduites en fr.json ; l'indicateur était déjà corrigé | ✅ | 1 | V1-P145 |
 | 6 | **Menus header vitrine** Solutions / Tarifs / Documentation (déroulants façon Kkiapay) — absents | ⬜ | 6 | V1-P181-184 |
 | 7 | **Barre de contact fine** au-dessus du header (tél + WhatsApp +229) — absente | ⬜ | 6 | V1-P180 |
 | 8 | **Likes (cœur) + 4 boutons** sur chaque création (❤️/💬/📩/🛒) — absents du profil créateur | ⬜ | 1 | V1-P159-160 |
@@ -88,8 +88,8 @@ valider par la direction avant de lancer les corrections.
 - ✅ Slogan du logo corrigé à l'impératif « Créez » (glyphe z) — SUG-2.
 - ✅ Double icône œil MDP corrigée (V1-P148) ; ✅ bouton « Se connecter » ne dépasse plus (burger mobile, V1-P191).
 - ✅ Champ Quantité éditable (SUG-18) ; ✅ Historique alimenté + au menu (SUG-20) ; ✅ Mesures wizard obsolète (SUG-19) ; ✅ profil client `/`/`Key` non reproduit (SUG-21) ; ✅ recherche clients live (P9).
-- ⚠️ Reste à vérifier device : icône module « nouveau modèle » (SUG-17),
-  bouton « déjà inscrit » (SUG-7). ✅ Bouton se connecter : safe-area (SUG-8).
+- ✅ Icône officielle du module « nouveau modèle » — placeholder image générique remplacé par `Shirt` (icône de la nav / action-sheet « Nouveau modèle ») dans le form catalogue (SUG-17, choix boss « A »).
+- ⚠️ Reste à vérifier device : bouton « déjà inscrit » (SUG-7). ✅ Bouton se connecter : safe-area (SUG-8).
 - ✅ Placeholders adaptés au profil + références béninoises (Sèna/Hounkpatin/Tofa) — SUG-9/10/11.
 - 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61.
 - ✅ PDF : pied de page marketing Gextimo (logo, « Créez, Gérez, Rayonnez », site, pitch) +
@@ -267,9 +267,9 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P11 | Export mesures depuis la fiche | 1 | ✅ |
 | P12 | Export WhatsApp / CSV | 1 | 🟡 (CSV ?) |
 | P13 | Ajout commande sans animation (noAnimation sur les pages de saisie) | 1 | ✅ |
-| P14 | Acompte > total → bloc auto | 1 | ⬜ |
-| P15 | Bloc différence calculée + raison obligatoire | 1 | ⬜ |
-| P16 | Acompte ne dépasse pas total sans raison | 1 | ⬜ |
+| P14 | Acompte > total → bloc auto (commande simple **et** groupée) | 1 | ✅ |
+| P15 | Bloc différence calculée (`+ acompte−total`) + motif obligatoire | 1 | ✅ |
+| P16 | Acompte ne dépasse pas total sans motif (bloqué UI + serveur : `StoreCommandeRequest` + `CommandeGroupeController`) | 1 | ✅ |
 | P17 | Bouton « + » ajouter un vêtement | 1 | ✅ |
 | P18 | Dates de livraison passées grisées | 1 | ✅ |
 | P19 | Interdire validation date passée | 1 | ✅ |
@@ -424,7 +424,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-14 | PDF : pied de page marketing Gextimo (logo, slogan, site, pitch) | 1 | ✅ |
 | SUG-15 | Coordonnées artisan (tél/e-mail/adresse) sur toutes les factures | 1 | ✅ |
 | SUG-16 | Export WhatsApp mesures : message construit localement (offline-first) | 1 | ✅ |
-| SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
+| SUG-17 | Icône du module « Nouveau modèle » — placeholder image générique → `Shirt` (icône officielle du module) dans VetementForm | 1 | ✅ |
 | SUG-18 | Champ Quantité éditable (effaçable, borné 1–999, select au focus) | 1 | ✅ |
 | SUG-19 | Mesures : plus d'étape Mesures dans le wizard commande (obsolète) ; mesures client OK | 1 | ✅ |
 | SUG-20 | Historique alimenté (logAction branché app) + entrée menu ajoutée — vérifié device | 1 | ✅ |
