@@ -126,7 +126,9 @@ class VitrineController extends Controller
         ]);
 
         return response()->json(array_merge($this->creatorCard($atelier), [
-            'bio'       => $atelier->bio,
+            'bio'            => $atelier->bio,
+            'banniere_url'   => $atelier->banniere_url,   // P134
+            'banniere_type'  => $atelier->banniere_type,  // image | video
             'whatsapp'  => $whatsapp,
             'reseaux'   => [
                 'instagram' => $atelier->instagram,

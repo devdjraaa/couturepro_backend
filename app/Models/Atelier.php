@@ -30,6 +30,8 @@ class Atelier extends Model
         'specialite',
         'bio',
         'logo_path',
+        'banniere_path',
+        'banniere_type',
         'instagram',
         'facebook',
         'site_web',
@@ -56,12 +58,20 @@ class Atelier extends Model
         'verification_demandee_a' => 'datetime',
     ];
 
-    protected $appends = ['logo_url', 'sponsorise', 'verification_doc_url'];
+    protected $appends = ['logo_url', 'banniere_url', 'sponsorise', 'verification_doc_url'];
 
     protected function logoUrl(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->logo_path ? url(Storage::url($this->logo_path)) : null,
+        );
+    }
+
+    // P134 : URL publique de la bannière (photo/GIF/vidéo).
+    protected function banniereUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->banniere_path ? url(Storage::url($this->banniere_path)) : null,
         );
     }
 

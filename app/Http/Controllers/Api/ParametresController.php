@@ -73,7 +73,47 @@ class ParametresController extends Controller
             'site_web'       => $atelier->site_web,
             'latitude'       => $atelier->latitude,
             'longitude'      => $atelier->longitude,
+            'banniere_url'   => $atelier->banniere_url,
+            'banniere_type'  => $atelier->banniere_type,
         ]);
+    }
+
+    // P134 : bannière du profil (photo/GIF/vidéo). Image ≤ 4 Mo, vidéo ≤ 15 Mo.
+    public function uploadAtelierBanniere(Request $request): JsonResponse
+    {
+        $request->validate([
+            'banniere' => ['required', 'file', 'mimes:jpeg,jpg,png,webp,gif,mp4,webm', 'max:15360'],
+        ]);
+
+        $atelier = $this->getAtelier($request);
+        $file    = $request->file('banniere');
+        $type    = str_starts_with((string) $file->getMimeType(), 'video') ? 'video' : 'image';
+
+        // Une image de plus de 4 Mo est refusée (seules les vidéos vont jusqu'à 15 Mo).
+        if ($type === 'image' && $file->getSize() > 4 * 1024 * 1024) {
+            return response()->json(['message' => 'Image trop lourde (max 4 Mo).'], 422);
+        }
+
+        if ($atelier->banniere_path) {
+            Storage::disk('public')->delete($atelier->banniere_path);
+        }
+
+        $path = $file->store('ateliers/' . $atelier->id . '/banniere', 'public');
+        $atelier->update(['banniere_path' => $path, 'banniere_type' => $type]);
+
+        return response()->json(['banniere_url' => $atelier->banniere_url, 'banniere_type' => $type]);
+    }
+
+    public function supprimerAtelierBanniere(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if ($atelier->banniere_path) {
+            Storage::disk('public')->delete($atelier->banniere_path);
+        }
+        $atelier->update(['banniere_path' => null, 'banniere_type' => null]);
+
+        return response()->json(['message' => 'Bannière retirée.']);
     }
 
     public function getCommunications(Request $request): JsonResponse

@@ -269,6 +269,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('parametres/profil',              [ParametresController::class, 'updateProfil']);
     Route::put('parametres/atelier',             [ParametresController::class, 'updateAtelier']);
     Route::post('parametres/atelier/logo',       [ParametresController::class, 'uploadAtelierLogo']);
+    // P134 : bannière du profil créateur (photo/GIF/vidéo).
+    Route::post('parametres/atelier/banniere',   [ParametresController::class, 'uploadAtelierBanniere']);
+    Route::delete('parametres/atelier/banniere', [ParametresController::class, 'supprimerAtelierBanniere']);
     Route::post('parametres/demande-verification', [ParametresController::class, 'demanderVerification']);
     Route::get('parametres/communications',      [ParametresController::class, 'getCommunications']);
     Route::put('parametres/communications',      [ParametresController::class, 'updateCommunications']);
