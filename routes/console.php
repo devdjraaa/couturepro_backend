@@ -21,3 +21,7 @@ Schedule::command('abonnements:notify-expiry')->dailyAt('08:00');
 
 // Expire les bonus de fidélité arrivés à terme (quotidien à 1h du matin)
 Schedule::command('abonnements:process-bonus-expiry')->dailyAt('01:00');
+
+// ─── Veille SEO (P200) ──────────────────────────────────────────────────────
+// Rapport technique hebdo (PageSpeed, HTTPS, dispo) — lundi 7h, 2 sites.
+Schedule::command('veille:seo')->weeklyOn(1, '07:00');

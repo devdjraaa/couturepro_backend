@@ -41,4 +41,9 @@ return [
         'project_id'  => env('FCM_PROJECT_ID', 'gextimo-28a49'),
     ],
 
+    // P200 : destinataire du rapport de veille SEO hebdo (vide = rapport fichier/log seulement)
+    'veille_seo' => [
+        'email' => env('VEILLE_SEO_EMAIL'),
+    ],
+
 ];
