@@ -94,11 +94,14 @@ valider par la direction avant de lancer les corrections.
 - 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61 ; 🟡 PDF pied de page
   marketing Gextimo (logo/slogan/site) — SUG-14/15, V1-P14.
 
-### 1.3 Isolation multi-ateliers ⚠️ (chantier sensible)
-- 🟡 Infrastructure présente : scoping par atelier dans les hooks (`useClients`, `useCommandes`,
-  `useMesures`, `useVetements`), switch d'atelier (`Header`, `useMesAteliers`), back scope `atelier_id`.
-- ⚠️ Bugs signalés à re-tester : données mélangées entre ateliers (V1-P62-65), rechargement au switch
-  (P65), recherche cross-ateliers intelligente (P68-77, probablement ⬜/🟡).
+### 1.3 Isolation multi-ateliers ✅ (chantier sensible — corrigé)
+- ✅ **Bug de mélange corrigé (V1-P62-65)** : le sync tirait TOUS les ateliers du propriétaire dans le
+  WatermelonDB local mais les requêtes ne filtraient pas → un sous-atelier voyait les clients/commandes
+  du maître. Fix : filtrage local par l'id de l'atelier actif issu du **contexte auth** (`useAuth().atelier?.id`,
+  synchrone + re-render au switch) sur `useClients`, `useCommandes`, `useVetements` (+ modèles système gardés)
+  et `useCommandeStats`. **Vérifié sur device** : maître 359 clients / sous-atelier « carnet vierge », commandes
+  idem, aucun mélange, aucune perte au retour. Données enfant (mesures/paiements) isolées via leur parent.
+- ⬜ Recherche cross-ateliers intelligente (P68-77). ⚠️ Web/master (hooks service) : scoping serveur à confirmer.
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
@@ -257,7 +260,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P59 | Consulter mesures enregistrées | 1 | ✅ |
 | P60 | Modifier les mesures | 1 | ✅ |
 | P61 | Export mesures WhatsApp/CSV | 1 | 🟡 |
-| P62-65 | Isolation stricte des ateliers (données mélangées) | 1 | ⚠️ à re-tester |
+| P62-65 | Isolation stricte des ateliers — **corrigé & vérifié device** (filtre local par atelier actif sur clients/commandes/catalogue) | 1 | ✅ |
 | P66-67 | Validation champ téléphone (chiffres + « + ») | 1 | 🟡 |
 | P68-77 | Recherche client cross-ateliers + mesures partagées | 1 | ⬜/🟡 |
 | P78-81 | WhatsApp preuve de paiement (PDF/image attaché) | 1 | ⚠️ |
