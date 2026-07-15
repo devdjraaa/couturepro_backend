@@ -35,7 +35,7 @@ valider par la direction avant de lancer les corrections.
 | 11 | **Téléchargement de patrons payants** (bouton payant, récup par code transaction) | ⬜ | 1 | V1-P161-163 |
 | 12 | **Connexion sociale** Google / Facebook / Apple | ⬜ | 1 | V1-P150 |
 | 13 | **Photos dans les avis** clients | ⬜ | 1 | V1-P137 |
-| 14 | **PWA** (manifest.json + service worker + bannière « ajouter à l'écran d'accueil ») | ⬜ | 7 | V1-P186 |
+| 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
 | 16 | **Veille technique SEO hebdo** (PageSpeed + Search Console + HTTPS + alertes), 2 sites | ⬜ | 2 | V1-P200 |
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
@@ -72,7 +72,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ « novafrique » → « novafriq » (footer/Qui sommes-nous, master) — V1-P127/188.
 - ✅ Indicateur langue affiche bien la langue **courante** (FR en FR) — V1-P37.
 - ⬜ Menus header Solutions/Tarifs/Documentation — V1-P181-184 ; ⬜ barre contact — V1-P180.
-- ⬜ PWA — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
+- ✅ PWA livrée (manifest + SW + bannière, web only) — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
 - 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
 - 🟡 Localisation pays/devise auto + message — V1-P135 ; 🟡 phrases d'accroche — V1-P192/193.
 - ⬜ Bannière profil (photo/GIF/vidéo) — V1-P134 ; ✅ profil s'ouvre en haut (P133, master).
