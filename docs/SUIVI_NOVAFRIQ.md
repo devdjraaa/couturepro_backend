@@ -104,9 +104,13 @@ valider par la direction avant de lancer les corrections.
   idem, aucun mélange, aucune perte au retour. Données enfant (mesures/paiements) isolées via leur parent.
 - 🟡 **Recherche cross-ateliers (P68-71/76) livrée** : toggle « Cet atelier / Tous mes ateliers »
   (comptes multi-ateliers), badge d'atelier d'origine sur chaque client, fiche consultable (infos +
-  mesures). App (local) + web (API `scope=tous`, réservé propriétaire). Reste ⬜ : commande
-  cross-atelier sans ressaisie (P72-73), versionnage des mesures (P74), déduplication (P75), partage
-  explicite (P77).
+  mesures). App (local) + web (API `scope=tous`, réservé propriétaire).
+- ✅ **Sécurité + backend commande cross-atelier (P72-73/75)** : correctif IDOR — `client_id`/`vetement_id`
+  des commandes (simples + groupées) scopés aux ateliers du propriétaire via
+  `ResolvesAtelier::ateliersAutorises()` (avant : n'importe quel client/vêtement d'un autre propriétaire
+  était référençable). Effet voulu : le backend accepte désormais une commande pour un client d'un
+  **autre de mes ateliers** sans ressaisie. Reste ⬜ : parcours front « créer commande depuis la fiche
+  cross-atelier » (P72-73 UX), versionnage des mesures (P74), partage explicite (P77).
 
 ### 1.4 Auth / OTP / inscription ⚠️
 - ✅ Flux OTP + récupération (`OtpPage`, `ProprietaireAuthController`, `RecuperationController`),
