@@ -91,8 +91,9 @@ valider par la direction avant de lancer les corrections.
 - ⚠️ Reste à vérifier device : icône module « nouveau modèle » (SUG-17),
   bouton « déjà inscrit » (SUG-7). ✅ Bouton se connecter : safe-area (SUG-8).
 - ✅ Placeholders adaptés au profil + références béninoises (Sèna/Hounkpatin/Tofa) — SUG-9/10/11.
-- 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61 ; 🟡 PDF pied de page
-  marketing Gextimo (logo/slogan/site) — SUG-14/15, V1-P14.
+- 🟡 Export mesures WhatsApp/CSV (WhatsApp oui, CSV à confirmer) — V1-P11/12/61.
+- ✅ PDF : pied de page marketing Gextimo (logo, « Créez, Gérez, Rayonnez », site, pitch) +
+  coordonnées de l'artisan (tél/e-mail/adresse) sur toutes les factures — SUG-14/15.
 
 ### 1.3 Isolation multi-ateliers ✅ (chantier sensible — corrigé)
 - ✅ **Bug de mélange corrigé (V1-P62-65)** : le sync tirait TOUS les ateliers du propriétaire dans le
@@ -397,7 +398,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-12 | Champ Prénom dans le profil | 1 | ✅ |
 | SUG-13 | Import contacts : timeout 60 s par lot — fini l'« erreur »' fantôme | 1 | ✅ |
 | SUG-14 | PDF : pied de page marketing (logo/slogan/site) | 1 | 🟡 |
-| SUG-15 | Coordonnées artisan dans les exports | 1 | 🟡 |
+| SUG-15 | Coordonnées artisan (tél/e-mail/adresse) sur toutes les factures | 1 | ✅ |
 | SUG-16 | Export WhatsApp mesures : message construit localement (offline-first) | 1 | ✅ |
 | SUG-17 | Icône du module « Nouveau modèle » | 1 | ⚠️ |
 | SUG-18 | Champ Quantité éditable (effaçable, borné 1–999, select au focus) | 1 | ✅ |
