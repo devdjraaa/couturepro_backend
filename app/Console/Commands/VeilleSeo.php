@@ -121,11 +121,17 @@ class VeilleSeo extends Command
     private function scorePsi(string $site, string $strategy): ?int
     {
         try {
-            $resp = Http::timeout(90)->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', [
+            // Sans clé, le quota PSI anonyme (partagé) tombe vite en 429 →
+            // configurer PSI_API_KEY (clé gratuite Google Cloud, 25k req/jour).
+            $params = [
                 'url'      => $site,
                 'strategy' => $strategy,
                 'category' => 'performance',
-            ]);
+            ];
+            if ($key = config('services.veille_seo.psi_key')) {
+                $params['key'] = $key;
+            }
+            $resp = Http::timeout(90)->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', $params);
             if (! $resp->successful()) {
                 return null;
             }

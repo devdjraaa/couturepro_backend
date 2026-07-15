@@ -41,9 +41,11 @@ return [
         'project_id'  => env('FCM_PROJECT_ID', 'gextimo-28a49'),
     ],
 
-    // P200 : destinataire du rapport de veille SEO hebdo (vide = rapport fichier/log seulement)
+    // P200 : veille SEO hebdo — destinataire du rapport (vide = fichier/log seulement)
+    // + clé API PageSpeed Insights (gratuite, Google Cloud Console, sinon quota anonyme 429)
     'veille_seo' => [
-        'email' => env('VEILLE_SEO_EMAIL'),
+        'email'   => env('VEILLE_SEO_EMAIL'),
+        'psi_key' => env('PSI_API_KEY'),
     ],
 
 ];
