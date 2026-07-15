@@ -403,7 +403,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | SUG-4 | Checkbox CGU obligatoire à l'inscription | 1 | ✅ |
 | SUG-5 | Lien CGU ouvre le site web (page /cgu publiée par l'équipe) | 1 | ✅ |
 | SUG-6 | Lien CGU → page publique /cgu en externe (formulaire intact) | 1 | ✅ |
-| SUG-7 | Bouton « Déjà inscrit ? Se connecter » | 1 | ⚠️ |
+| SUG-7 | « Déjà inscrit ? Se connecter » → /login sur l'écran d'inscription (i18n FR/EN) — présent (code vérifié) | 1 | ✅ |
 | SUG-8 | Bouton « Se connecter » : safe-area bas (ne colle plus la barre système) | 1 | ✅ |
 | SUG-9 | Placeholders atelier adaptés au type (artisan/designer) | 1 | ✅ |
 | SUG-10 | Références béninoises (Sèna, Hounkpatin, Tofa) partout | 1 | ✅ |
