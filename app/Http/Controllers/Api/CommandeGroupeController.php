@@ -54,6 +54,7 @@ class CommandeGroupeController extends Controller
             'sous_commandes.*.description'           => ['nullable', 'string', 'max:2000'],
             'sous_commandes.*.urgence'               => ['nullable', 'boolean'],
             'sous_commandes.*.mode_paiement_acompte' => ['nullable', 'in:especes,mobile_money,virement'],
+            'sous_commandes.*.photo_tissu'           => ['nullable', 'image', 'max:4096'], // P24 : photo tissu par article
         ]);
 
         $client = Client::where('id', $data['client_id'])
@@ -79,6 +80,11 @@ class CommandeGroupeController extends Controller
             foreach ($data['sous_commandes'] as $sc) {
                 $acompteInitial = $sc['acompte'] ?? 0;
 
+                // P24 : photo du tissu propre à chaque article de la commande groupée
+                $photoPath = isset($sc['photo_tissu']) && $sc['photo_tissu']
+                    ? $sc['photo_tissu']->store('tissus', 'public')
+                    : null;
+
                 $commande = Commande::create([
                     'atelier_id'            => $atelier->id,
                     'client_id'             => $client->id,
@@ -94,6 +100,7 @@ class CommandeGroupeController extends Controller
                     'date_livraison_prevue' => $sc['date_livraison_prevue'] ?? null,
                     'description'           => $sc['description'] ?? null,
                     'urgence'               => $sc['urgence'] ?? false,
+                    'photo_tissu_path'      => $photoPath,
                 ]);
 
                 if ($acompteInitial > 0) {
