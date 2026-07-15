@@ -39,7 +39,7 @@ valider par la direction avant de lancer les corrections.
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
 | 16 | **Veille technique SEO hebdo** — ✅ livrée : `veille:seo` (PSI mobile+desktop, HTTPS, dispo, alertes, 2 sites), lundi 7h. 🟡 Search Console API (OAuth à configurer) ; e-mail : définir `VEILLE_SEO_EMAIL` | 🟡 | 2 | V1-P200 |
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
-| 18 | **Sauvegardes VPS** chiffrées quotidiennes off-site + test de restauration mensuel | ⬜ | 4 | V1-P203 |
+| 18 | **Sauvegardes VPS** — ✅ quotidiennes locales (pg_dump + storage, 3h30, rotation 7 j, intégrité vérifiée) ; ⬜ off-site (destination à choisir) + chiffrement + test restore mensuel | 🟡 | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
 | 20 | **Format numéro de reçu** — ✅ majuscules + tirets automatiques livrés | ✅ | 1 | V1-P144 |
 | 21 | **e-mail `support@gextimo.africa`** erroné (FAQ) → mettre la bonne adresse | ⬜ | 5 | V1-P189 |
@@ -56,7 +56,7 @@ valider par la direction avant de lancer les corrections.
 | **1** | Backlog produit Gextimo (requêtes antérieures) | 🔴 | Majorité **faite** ; restent des bugs ⚠️ (multi-ateliers, OTP) + features vitrine/créateur ⬜ |
 | **2** | Veille auto (SEO/technique) | 🟡 | ✅ `veille:seo` hebdo livrée (PSI+HTTPS+dispo, 2 sites) ; reste Search Console + destinataire e-mail |
 | **3** | Volet APK Admin | 🟡 | App admin existe ; codes promo + dashboard temps réel ⬜ ; gel/dégel ⚠️ |
-| **4** | Gestion VPS | 🟡 | Durcissement ✅ ; **sauvegardes** ⬜ (prioritaire) |
+| **4** | Gestion VPS | 🟡 | Durcissement ✅ ; sauvegardes quotidiennes locales ✅ ; off-site ⬜ (destination) |
 | **5** | Gestion mailing | 🟡 | Archi + queue ✅ ; Brevo/délivrabilité + adresses ⬜ |
 | **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ✅, header/SEO/Cloudflare ⬜, lancement commun |
 | **7** | Updates Gextimo (release/OTA) | ✅ | Système complet livré ; FCM + PWA ⬜ |
