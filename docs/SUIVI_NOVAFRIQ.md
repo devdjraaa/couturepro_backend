@@ -168,22 +168,22 @@ valider par la direction avant de lancer les corrections.
   annuel → Studio mensuel), le crédit est plafonné au prix du nouveau plan → l'excédent de valeur est
   perdu. La spec ne couvre que les upgrades ; comportement downgrade à définir par la direction.
 
-#### ⏳ Fonctionnalités promises dans les plans — À CONSTRUIRE (« Bientôt » — P178)
+#### ✅ Fonctionnalités promises dans les plans — LIVRÉES (16/07/2026)
 > Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :
 > les tracer ici en « Bientôt » et les construire ensuite. Le **gating des quotas**, lui, est déjà en place.
 
 | # | Fonctionnalité | Plan | Réf tracker |
 |---|---|---|---|
-| PL-1 | **Lookbook PDF** (catalogue de collection en PDF) | Atelier+ | s30t1 |
-| PL-2 | **Export groupé** — 🟡 **mesures FAIT** (16/07 : endpoint gaté `export_groupe` + bouton page Clients, CSV toutes clientes) ; reste collections/patrons (PDF) | Atelier+ | s30t2 |
-| PL-3 | **Rapport PDF mensuel** (global + par cliente) | Atelier / Studio | s30t3 |
-| PL-4 | **Liste d'attente clients** | Studio | s30t4 |
-| PL-5 | **Simulateur de revenus** | Studio | s30t5 |
-| PL-6 | **Annonce de collection** | Studio | s30t6 |
-| PL-7 | **Vidéos de présentation** (jusqu'à 50) | Studio | s30t7 |
-| PL-8 | **Badge « Designer Pro »** (distinct du badge Vérifié qui existe) | Atelier | s30t8 |
-| PL-9 | **Programme de fidélité avancé** (le basique existe) | Studio | s30t9 |
-| PL-10 | **Sauvegarde cloud par atelier cadencée** (/3 j Atelier, journalière Studio) — flag posé, backup réel à faire | Atelier / Studio | s30t10 |
+| PL-1 | ✅ **Lookbook PDF** — bouton dans Ma Vitrine, catalogue paginé des créations publiées (gaté) | Atelier+ | s30t1 |
+| PL-2 | ✅ **Export groupé mesures** (CSV toutes clientes, gaté) — l'export PDF groupé collections/patrons reste optionnel | Atelier+ | s30t2 |
+| PL-3 | ✅ **Rapport PDF mensuel** — global + encaissements par cliente (endpoint gaté + PDF Caisse) | Atelier / Studio | s30t3 |
+| PL-4 | ✅ **Liste d'attente clients** — page Studio, CRUD + statuts (gaté) | Studio | s30t4 |
+| PL-5 | ✅ **Simulateur de revenus** — page Studio, projection CA/bénéfice (gaté) | Studio | s30t5 |
+| PL-6 | ✅ **Annonce de collection** — page Studio + bandeau sur le profil vitrine (gaté) | Studio | s30t6 |
+| PL-7 | ✅ **Vidéos de présentation** (≤50) — onglet Studio + section profil vitrine (gaté) | Studio | s30t7 |
+| PL-8 | ✅ **Badge « Designer Pro »** — affiché sur le profil vitrine (gaté badge_designer_pro) | Atelier | s30t8 |
+| PL-9 | ✅ **Fidélité avancé** — paliers cumulés Bronze/Argent/Or/Platine (PointsPage, gaté) | Studio | s30t9 |
+| PL-10 | ✅ **Sauvegarde cloud par atelier** — commande cadencée (Studio 1j/Atelier 3j), snapshots JSON + rotation, planifiée 02:30 | Atelier / Studio | s30t10 |
 
 - ⚠️ Bugs quotas plans à re-tester : Premium annuel assistants/viewers (P50), Magnat annuel 7 ateliers
   mais 3 max (P51), cumul essai après souscription (P47), MAJ tous ateliers (P48).
