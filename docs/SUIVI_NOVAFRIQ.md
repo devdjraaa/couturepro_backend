@@ -302,7 +302,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
 | Pt | Sujet | Statut | Détail |
 |---|---|---|---|
-| 1 | Mémoire chatbot/assistant | ⬜ décision | Aucun chatbot n'existe (tickets humains seulement) — construire le chatbot = décision direction avant toute table |
+| 1 | Mémoire chatbot/assistant | ✅ | **Chatbot v1 LIVRÉ & testé prod (16/07)** : widget vitrine (bulle, fil de session, pouces), 12 intentions fr/en éditables admin (PUT admin/chatbot/intents), mémoire complète (conversations/messages/intention/feedback, rattachée au compte à la connexion), dashboard admin/chatbot/analyse (questions sans réponse, pouces bas, satisfaction 30j), note de confidentialité affichée ; architecture prête pour LLM plus tard |
 | 2 | Analytics comportemental + consentement | ✅ | = P202 Phase 3 (gxt_evenements, bandeau granulaire APDP, GA4/Meta/Clarity consent-gated) ; ⏳ clés GA4/Clarity à créer |
 | 3 | Profil utilisateur basique | ✅ | gxt_clients + PATCH client/me (prénom/nom/ville/date de naissance, UI espace client) ; clients sans mot de passe (OTP), pros bcrypt |
 | 4 | Recommandation / boost | 🟡 | ✅ scoring nocturne + boost payant (sponsorisation) + reco v1 (designers favoris en tête de galerie pour le client connecté) ; reste : reco par catégorie (nécessite catégoriser les créations) |
