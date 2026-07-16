@@ -54,6 +54,9 @@ Route::get('/', fn() => response()->json([
 ]));
 
 // ─── Vitrine publique (marketplace, sans authentification) ───────────────────
+// P199 : sitemap dynamique des créateurs (référencé dans robots.txt de la vitrine).
+Route::get('sitemap/createurs.xml', [\App\Http\Controllers\Api\SitemapController::class, 'createurs']);
+
 Route::prefix('vitrine')->group(function () {
     Route::get('createurs',            [VitrineController::class, 'index']);
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
