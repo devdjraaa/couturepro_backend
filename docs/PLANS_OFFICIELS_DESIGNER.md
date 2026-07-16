@@ -23,11 +23,19 @@
 
 - **Vitrine & créations** : compte vitrine automatique · collections illimitées · photos/collection
   illimitées · référentiels de tailles illimités · page publique = **1 suppression / mois**.
+- **Publications vitrine** *(logique définitive direction 16/07/2026)* : **5 actes de publication par
+  période d'abonnement** — à la 6ᵉ publication, message d'invitation à passer au payant ; le compteur
+  repart à zéro à chaque **date anniversaire** de l'abonnement. La limite porte sur les **publications
+  effectuées pendant la période**, pas sur les photos enregistrées (dépublier ne redonne pas de crédit).
 - **Clients & mesures** : import contacts illimité · enregistrement clients illimité · **10 clients
   sur mesure** (une commande pour un 11e client distinct exige un plan payant) · encaissement illimité ·
   mesures/cliente illimitées (corrections incluses) · export mesure **client par client** (groupé = payant).
 - **Commandes & caisse** : commandes illimitées (pour clients enregistrés) · caisse illimitée.
-- **Facturation** : standard illimitée · facture perso avec logo (**limité à 10**).
+- **Facturation** *(logique définitive direction 16/07/2026)* : le **nombre de factures est illimité** ;
+  la limite porte sur les **clients différents facturés** — **10 clients distincts par période
+  d'abonnement**. Un client facturé une 1ʳᵉ fois consomme 1 place ; ses factures suivantes sont
+  illimitées pendant la période. Au 11ᵉ client distinct → message d'upgrade. Compteur remis à zéro à
+  chaque nouvelle période (un client re-facturé compte alors à nouveau pour 1). Devis exclus du quota.
 - **Alertes** : WhatsApp. **Galerie** : consultation illimitée.
 
 ## Atelier (Recommandé) — 2 500/mois · 25 000/an
@@ -69,7 +77,10 @@
 |---|---|---|---|
 | Clients sur mesure | 10 | 75 / mois | illimité |
 | Commandes | illimité | 75 / mois | illimité |
-| Créations vitrine | illimité (photos) | 25 | 50 |
+| Publications vitrine (actes / période) | **5** (`publications_par_periode`) | — | — |
+| Créations publiées en simultané | — | 25 | 50 |
+| Clients distincts facturés / période | **10** (`max_clients_factures_periode`) | illimité | illimité |
+| Nombre de factures | illimité | illimité | illimité |
 | Patrons / fiches techniques | 0 | 20 | 50 |
 | Vidéos | 0 | 0 | 50 |
 | Assistants inclus | 0 | 1 | 3 |

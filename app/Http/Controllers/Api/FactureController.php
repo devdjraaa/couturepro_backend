@@ -57,6 +57,15 @@ class FactureController extends Controller
         if ($gate = $this->planGate($atelier, 'facturation')) {
             return $gate;
         }
+
+        // Plan gratuit : 10 clients DIFFÉRENTS facturés par période (les factures d'un
+        // client déjà compté restent illimitées ; devis exclus) — logique direction 16/07/2026.
+        $refus = app(\App\Services\AtelierLimitsService::class)
+            ->factureRefus($atelier, $data['type'], $data['client_nom'], $data['client_telephone'] ?? null);
+        if ($refus) {
+            return response()->json(['message' => $refus, 'feature_bloquee' => 'clients_factures_periode'], 403);
+        }
+
         $prefs = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
 
         $facture = Facture::create([

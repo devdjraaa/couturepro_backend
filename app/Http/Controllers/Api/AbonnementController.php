@@ -96,6 +96,27 @@ class AbonnementController extends Controller
             ];
         }
 
+        // Quotas « par période » du plan gratuit (reset à l'anniversaire de l'abonnement) :
+        // actes de publication vitrine + clients distincts facturés.
+        $limits = app(\App\Services\AtelierLimitsService::class);
+        $finPeriode = $abonnement->debutPeriodeCourante()->addMonthsNoOverflow(1)->toIso8601String();
+
+        $quotaPublications = isset($config['publications_par_periode']) && $config['publications_par_periode'] !== null
+            ? [
+                'utilise'  => $limits->publicationsUtilisees($atelier),
+                'max'      => (int) $config['publications_par_periode'],
+                'reset_le' => $finPeriode,
+            ]
+            : null;
+
+        $quotaClientsFactures = isset($config['max_clients_factures_periode']) && $config['max_clients_factures_periode'] !== null
+            ? [
+                'utilise'  => $limits->clientsFacturesPeriode($atelier)->count(),
+                'max'      => (int) $config['max_clients_factures_periode'],
+                'reset_le' => $finPeriode,
+            ]
+            : null;
+
         return response()->json([
             'niveau_cle'           => $abonnement->niveau_cle,
             'niveau_label'         => $abonnement->niveau?->label,
@@ -107,6 +128,8 @@ class AbonnementController extends Controller
             'prix_xof'             => $abonnement->niveau?->prix_xof,
             'config'               => $config,
             'quota_factures'       => $quotaFactures,
+            'quota_publications'      => $quotaPublications,
+            'quota_clients_factures'  => $quotaClientsFactures,
         ]);
     }
 

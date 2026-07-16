@@ -114,14 +114,17 @@ class VetementController extends Controller
 
         $publie = $request->boolean('publie', ! $vetement->publie_vitrine);
 
-        // Limite de publications (offre gratuite = 10) — uniquement au passage en publié.
+        // Limites de publication (cap simultané des plans payants + quota d'actes
+        // par période du plan gratuit) — uniquement au passage en publié.
         if ($publie && ! $vetement->publie_vitrine) {
             $atelier = $this->getAtelier($request);
-            if (! app(AtelierLimitsService::class)->canPublishVetement($atelier)) {
-                return response()->json([
-                    'message' => 'Limite de 10 créations publiées atteinte (offre gratuite). Passez à une offre supérieure pour en publier davantage.',
-                ], 403);
+            $limits  = app(AtelierLimitsService::class);
+
+            if ($refus = $limits->publicationRefus($atelier)) {
+                return response()->json(['message' => $refus], 403);
             }
+
+            $limits->logPublication($atelier, $vetement->id);
         }
 
         $vetement->update(['publie_vitrine' => $publie]);

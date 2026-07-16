@@ -150,8 +150,14 @@ valider par la direction avant de lancer les corrections.
   à tout le monde → un designer en essai n'avait ni patrons ni quotas designer. Corrigé aux 4 points de
   création (inscription, sous-atelier, reset CLI, prolongation admin) via `NiveauConfig::cleEssaiPour()`
   (designer → Studio) + sous-atelier hérite du type + migration de rattrapage prod (1 compte migré).
-- ❓ **2 questions envoyées au boss** (plan Gratuit) : créations vitrine 5 ou illimité ? factures 10/mois
-  au total (actuel) vs standard illimité + 10 avec logo (maquette — demande un compteur séparé) ?
+- ✅ **Logique définitive plan Gratuit** (réponse direction 16/07/2026, implémentée & déployée) :
+  vitrine = **5 actes de publication / période** (journal `publications_vitrine`, reset à l'anniversaire
+  de l'abonnement, dépublier ne rend pas de crédit) ; facturation = **10 clients distincts / période**
+  (factures illimitées pour un client déjà compté, devis exclus, plus aucune limite sur le nombre de
+  factures). Messages d'upgrade affichés côté app (publication + facture). Usage exposé par l'API
+  abonnement (`quota_publications`, `quota_clients_factures`).
+- 🔵 **Spec upgrade abonnement reçue** (16/07/2026) : crédit prorata base 31 j + période date-à-date +
+  récap avant paiement — cf. `docs/SPEC_UPGRADE_ABONNEMENT.md` (implémentation en cours).
 
 #### ⏳ Fonctionnalités promises dans les plans — À CONSTRUIRE (« Bientôt » — P178)
 > Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :

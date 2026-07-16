@@ -40,6 +40,24 @@ class Abonnement extends Model
         return $this->belongsTo(Atelier::class, 'atelier_id');
     }
 
+    /**
+     * Début de la période de quota courante : dernière date anniversaire mensuelle
+     * de l'abonnement (les compteurs « par période » repartent de zéro à chaque
+     * anniversaire — logique métier plan Gratuit, direction 16/07/2026).
+     */
+    public function debutPeriodeCourante(): \Carbon\CarbonInterface
+    {
+        $ancre = $this->timestamp_debut ?? $this->created_at ?? now();
+        $mois  = max(0, (int) $ancre->diffInMonths(now()));
+        $debut = $ancre->copy()->addMonthsNoOverflow($mois);
+
+        if ($debut->isFuture()) {
+            $debut = $ancre->copy()->addMonthsNoOverflow(max(0, $mois - 1));
+        }
+
+        return $debut;
+    }
+
     public function niveau(): BelongsTo
     {
         return $this->belongsTo(NiveauConfig::class, 'niveau_cle', 'cle');
