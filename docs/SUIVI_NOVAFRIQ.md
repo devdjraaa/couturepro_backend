@@ -283,7 +283,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 - ⬜ **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC — compte déjà créé) — V1-P197.
 - ⬜ **Search Console + Bing + sitemap.xml** (novafriq.africa) — V1-P199.
 - ⬜ Menus header vitrine + barre contact (partagés avec Bloc 1) — V1-P180-184.
-- ℹ️ Coordination **lancement commun** : Gextimo prêt, NovAfriq attend la vitrine finalisée — V1-P205.
+- 🟡 Coordination **lancement commun** (V1-P205) : ✅ site `novafriq.africa` **EN LIGNE** (16/07 — page d'attente logo officiel, HTTPS Let's Encrypt, déploiement auto GitHub Actions→VPS) ; reste la coordination marketing.
 
 ---
 
@@ -448,10 +448,10 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P199 | Search Console + Bing + sitemap.xml | 6 | 🟡 (sitemaps + fichier vérif prêts ; soumission à finir) |
 | P200 | Veille technique SEO hebdo (2 sites) | 2 | ✅ (PSI + HTTPS + e-mail, déployé) |
 | P201 | Alerte inscription + messages bienvenue/retour | 5 | 🟡 (dit fait) |
-| P202 | Spec « espace client » (à suivre telle quelle) | 1 | 🔵 |
+| P202 | Espace client (spec direction v2 → v3 optimisée) | 1 | ✅ full-stack déployé 16/07 |
 | P203 | Spec sécurité mobile v5 + sauvegardes VPS | 4 | 🔵/⬜ |
 | P204 | Note « Partenaires » (doc maître) | 1 | 🔵 |
-| P205 | Coordination lancement commun | 6 | ℹ️ |
+| P205 | Coordination lancement commun | 6 | 🟡 (site novafriq.africa en ligne) |
 
 ---
 
@@ -503,7 +503,7 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 
 ## Annexe D — Specs maîtres à suivre telles quelles
 
-- 🔵 **V1-P202** — Spécification « espace client » (auth Google/OTP sans mot de passe, consentement,
+- ✅ **V1-P202** — FAIT (16/07, full-stack) : spécification « espace client » (auth Google/OTP sans mot de passe, consentement,
   suivi commandes + e-mails par étape, avis/réclamations, tracking comportemental, scoring/segmentation,
   Meta Pixel + Clarity, dashboard admin). *Document fourni — à suivre tel quel.*
 - 🔵 **V1-P203** — Spécification sécurité & anti-fraude mobile (v5) : ne jamais faire confiance au
@@ -530,7 +530,7 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 - **Downgrade option A** (P53-55) : différé à l'échéance, annulable, testé prod.
 - **P115** : indicateur « modifications en attente de synchronisation » (SyncContext + bouton réseau), OTA 1.0.64.
 - **P204 (Partenaires) ✅ LIVRÉ** (Document Maître reçu 16/07) : page `/partenaires` (liste par catégorie + modale de candidature), lien footer, bandeau accueil défilant (auto, boutons → /partenaires), admin CRUD + candidatures, e-mails confirmation/alerte SANS document contractuel auto. Catégories éditables (`config/partenaires.php`) — les 12 définitives du doc maître (Partie 2) à y reporter ; mentions pied de page laissées optionnelles (point ouvert du doc).
-- **P202 (espace client)** : le **document détaillé n'est PAS dans le repo** → non implémentable « telle quelle » sans lui. Déjà en place : connexion Google + OTP (P150), avis clients, bandeau cookies. Le reste (tracking comportemental, scores, segmentation, CLV, Meta Pixel, Clarity, e-mails comportementaux, dashboard analytics) nécessite le doc + clés externes (Meta/Clarity).
+- ✅ **P202 (espace client)** : document fourni le 16/07 → **implémenté full-stack le jour même** (spec v3 optimisée : tables gxt_* UUID/Postgres, commande vitrine DIRECTE dans l'outil designer, Brevo par étape, avis/réclamations, tracking métier par lots + GA4/Meta/Clarity sous consentement, scoring nocturne gxt:recalculer-metrics, dashboard /admin/analytique). Voir docs/SPEC_ESPACE_CLIENT_V3.md. Restent à fournir : clés GA4/Meta Pixel/Clarity (.env : GA4_ID, META_PIXEL_ID, CLARITY_ID).
 
 **Restants (mis de côté — hors de mon contrôle)** :
 - **Clés/accès externes** : ✅ FAITS cette session — P196 reCAPTCHA, P197 Cloudflare (migré), P198 Brevo
