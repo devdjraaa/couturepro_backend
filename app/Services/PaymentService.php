@@ -415,6 +415,13 @@ class PaymentService
 
         $atelier?->update(['statut' => 'actif']);
 
+        // P48 : un abonnement couvre TOUS les ateliers du propriétaire (le multi-ateliers
+        // est inclus dans le plan Studio). On propage le même plan/échéance aux autres
+        // ateliers du proprio, dans la limite de sous-ateliers du plan.
+        if ($atelier && $niveau) {
+            $this->propagerAuxSousAteliers($atelier, $niveauCle, $configSnapshot, $debut, $expiration, $joursRestants);
+        }
+
         // Step 5 blueprint : créditer pts_activation
         $ptsActivation = (int) ($configSnapshot['pts_activation'] ?? 0);
         if ($ptsActivation > 0) {
@@ -441,6 +448,46 @@ class PaymentService
             'lien'       => '/parametres?tab=abonnement',
             'is_read'    => false,
         ]);
+    }
+
+    /**
+     * P48 : propage le plan actif à tous les autres ateliers du même propriétaire
+     * (le plan Studio inclut le multi-ateliers). Limité au nombre de sous-ateliers
+     * autorisé par le plan ; les sous-ateliers en trop restent tels quels.
+     */
+    private function propagerAuxSousAteliers(
+        Atelier $source,
+        string $niveauCle,
+        ?array $configSnapshot,
+        \Carbon\CarbonInterface $debut,
+        \Carbon\CarbonInterface $expiration,
+        int $joursRestants,
+    ): void {
+        $maxSous = $configSnapshot['max_sous_ateliers'] ?? 0;
+        if (! $source->proprietaire_id) {
+            return;
+        }
+
+        $autres = Atelier::where('proprietaire_id', $source->proprietaire_id)
+            ->where('id', '!=', $source->id)
+            ->orderBy('created_at')
+            ->take((int) $maxSous)
+            ->get();
+
+        foreach ($autres as $sous) {
+            Abonnement::updateOrCreate(
+                ['atelier_id' => $sous->id],
+                [
+                    'niveau_cle'           => $niveauCle,
+                    'statut'               => 'actif',
+                    'jours_restants'       => $joursRestants,
+                    'timestamp_debut'      => $debut,
+                    'timestamp_expiration' => $expiration,
+                    'config_snapshot'      => $configSnapshot,
+                ]
+            );
+            $sous->update(['statut' => 'actif']);
+        }
     }
 
     private function resolveProvider(string $provider): PaymentProviderContract
