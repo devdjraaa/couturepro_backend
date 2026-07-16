@@ -146,6 +146,12 @@ valider par la direction avant de lancer les corrections.
   assistants, membres, sous-ateliers/multi-ateliers, caisse, facture perso, devis, sponsorisation, photos VIP.
 - Onglets Mensuel/Annuel (vitrine `PremiumPage`) — SUG-22/V1-P22 (app `AbonnementTab` à confirmer).
 - ✅ Blocage par plan + `FeatureGate` (Caisse, etc.) — V1-P56.
+- ✅ **Essai 14 j « accès complet » réel** (16/07/2026) : l'essai servait le plan artisan `standard_mensuel`
+  à tout le monde → un designer en essai n'avait ni patrons ni quotas designer. Corrigé aux 4 points de
+  création (inscription, sous-atelier, reset CLI, prolongation admin) via `NiveauConfig::cleEssaiPour()`
+  (designer → Studio) + sous-atelier hérite du type + migration de rattrapage prod (1 compte migré).
+- ❓ **2 questions envoyées au boss** (plan Gratuit) : créations vitrine 5 ou illimité ? factures 10/mois
+  au total (actuel) vs standard illimité + 10 avec logo (maquette — demande un compteur séparé) ?
 
 #### ⏳ Fonctionnalités promises dans les plans — À CONSTRUIRE (« Bientôt » — P178)
 > Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :
