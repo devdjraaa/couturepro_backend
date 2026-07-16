@@ -75,7 +75,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ PWA livrée (manifest + SW + bannière, web only) — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
 - 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
 - 🟡 Localisation pays/devise auto + message — V1-P135 ; 🟡 phrases d'accroche — V1-P192/193.
-- ⬜ Bannière profil (photo/GIF/vidéo) — V1-P134 ; ✅ profil s'ouvre en haut (P133, master).
+- ✅ Bannière profil (photo/GIF/vidéo) — V1-P134 (upload Ma Vitrine + couverture vitrine, QA device OK) ; ✅ profil s'ouvre en haut (P133, master).
 
 ### 1.2 App mobile artisan/designer
 - ✅ Checkbox CGU obligatoire à l'inscription (`RegisterPage`) — V1-P141/SUG-4.
