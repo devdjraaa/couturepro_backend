@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendInscriptionAlert;
 use App\Http\Requests\Auth\InscriptionRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\VerifierOtpRequest;
@@ -97,6 +98,22 @@ class ProprietaireAuthController extends Controller
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
 
+        // P201 : message de bienvenue (ouvre l'onboarding) + alerte interne à l'équipe.
+        NotificationSysteme::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => "Bienvenue sur Gextimo, {$proprietaire->prenom} !",
+            'contenu'    => "Votre espace est prêt. Commencez par ajouter votre première cliente ou votre première création.",
+            'type'       => 'bienvenue',
+            'lien'       => '/',
+            'is_read'    => false,
+        ]);
+        SendInscriptionAlert::dispatch(
+            trim("{$proprietaire->prenom} {$proprietaire->nom}"),
+            (string) $proprietaire->telephone,
+            $proprietaire->email,
+            $atelier->type ?? 'artisan',
+        );
+
         return response()->json([
             'message'      => 'Compte vérifié avec succès.',
             'token'        => $token,
@@ -124,11 +141,12 @@ class ProprietaireAuthController extends Controller
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
 
-        // (Plus de notification « Connexion réussie » : c'était du bruit à chaque login.)
-
+        // P201 : message « heureux de te revoir » — renvoyé dans la réponse (toast one-shot
+        // côté app), PAS stocké en notification (évite le bruit à chaque connexion).
         return response()->json([
             'token'        => $token,
             'proprietaire' => $proprietaire->only(['id', 'nom', 'prenom', 'email', 'telephone']),
+            'welcome_back' => "Heureux de vous revoir, {$proprietaire->prenom} !",
         ]);
     }
 
