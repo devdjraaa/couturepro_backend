@@ -33,11 +33,45 @@ class FideliteController extends Controller
 
         $config = $atelier->abonnement?->getConfigEffective() ?? [];
 
+        // PL-9 : programme de fidélité avancé (Studio) — paliers cumulés + prochain palier.
+        $paliers = null;
+        if (! empty($config['fidelite_avancee'])) {
+            $cumul = (int) PointsHistorique::where('atelier_id', $atelier->id)
+                ->where('points', '>', 0)
+                ->sum('points');
+
+            $seuils = [
+                ['cle' => 'bronze',  'nom' => 'Bronze',  'seuil' => 0],
+                ['cle' => 'argent',  'nom' => 'Argent',  'seuil' => 5000],
+                ['cle' => 'or',      'nom' => 'Or',      'seuil' => 20000],
+                ['cle' => 'platine', 'nom' => 'Platine', 'seuil' => 50000],
+            ];
+
+            $actuel = $seuils[0];
+            $prochain = null;
+            foreach ($seuils as $i => $p) {
+                if ($cumul >= $p['seuil']) {
+                    $actuel = $p;
+                    $prochain = $seuils[$i + 1] ?? null;
+                }
+            }
+
+            $paliers = [
+                'cumul_pts'      => $cumul,
+                'palier_actuel'  => $actuel,
+                'palier_suivant' => $prochain,
+                'restant_pts'    => $prochain ? max(0, $prochain['seuil'] - $cumul) : 0,
+                'echelle'        => $seuils,
+            ];
+        }
+
         return response()->json([
             'solde_pts'          => $solde->solde_pts,
             'seuil_conversion'   => (int) ($config['seuil_conversion_pts'] ?? 0),
             'bonus_actif'        => $atelier->abonnement?->bonus_actif ?? false,
             'bonus_jours_restants' => $atelier->abonnement?->bonus_jours_restants ?? 0,
+            'fidelite_avancee'   => ! empty($config['fidelite_avancee']),
+            'paliers'            => $paliers,
             'historique'         => $historique,
         ]);
     }

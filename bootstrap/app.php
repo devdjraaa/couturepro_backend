@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\BackupAteliersCloud;
 use App\Console\Commands\CheckPendingPayments;
 use App\Console\Commands\ExpireStalePayments;
 use App\Console\Commands\NotifyAbonnementExpiry;
@@ -45,6 +46,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command(CheckPendingPayments::class)->everyFifteenMinutes();
         $schedule->command(ProcessBonusExpiry::class)->hourly();
         $schedule->command(NotifyAbonnementExpiry::class)->dailyAt('08:00');
+        // PL-10 : sauvegarde cloud par atelier (la commande applique la cadence par plan).
+        $schedule->command(BackupAteliersCloud::class)->dailyAt('02:30');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Pour les requêtes API, retourner un 401 JSON au lieu de tenter

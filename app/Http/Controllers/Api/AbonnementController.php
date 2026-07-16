@@ -145,6 +145,11 @@ class AbonnementController extends Controller
             'quota_factures'       => $quotaFactures,
             'quota_publications'      => $quotaPublications,
             'quota_clients_factures'  => $quotaClientsFactures,
+            // PL-10 : date de la dernière sauvegarde cloud de l'atelier (si le plan l'inclut).
+            'derniere_sauvegarde_cloud' => ! empty($config['backup_cloud'])
+                ? \Illuminate\Support\Facades\DB::table('atelier_backups')
+                    ->where('atelier_id', $atelier->id)->max('created_at')
+                : null,
         ]);
     }
 
