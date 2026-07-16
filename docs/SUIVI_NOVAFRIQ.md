@@ -284,7 +284,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P28 | Défilement horizontal des catégories | 1 | 🟡 |
 | P29-34 | Compteur caractères tickets (255/5000 + blocage) | 1 | ✅ |
 | P35 | Timeout uploads étendu à 120 s (multipart) | 1 | ✅ |
-| P36 | Tickets avec photos : plus de timeout (couvert par P35) | 1 | ✅ |
+| P36 | Tickets avec photos : plus de timeout (timeout multipart 120s + **compression client ~1600px/<1Mo** avant upload, créer & répondre) | 1 | ✅ |
 | P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
 | P38 | Gamification : chaîne vérifiée (attribution au sync, config 1-2 pts/action tous plans, solde test 367 pts accumulés) — fonctionne | 1 | ✅ |
 | P39 | Visibilité des gains par action (toast ?) — choix produit (risque de bruit) | 1 | ℹ️ décision |
