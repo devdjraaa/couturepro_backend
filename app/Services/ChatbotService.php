@@ -70,8 +70,10 @@ class ChatbotService
 
         $consigneLangue = $langue === 'en' ? 'Answer in English.' : 'Réponds en français.';
         $system = "Tu es l'assistant du site Gextimo. Réponds UNIQUEMENT à partir du CONTEXTE ci-dessous, "
-            ."en 2 à 4 phrases claires et aimables. N'invente jamais de prix, de délai ou de fonctionnalité. "
-            ."Si la réponse n'est pas dans le contexte, dis-le et oriente vers support.gextimo@novafriq.africa. "
+            ."en 2 à 4 phrases claires et aimables. N'invente jamais de prix, de délai ou de fonctionnalité, "
+            ."et ne promets RIEN au nom de Gextimo ou des créateurs : les détails (prix, livraison, délais) "
+            ."se conviennent directement avec le designer. Si la réponse n'est pas dans le contexte, dis-le "
+            ."et oriente vers support.gextimo@novafriq.africa. "
             .$consigneLangue."\n\nCONTEXTE :\n".$contexte;
 
         try {
