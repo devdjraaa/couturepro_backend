@@ -73,7 +73,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ Indicateur langue affiche bien la langue **courante** (FR en FR) — V1-P37.
 - ⬜ Menus header Solutions/Tarifs/Documentation — V1-P181-184 ; ⬜ barre contact — V1-P180.
 - ✅ PWA livrée (manifest + SW + bannière, web only) — V1-P186 ; ✅ reCAPTCHA v3 actif — V1-P196.
-- 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
+- 🟢 Pages légales : **désormais 100 % éditables depuis le back-office** (éditeur riche type Word, FR/EN, import du texte actuel, publication instantanée, fallback i18n) — la direction peut appliquer P138-142 (renommages, CGV complètes) elle-même sans développeur. Livré 16/07.
 - 🟡 Localisation pays/devise auto + message — V1-P135 ; 🟡 phrases d'accroche — V1-P192/193.
 - ✅ Bannière profil (photo/GIF/vidéo) — V1-P134 (upload Ma Vitrine + couverture vitrine, QA device OK) ; ✅ profil s'ouvre en haut (P133, master).
 
