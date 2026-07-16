@@ -38,6 +38,16 @@ class NiveauConfig extends Model
         'ordre_affichage'               => 'integer',
     ];
 
+    /**
+     * Plan servi pendant la période d'essai selon le type d'atelier.
+     * L'essai promet un « accès complet » : un designer doit donc avoir le niveau
+     * Studio (cle historique master_mensuel), un artisan le niveau standard.
+     */
+    public static function cleEssaiPour(?string $typeAtelier): string
+    {
+        return $typeAtelier === 'designer' ? 'master_mensuel' : 'standard_mensuel';
+    }
+
     // Relations
     public function abonnements(): HasMany
     {

@@ -52,7 +52,7 @@ class ResetAtelierTrial extends Command
                     ['atelier_id' => $atelier->id],
                     [
                         'statut'               => 'essai',
-                        'niveau_cle'           => 'standard_mensuel',
+                        'niveau_cle'           => \App\Models\NiveauConfig::cleEssaiPour($atelier->type),
                         'jours_restants'       => 14,
                         'timestamp_debut'      => now(),
                         'timestamp_expiration' => $expire,

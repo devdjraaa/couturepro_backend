@@ -81,11 +81,13 @@ class ProprietaireAuthController extends Controller
             'essai_expire_at' => now()->addDays(14),
         ]);
 
-        $niveauEssai = NiveauConfig::where('cle', 'standard_mensuel')->first();
+        // Essai « accès complet » : le niveau dépend du type de compte (designer → Studio).
+        $cleEssai    = NiveauConfig::cleEssaiPour($atelier->type);
+        $niveauEssai = NiveauConfig::where('cle', $cleEssai)->first();
 
         Abonnement::create([
             'atelier_id'            => $atelier->id,
-            'niveau_cle'            => $niveauEssai?->cle ?? 'standard_mensuel',
+            'niveau_cle'            => $niveauEssai?->cle ?? $cleEssai,
             'statut'                => 'essai',
             'jours_restants'        => 14,
             'timestamp_debut'       => now(),

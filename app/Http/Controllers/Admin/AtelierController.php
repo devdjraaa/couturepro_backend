@@ -104,7 +104,7 @@ class AtelierController extends Controller
             ['atelier_id' => $atelier->id],
             [
                 'statut'               => 'essai',
-                'niveau_cle'           => 'standard_mensuel',
+                'niveau_cle'           => \App\Models\NiveauConfig::cleEssaiPour($atelier->type),
                 'jours_restants'       => $dureeJours,
                 'timestamp_debut'      => now(),
                 'timestamp_expiration' => $expire,
