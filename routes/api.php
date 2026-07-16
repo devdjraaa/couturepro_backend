@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CodePromoController;
 use App\Http\Controllers\Api\AppVersionController;
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\AtelierProprietaireController;
+use App\Http\Controllers\Api\AtelierVideoController;
 use App\Http\Controllers\Api\AvisController;
 use App\Http\Controllers\Api\CaisseController;
 use App\Http\Controllers\Api\ClientController;
@@ -328,6 +329,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('liste-attente',               [ListeAttenteController::class, 'store']);
     Route::put('liste-attente/{liste_attente}', [ListeAttenteController::class, 'update']);
     Route::delete('liste-attente/{liste_attente}', [ListeAttenteController::class, 'destroy']);
+
+    // PL-7 : vidéos de présentation (Studio)
+    Route::get('atelier-videos',                   [AtelierVideoController::class, 'index']);
+    Route::post('atelier-videos',                  [AtelierVideoController::class, 'store']);
+    Route::delete('atelier-videos/{atelier_video}', [AtelierVideoController::class, 'destroy']);
 
     // Galerie photos VIP
     Route::get('galerie',              [GalerieController::class, 'index']);

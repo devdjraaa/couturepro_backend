@@ -142,6 +142,9 @@ class VitrineController extends Controller
             'abonne'         => $visitorKey ? $atelier->abonnes()->where('visitor_key', $visitorKey)->exists() : false, // P173
             'merites'        => $badges,             // P174-176
             'badge_pro'      => (bool) ($atelier->abonnement?->getConfigEffective()['badge_designer_pro'] ?? false), // PL-8
+            'videos'         => (($atelier->abonnement?->getConfigEffective()['videos_presentation'] ?? false)) // PL-7
+                ? \App\Models\AtelierVideo::where('atelier_id', $atelier->id)->orderBy('position')->get(['titre', 'url'])
+                : [],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
             'creations'   => $creations,
