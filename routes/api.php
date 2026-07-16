@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\FactureController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\GalerieController;
+use App\Http\Controllers\Api\ListeAttenteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
@@ -222,6 +223,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('collections',                 [CollectionController::class, 'index']);
     Route::post('collections',                [CollectionController::class, 'store']);
     Route::put('collections/{collection}',    [CollectionController::class, 'update']);
+    Route::post('collections/{collection}/annonce', [CollectionController::class, 'annoncer']); // PL-6
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
 
     // Avis (modération par le créateur)
@@ -320,6 +322,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('creations-designer/{creation}',            [CreationDesignerController::class, 'show']);
     Route::match(['PUT', 'POST'], 'creations-designer/{creation}', [CreationDesignerController::class, 'update']);
     Route::delete('creations-designer/{creation}',         [CreationDesignerController::class, 'destroy']);
+
+    // PL-4 : liste d'attente clients (Studio)
+    Route::get('liste-attente',                [ListeAttenteController::class, 'index']);
+    Route::post('liste-attente',               [ListeAttenteController::class, 'store']);
+    Route::put('liste-attente/{liste_attente}', [ListeAttenteController::class, 'update']);
+    Route::delete('liste-attente/{liste_attente}', [ListeAttenteController::class, 'destroy']);
 
     // Galerie photos VIP
     Route::get('galerie',              [GalerieController::class, 'index']);

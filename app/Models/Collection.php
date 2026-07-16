@@ -13,7 +13,9 @@ class Collection extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
-    protected $fillable = ['atelier_id', 'nom'];
+    protected $fillable = ['atelier_id', 'nom', 'annonce_message', 'annonce_at'];
+
+    protected $casts = ['annonce_at' => 'datetime'];
 
     public function atelier(): BelongsTo
     {
