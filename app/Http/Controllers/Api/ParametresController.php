@@ -20,12 +20,23 @@ class ParametresController extends Controller
     use ResolvesAtelier, ChecksPlanFeature;
     public function updateProfil(Request $request): JsonResponse
     {
+        // Normalise AVANT validation : la règle unique doit tester la forme stockée en base
+        // (le mutator du modèle normalise à l'écriture) — sinon 500 (23505) sur doublon.
+        if ($request->filled('telephone')) {
+            $request->merge(['telephone' => Proprietaire::normalizePhone($request->telephone)]);
+        }
+
         $data = $request->validate([
             'nom'       => ['required', 'string', 'max:255'],
             // Format téléphone : sinon une saisie non numérique est normalisée à
             // vide/null → violation NOT NULL en base → 500 au lieu d'un 422 clair.
-            'telephone' => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s]{6,}$/'],
-            'email'     => ['nullable', 'email', 'max:255'],
+            'telephone' => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s]{6,}$/',
+                            'unique:proprietaires,telephone,' . $request->user()->id],
+            'email'     => ['nullable', 'email', 'max:255',
+                            'unique:proprietaires,email,' . $request->user()->id],
+        ], [
+            'telephone.unique' => 'Ce numéro est déjà utilisé par un autre compte.',
+            'email.unique'     => 'Cet e-mail est déjà utilisé par un autre compte.',
         ]);
 
         $user = $request->user();

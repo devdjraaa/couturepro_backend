@@ -34,6 +34,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth'       => \App\Http\Middleware\AdminAuth::class,
             'admin.permission' => \App\Http\Middleware\CheckAdminPermission::class,
         ]);
+
+        // API pure : jamais de redirection invité. Sans ça, le middleware Authenticate
+        // appelle route('login') (inexistante) AVANT même le handler d'exception →
+        // 500 « Route [login] not defined » au lieu d'un 401 (vu en prod le 15/07).
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command(ExpireStalePayments::class)->hourly();

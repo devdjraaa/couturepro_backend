@@ -85,6 +85,16 @@ class RecuperationController extends Controller
             return response()->json(['message' => 'Demande invalide ou étape incorrecte.'], 422);
         }
 
+        // Le nouveau numéro ne doit pas appartenir à un AUTRE compte (sinon l'update
+        // final viole la contrainte unique → 500). Comparé sous forme normalisée.
+        $normalise = Proprietaire::normalizePhone($request->telephone_nouveau);
+        $dejaPris = Proprietaire::where('telephone', $normalise)
+            ->where('email', '!=', $demande->email)
+            ->exists();
+        if ($dejaPris) {
+            return response()->json(['message' => 'Ce numéro est déjà associé à un autre compte.'], 422);
+        }
+
         $demande->update([
             'telephone_nouveau' => $request->telephone_nouveau,
             'statut'            => 'etape_3',
