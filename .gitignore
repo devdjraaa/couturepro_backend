@@ -23,3 +23,9 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Artefacts sources/binaires locaux (docs bruts du boss, APK, assets non versionnés)
+*.apk
+docs/message.txt
+docs/*volet*.txt
+public/logooffcielcolore.png

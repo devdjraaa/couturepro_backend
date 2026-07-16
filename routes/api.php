@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\PatronPublicController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
+use App\Http\Controllers\Api\Vitrine\ClientAuthController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\VitrineStatsController;
 use App\Http\Controllers\Api\WebhookController;
@@ -87,6 +88,19 @@ Route::prefix('vitrine')->group(function () {
     Route::post('partenaires/candidature',       [PartenairePublicController::class, 'candidater']);
 });
 
+// ─── Espace client vitrine (P202) : auth sans mot de passe (Google / OTP e-mail) ───
+Route::prefix('vitrine/client')->group(function () {
+    Route::post('otp/demander', [ClientAuthController::class, 'demanderOtp'])->middleware('throttle:5,1');
+    Route::post('otp/verifier', [ClientAuthController::class, 'verifierOtp'])->middleware('throttle:10,1');
+    Route::post('google',       [ClientAuthController::class, 'google'])->middleware('throttle:10,1');
+
+    Route::middleware(['auth:sanctum', 'account:client'])->group(function () {
+        Route::get('me',            [ClientAuthController::class, 'me']);
+        Route::post('consentement', [ClientAuthController::class, 'consentement']);
+        Route::post('logout',       [ClientAuthController::class, 'logout']);
+    });
+});
+
 // ─── Mises à jour de l'app (version-gate natif + OTA bundle web) ─────────────
 Route::prefix('app')->group(function () {
     Route::get('version',  [AppVersionController::class, 'version']);   // grosse MAJ (APK)
@@ -130,8 +144,9 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// ─── Routes protégées Sanctum ────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+// ─── Routes protégées Sanctum (espace pro : Proprietaire + EquipeMembre) ─────
+// account:app = interdit aux jetons « client vitrine » (P202) d'atteindre l'espace pro.
+Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
 
     // Auth
     Route::post('auth/logout', [ProprietaireAuthController::class, 'logout']);

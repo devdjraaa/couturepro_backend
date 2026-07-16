@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth'       => \App\Http\Middleware\AdminAuth::class,
             'admin.permission' => \App\Http\Middleware\CheckAdminPermission::class,
             'recaptcha'        => \App\Http\Middleware\VerifyRecaptcha::class,
+            'account'          => \App\Http\Middleware\EnsureAccountType::class, // P202 : isole client vitrine / pro
         ]);
 
         // API pure : jamais de redirection invité. Sans ça, le middleware Authenticate
