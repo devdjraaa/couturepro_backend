@@ -12,19 +12,19 @@ class AdminSeeder extends Seeder
     {
         // Super Admin principal — CHANGER le mot de passe en production
         Admin::updateOrCreate(
-            ['email' => 'superadmin@couturepro.app'],
+            ['email' => 'admin.gextimo@novafriq.africa'],
             [
                 'nom'         => 'Super',
                 'prenom'      => 'Admin',
-                'email'       => 'superadmin@couturepro.app',
-                'password'    => Hash::make('CouturePro@2026!'), // ← CHANGER EN PRODUCTION
+                'email'       => 'admin.gextimo@novafriq.africa',
+                'password'    => Hash::make('Gextimo@2026!'), // ← CHANGER EN PRODUCTION
                 'role'        => 'super_admin',
                 'permissions' => null, // null = accès total
                 'is_active'   => true,
             ]
         );
 
-        $this->command->info('✅ AdminSeeder : super_admin créé (email: superadmin@couturepro.app)');
+        $this->command->info('✅ AdminSeeder : super_admin créé (email: admin.gextimo@novafriq.africa)');
         $this->command->warn('⚠️  Pensez à changer le mot de passe en production !');
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Couture Pro — La gestion d'atelier qui simplifie votre journée</title>
+    <title>Gextimo — La gestion d'atelier qui simplifie votre journée</title>
     <meta name="description" content="L'application qui aide les ateliers de couture à gérer clients, commandes, mesures et paiements depuis leur téléphone — même sans Internet." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,7 +307,7 @@
             <div class="brand-icon">
                 <svg viewBox="0 0 24 24" class="icon"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
             </div>
-            <span>Couture Pro</span>
+            <span>Gextimo</span>
         </div>
         <nav class="nav-links">
             <a href="#fonctionnalites">Fonctionnalités</a>
@@ -333,7 +333,7 @@
         <div class="hero-grid">
             <div class="badge"><span class="dot"></span> Disponible sur Android et Web</div>
             <h1 class="title">L'atelier de couture de demain — <span class="grad-text">tient dans votre poche</span>.</h1>
-            <p class="hero-sub">Couture Pro accompagne les couturiers africains au quotidien : clients, commandes, mesures, paiements, équipe. Tout au même endroit, même quand vous êtes hors-ligne.</p>
+            <p class="hero-sub">Gextimo accompagne les couturiers africains au quotidien : clients, commandes, mesures, paiements, équipe. Tout au même endroit, même quand vous êtes hors-ligne.</p>
             <div class="cta-row">
                 <a href="#telecharger" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" class="icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
@@ -438,7 +438,7 @@
                 <svg viewBox="0 0 24 24" class="icon"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
             </div>
             <h2>L'application qui marche sans Internet</h2>
-            <p>Couture Pro fonctionne <strong>30 jours sans connexion</strong>. Vos données sont stockées sur votre téléphone et se synchronisent automatiquement dès que la connexion revient.</p>
+            <p>Gextimo fonctionne <strong>30 jours sans connexion</strong>. Vos données sont stockées sur votre téléphone et se synchronisent automatiquement dès que la connexion revient.</p>
             <div class="highlight-stats">
                 <div>
                     <div class="highlight-stat-num">30 j</div>
@@ -504,7 +504,7 @@
 {{-- ─── FOOTER ─── --}}
 <footer>
     <div class="container">
-        <div>© {{ date('Y') }} Couture Pro — Conçu en Afrique, pour l'Afrique.</div>
+        <div>© {{ date('Y') }} Gextimo — Conçu en Afrique, pour l'Afrique.</div>
         <div class="footer-links">
             <a href="#fonctionnalites">Fonctionnalités</a>
             <a href="#offline">Mode hors-ligne</a>

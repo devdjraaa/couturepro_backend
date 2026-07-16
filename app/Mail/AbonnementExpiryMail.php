@@ -21,8 +21,8 @@ class AbonnementExpiryMail extends Mailable
     public function envelope(): Envelope
     {
         $sujet = $this->jours === 1
-            ? 'Votre abonnement CouturePro expire demain'
-            : "Votre abonnement CouturePro expire dans {$this->jours} jours";
+            ? 'Votre abonnement Gextimo expire demain'
+            : "Votre abonnement Gextimo expire dans {$this->jours} jours";
 
         return new Envelope(subject: $sujet);
     }

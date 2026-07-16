@@ -29,7 +29,7 @@ class FedaPayProvider implements PaymentProviderContract
         $response = Http::withToken($this->apiKey)
             ->asJson()
             ->post("{$this->baseUrl}/transactions", [
-                'description' => "Abonnement CouturePro — {$paiement->niveau_cle}",
+                'description' => "Abonnement Gextimo — {$paiement->niveau_cle}",
                 'amount'      => (int) $paiement->montant,
                 'currency'    => ['iso' => $paiement->devise],
                 'customer'    => [

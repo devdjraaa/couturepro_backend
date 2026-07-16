@@ -57,7 +57,7 @@ return [
     |--------------------------------------------------------------------------
     | Resetting Passwords
     |--------------------------------------------------------------------------
-    | Couture Pro utilise son propre système OTP/question secrète.
+    | Gextimo utilise son propre système OTP/question secrète.
     | Le reset Laravel par défaut n'est pas utilisé.
     */
 

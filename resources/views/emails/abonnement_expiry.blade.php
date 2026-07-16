@@ -20,7 +20,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>CouturePro</h1>
+      <h1>Gextimo</h1>
     </div>
 
     <div class="body">
@@ -37,7 +37,7 @@
       </div>
 
       <p>
-        Pour continuer à utiliser toutes les fonctionnalités de CouturePro sans interruption,
+        Pour continuer à utiliser toutes les fonctionnalités de Gextimo sans interruption,
         renouvelez votre abonnement dès maintenant.
       </p>
 
@@ -49,7 +49,7 @@
     </div>
 
     <div class="footer">
-      Vous recevez cet email car vous êtes abonné à CouturePro.
+      Vous recevez cet email car vous êtes abonné à Gextimo.
     </div>
   </div>
 </body>
