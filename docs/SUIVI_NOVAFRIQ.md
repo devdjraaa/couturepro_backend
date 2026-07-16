@@ -191,7 +191,7 @@ valider par la direction avant de lancer les corrections.
 
 - ⚠️ Bugs quotas plans à re-tester : Premium annuel assistants/viewers (P50), Magnat annuel 7 ateliers
   mais 3 max (P51), cumul essai après souscription (P47), MAJ tous ateliers (P48).
-- ⬜/🟡 Comportement changement de plan / downgrade ateliers en trop (verrouillés/archivés ?) — V1-P53-55.
+- ✅ Downgrade livré (option A validée direction : ateliers en trop verrouillés, testé prod 16/07) — V1-P53-55.
 - 🟡 Rendre le module abonnement plus visible + valoriser les cartes — V1-P46, SUG-23.
 
 ### 1.6 Facturation par plan
@@ -201,7 +201,7 @@ valider par la direction avant de lancer les corrections.
 
 ### 1.7 Profil créateur public + interactions ⬜
 - ✅ Liens réseaux sociaux (migration `add_socials_to_ateliers`) — V1-P177 ; ✅ photo/logo profil — V1-P169.
-- ⬜ Likes cœur + 4 boutons par création — V1-P159/160 ; ⬜ badges/mérites — V1-P174-176 ;
+- ✅ Likes cœur + 4 boutons par création — V1-P159/160 ; ✅ badges/mérites (6 cat. × 5 niveaux) — V1-P174-176 ;
   ⬜ 4 compteurs + pseudo public + date intelligente + bouton s'abonner — V1-P170-173 ;
   ⬜ téléchargement patrons payants — V1-P161-163 ; ⬜ photos dans avis — V1-P137.
 
@@ -212,7 +212,7 @@ valider par la direction avant de lancer les corrections.
   vérifié en prod : 365→382 j, puis nettoyé), panel admin `/admin/codes-promo` (création, compteur
   d'utilisations par code, activer/désactiver), saisie dédiée dans Réglages → Abonnement,
   10 codes ambassadeurs GEXT-AMB-001→010 seedés (+17 j, sans expiration). Import contacts non gated (P157).
-- ⬜ P156 : expiration → repli mode gratuit lecture seule (chantier produit à part).
+- ✅ P156 : expiration → repli plan Gratuit (livré avec la logique définitive du plan Gratuit, 16/07).
   `abonnement/activer-code` existe mais ≠ codes promo/ambassadeurs. Voir aussi Bloc 3.
 
 ---
@@ -230,8 +230,8 @@ ne tournait **pas du tout** en prod (purge paiements, notifs d'expiration, bonus
 - ✅ gextimo.novafriq.africa : HTTP 200, certificat OK (60 j).
 
 **À configurer (direction)** :
-- ⬜ `PSI_API_KEY` (clé Google Cloud gratuite, sinon quota PSI anonyme → 429).
-- ⬜ `VEILLE_SEO_EMAIL` (destinataire du rapport hebdo).
+- ✅ `PSI_API_KEY` configurée (16/07, restriction IPv4 gérée via force_ip_resolve).
+- ✅ `VEILLE_SEO_EMAIL` = direction@novafriq.africa (16/07).
 - ⬜ Search Console API (OAuth) pour l'indexation/404/sitemap — après P199 (Bloc 6).
 Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
@@ -247,7 +247,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
   FR adapté (gelé → contacter support ; expiré → abonnement), `/support` accessible pour les tickets.
   ✅ V1-P119 (dégel restaure essai/actif). ✅ V1-P120 (page détail atelier admin blanche corrigée →
   la réactivation/dégel est de nouveau accessible). ⚠️ Reste V1-P121-123.
-- ⬜ **Espace création de codes** d'activation/promo côté admin — V1-P1.
+- ✅ **Espace création de codes** d'activation/promo côté admin (livré & testé prod) — V1-P1.
 - ⬜ **Dashboard admin temps réel** (auto-refresh configurable, bouton rafraîchir, delta, filtre atelier,
   perf multi-ateliers) — V1-P92-103.
 - ✅ Outil de diagnostic admin (queue/jobs échoués, base, stockage, dernières erreurs de log) — V1-P110-111.
