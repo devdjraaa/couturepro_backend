@@ -21,6 +21,42 @@ class MesureController extends Controller
 {
     use ResolvesAtelier;
     use AuthorizesRequests;
+    use \App\Traits\ChecksPlanFeature;
+
+    /**
+     * PL-2 : export groupé des mesures — toutes les clientes de l'atelier en une fois.
+     * Réservé aux plans payants (config `export_groupe`) ; le plan gratuit garde
+     * l'export client par client. Le front assemble le CSV (partage natif ou téléchargement).
+     */
+    public function exportGroupe(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        if ($gate = $this->planGate($atelier, 'export_groupe')) {
+            return $gate;
+        }
+
+        $mesures = Mesure::where('atelier_id', $atelier->id)->get(['client_id', 'champs', 'updated_at']);
+        $clients = Client::whereIn('id', $mesures->pluck('client_id'))
+            ->get(['id', 'prenom', 'nom', 'telephone'])
+            ->keyBy('id');
+
+        $rows = $mesures
+            ->map(function ($m) use ($clients) {
+                $client = $clients->get($m->client_id);
+
+                return $client ? [
+                    'client'    => trim("{$client->prenom} {$client->nom}"),
+                    'telephone' => $client->telephone,
+                    'champs'    => is_array($m->champs) ? $m->champs : [],
+                    'maj_le'    => $m->updated_at?->toDateString(),
+                ] : null;
+            })
+            ->filter()
+            ->sortBy('client', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        return response()->json($rows);
+    }
 
     public function index(Request $request, string $clientId): JsonResponse
     {

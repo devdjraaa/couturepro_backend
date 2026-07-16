@@ -151,6 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('clients/{client}/toggle-vip',   [ClientController::class, 'toggleVip']);
 
     // Mesures
+    Route::get('mesures/export-groupe',                  [MesureController::class, 'exportGroupe']); // PL-2
     Route::get('clients/{clientId}/mesures',             [MesureController::class, 'index']);
     Route::get('clients/{clientId}/mesures/historique',  [MesureController::class, 'historique']); // P74
 

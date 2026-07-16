@@ -36,6 +36,7 @@ trait ChecksPlanFeature
             'multi_ateliers'    => ['cle' => 'standard_annuel', 'label' => 'Standard Annuel', 'avantages' => ['Jusqu\'à 1 sous-atelier', 'Gestion multi-sites']],
             'photos_vip'        => ['cle' => 'premium_mensuel', 'label' => 'Premium', 'avantages' => ['Galerie photos VIP', '5 photos/mois']],
             'facture_personnalisee' => ['cle' => 'premium_mensuel', 'label' => 'Premium', 'avantages' => ['Factures personnalisées avec logo', 'Références IFU / RCCM', 'Mise en page pro']],
+            'export_groupe'     => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Export groupé des mesures', 'Exports groupés collections et patrons (PDF)']],
         ];
 
         return $map[$feature] ?? ['cle' => 'premium_mensuel', 'label' => 'Premium ou supérieur', 'avantages' => ['Fonctionnalités avancées']];
