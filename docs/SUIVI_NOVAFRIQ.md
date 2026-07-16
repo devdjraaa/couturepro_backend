@@ -298,6 +298,21 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
 ---
 
+## Brief technique 16/07 (données, reco, veille, UX locale) — 8 points
+
+| Pt | Sujet | Statut | Détail |
+|---|---|---|---|
+| 1 | Mémoire chatbot/assistant | ⬜ décision | Aucun chatbot n'existe (tickets humains seulement) — construire le chatbot = décision direction avant toute table |
+| 2 | Analytics comportemental + consentement | ✅ | = P202 Phase 3 (gxt_evenements, bandeau granulaire APDP, GA4/Meta/Clarity consent-gated) ; ⏳ clés GA4/Clarity à créer |
+| 3 | Profil utilisateur basique | ✅ | gxt_clients + PATCH client/me (prénom/nom/ville/date de naissance, UI espace client) ; clients sans mot de passe (OTP), pros bcrypt |
+| 4 | Recommandation / boost | 🟡 | ✅ scoring nocturne + boost payant (sponsorisation) + reco v1 (designers favoris en tête de galerie pour le client connecté) ; reste : reco par catégorie (nécessite catégoriser les créations) |
+| 5 | Veille opportunités/concours | 🟡 externe | Chantier n8n du collègue (hébergement : Oracle Free vs Hetzner, décision direction) — ne pas dupliquer côté app |
+| 6 | Identité visuelle locale | ✅ | Splash saisonnier config-driven (GET vitrine/splash-theme + PUT admin, overlay 2,5s 1×/jour) + vœux d'anniversaire (gxt:anniversaires 8h) + références béninoises déjà en place |
+| 7 | Accès équipe restreint | ✅ | Admin auth + permissions + audit log ; charte rédigée : docs/CHARTE_ACCES_DONNEES.md |
+| 8 | Planning sprints | ✅ | Sprint 1 + majorité Sprint 2 couverts par P202 + quick wins du 16/07 |
+
+---
+
 ## Annexe A — Détail volet 1 (V1-P1 → V1-P205)
 
 > Statut audité dans le code. « à re-tester » = code présent mais bug signalé par la direction.
