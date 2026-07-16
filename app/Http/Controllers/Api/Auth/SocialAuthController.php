@@ -36,6 +36,14 @@ class SocialAuthController extends Controller
             'google_web_client_id' => config('services.google.client_id'),
             // P196 : site key reCAPTCHA v3 (publique) — vide tant que non configurée.
             'recaptcha_site_key'   => config('recaptcha.site_key'),
+            // P202 Phase 3 : IDs analytics publics (GA4 / Meta Pixel / Microsoft Clarity).
+            // Configurables côté serveur (.env) — le front ne charge un script tiers QUE
+            // si l'ID est présent ET que le visiteur a consenti (interrupteur APDP).
+            'analytics'            => array_filter([
+                'ga4_id'        => config('services.analytics.ga4_id'),
+                'meta_pixel_id' => config('services.analytics.meta_pixel_id'),
+                'clarity_id'    => config('services.analytics.clarity_id'),
+            ]),
         ]);
     }
 

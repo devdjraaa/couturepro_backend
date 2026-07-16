@@ -48,6 +48,14 @@ return [
         'psi_key' => env('PSI_API_KEY'),
     ],
 
+    // P202 Phase 3 : IDs analytics publics (vides = script tiers jamais chargé côté front).
+    // Le front ne les charge de toute façon QUE si le visiteur a consenti (APDP).
+    'analytics' => [
+        'ga4_id'        => env('GA4_ID'),
+        'meta_pixel_id' => env('META_PIXEL_ID'),
+        'clarity_id'    => env('CLARITY_ID'),
+    ],
+
     // P150 : connexion sociale (Laravel Socialite). Chaque provider n'est ACTIF que si
     // ses client_id + client_secret sont renseignés dans .env → le jour où le boss a les
     // clés, il les colle ici (via .env) + `config:cache` et les boutons s'activent seuls.
