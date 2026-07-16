@@ -19,10 +19,19 @@ class PatronController extends Controller
     private function assertPeutVendre($atelier): void
     {
         // Seuls les designers ont une vitrine publique ; la capacité est pilotée par le plan
-        // (config `patrons_payants`, incluse par défaut dans les offres premium).
+        // (config `patrons_payants` : false sur le Gratuit, true sur Atelier/Studio).
         abort_unless($atelier->type === 'designer', 403, "La vente de patrons est réservée aux comptes créateur.");
-        $inclus = $atelier->abonnement?->getConfigEffective()['patrons_payants'] ?? true;
-        abort_unless($inclus, 403, "La vente de patrons n'est pas incluse dans votre offre.");
+        $inclus = $atelier->abonnement?->getConfigEffective()['patrons_payants'] ?? false;
+        abort_unless($inclus, 403, "La vente de patrons n'est pas incluse dans votre offre. Passez à un plan Atelier ou Studio.");
+    }
+
+    /** Plafond de patrons du plan (20 Atelier / 50 Studio) — null = illimité. */
+    private function assertQuotaPatrons($atelier): void
+    {
+        $max = $atelier->abonnement?->getConfigEffective()['max_patrons'] ?? null;
+        if ($max !== null && Patron::where('atelier_id', $atelier->id)->count() >= (int) $max) {
+            abort(403, "Limite de {$max} patrons atteinte pour votre plan. Passez à un plan supérieur.");
+        }
     }
 
     public function index(Request $request): JsonResponse
@@ -41,6 +50,7 @@ class PatronController extends Controller
     {
         $atelier = $this->getAtelier($request);
         $this->assertPeutVendre($atelier);
+        $this->assertQuotaPatrons($atelier);
 
         $data = $request->validate([
             'vetement_id' => ['required', 'uuid'],
