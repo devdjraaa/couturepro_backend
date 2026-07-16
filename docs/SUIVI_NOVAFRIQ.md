@@ -287,7 +287,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P36 | Tickets avec photos : plus de timeout (timeout multipart 120s + **compression client ~1600px/<1Mo** avant upload, créer & répondre) | 1 | ✅ |
 | P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
 | P38 | Gamification : chaîne vérifiée (attribution au sync, config 1-2 pts/action tous plans, solde test 367 pts accumulés) — fonctionne | 1 | ✅ |
-| P39 | Visibilité des gains par action (toast ?) — choix produit (risque de bruit) | 1 | ℹ️ décision |
+| P39 | Visibilité des gains de points par action | 1 | ✅ (watcher global `usePointsToast` : toast « +X pts » + notif locale **une seule fois** quand le solde augmente ; points rafraîchis après sync — sobre, pas de bruit) |
 | P40 | Meilleur affichage des points | 1 | 🟡 |
 | P41 | Badge auto au changement de niveau | 1 | 🟡 |
 | P42 | Notifs commande même app fermée | 7 | ✅ |
