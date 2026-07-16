@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\PatronPublicController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
+use App\Http\Controllers\Api\Vitrine\ChatbotController;
 use App\Http\Controllers\Api\Vitrine\ClientAuthController;
 use App\Http\Controllers\Api\Vitrine\ClientCommandeController;
 use App\Http\Controllers\Api\Vitrine\GxtEvenementController;
@@ -94,6 +95,13 @@ Route::prefix('vitrine')->group(function () {
 
 // ─── Tracking métier vitrine (P202 Phase 3) : ingestion groupée, connecté ou anonyme ───
 Route::post('vitrine/evenements', [GxtEvenementController::class, 'ingest'])->middleware('throttle:60,1');
+
+// ─── Chatbot vitrine (brief 16/07 pt 1) : assistance + mémoire des échanges ───
+Route::prefix('vitrine/chatbot')->group(function () {
+    Route::post('message',    [ChatbotController::class, 'message'])->middleware('throttle:20,1');
+    Route::post('feedback',   [ChatbotController::class, 'feedback'])->middleware('throttle:30,1');
+    Route::get('historique',  [ChatbotController::class, 'historique'])->middleware('throttle:30,1');
+});
 
 // ─── Espace client vitrine (P202) : auth sans mot de passe (Google / OTP e-mail) ───
 Route::prefix('vitrine/client')->group(function () {

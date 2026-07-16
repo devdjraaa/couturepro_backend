@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminsController;
 use App\Http\Controllers\Admin\AnalytiqueController;
+use App\Http\Controllers\Admin\ChatbotAdminController;
 use App\Http\Controllers\Admin\PartenaireController as AdminPartenaireController;
 use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\CodePromoController as AdminCodePromoController;
@@ -35,6 +36,11 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // P202 Phase 5 : tableau de bord analytique (vues globale/clients/designers/tendances).
     Route::get('analytique', [AnalytiqueController::class, 'index']);
+
+    // Brief 16/07 (pt 1) : dashboard chatbot (questions mal traitées → FAQ) + base d'intentions.
+    Route::get('chatbot/analyse', [ChatbotAdminController::class, 'analyse']);
+    Route::get('chatbot/intents', [ChatbotAdminController::class, 'intents']);
+    Route::put('chatbot/intents', [ChatbotAdminController::class, 'setIntents']);
 
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);
