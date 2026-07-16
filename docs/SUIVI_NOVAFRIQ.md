@@ -39,7 +39,7 @@ valider par la direction avant de lancer les corrections.
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
 | 16 | **Veille technique SEO hebdo** — ✅ livrée : `veille:seo` (PSI mobile+desktop, HTTPS, dispo, alertes, 2 sites), lundi 7h. 🟡 Search Console API (OAuth à configurer) ; e-mail : définir `VEILLE_SEO_EMAIL` | 🟡 | 2 | V1-P200 |
 | 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
-| 18 | **Sauvegardes VPS** — ✅ quotidiennes locales (pg_dump + storage, 3h30, rotation 7 j, intégrité vérifiée) ; ⬜ off-site (destination à choisir) + chiffrement + test restore mensuel | 🟡 | 4 | V1-P203 |
+| 18 | **Sauvegardes VPS** — ✅ quotidiennes **chiffrées AES-256** + ✅ **test restore mensuel** auto (vérif 61 tables/7 ateliers) + ✅ mécanisme **off-site S3/rclone** prêt ; ⏳ identifiants S3 à saisir | 🟡 | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
 | 20 | **Format numéro de reçu** — ✅ majuscules + tirets automatiques livrés | ✅ | 1 | V1-P144 |
 | 21 | ~~e-mail `support@gextimo.africa` erroné (FAQ)~~ ✅ **corrigé** → `support@gextimo.app` | ✅ | 5 | V1-P189 |
