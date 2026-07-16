@@ -175,7 +175,7 @@ valider par la direction avant de lancer les corrections.
 | # | Fonctionnalité | Plan | Réf tracker |
 |---|---|---|---|
 | PL-1 | **Lookbook PDF** (catalogue de collection en PDF) | Atelier+ | s30t1 |
-| PL-2 | **Export groupé** (collections / patrons / mesures en lot) — l'export **individuel** existe déjà | Atelier+ | s30t2 |
+| PL-2 | **Export groupé** — 🟡 **mesures FAIT** (16/07 : endpoint gaté `export_groupe` + bouton page Clients, CSV toutes clientes) ; reste collections/patrons (PDF) | Atelier+ | s30t2 |
 | PL-3 | **Rapport PDF mensuel** (global + par cliente) | Atelier / Studio | s30t3 |
 | PL-4 | **Liste d'attente clients** | Studio | s30t4 |
 | PL-5 | **Simulateur de revenus** | Studio | s30t5 |
