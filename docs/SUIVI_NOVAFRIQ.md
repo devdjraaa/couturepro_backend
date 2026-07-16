@@ -265,7 +265,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P9 | Recherche clients live (filtre au fil de la frappe) — vérifié device | 1 | ✅ |
 | P10 | Clic avatar client → modifier | 1 | ✅ (QA device 1.0.57 : sheet « Modifier le client » s'ouvre) |
 | P11 | Export mesures depuis la fiche | 1 | ✅ |
-| P12 | Export WhatsApp / CSV | 1 | 🟡 (CSV ?) |
+| P12 | Export WhatsApp / CSV | 1 | ✅ (PDF+partage natif WhatsApp + **export CSV** BOM UTF-8, bouton fiche client, OTA 1.0.60) |
 | P13 | Ajout commande sans animation (noAnimation sur les pages de saisie) | 1 | ✅ |
 | P14 | Acompte > total → bloc auto (commande simple **et** groupée) | 1 | ✅ |
 | P15 | Bloc différence calculée (`+ acompte−total`) + motif obligatoire | 1 | ✅ |
@@ -297,7 +297,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P46 | Module abonnement peu visible | 1 | 🟡 |
 | P47 | Cumul temps restant essai + abonnement (prolonge depuis l'expiration si statut essai) | 1 | ✅ |
 | P48 | MAJ abonnement sur tous les ateliers | 1 | 🟡 |
-| P49 | Points + bienvenue après souscription | 1 | 🟡 |
+| P49 | Points + bienvenue après souscription | 1 | ✅ (notif « Bienvenue sur le plan … » à l'activation : points crédités + instructions du plan) |
 | P50 | Premium annuel assistants/viewers — **config DB correcte** (assistants=2, membres=5) → re-tester runtime | 1 | 🟡 |
 | P51 | Magnat annuel 7 ateliers — **config DB correcte** (max_sous_ateliers=7) → re-tester runtime | 1 | 🟡 |
 | P52 | Magnat mensuel : points OK | 1 | ✅ |
@@ -307,7 +307,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P58 | Bouton → page abonnements/plan conseillé | 1 | 🟡 |
 | P59 | Consulter mesures enregistrées | 1 | ✅ |
 | P60 | Modifier les mesures | 1 | ✅ |
-| P61 | Export mesures WhatsApp/CSV | 1 | 🟡 |
+| P61 | Export mesures WhatsApp/CSV | 1 | ✅ (idem P12 — PDF/WhatsApp + CSV) |
 | P62-65 | Isolation stricte des ateliers — **corrigé & vérifié device** (filtre local par atelier actif sur clients/commandes/catalogue) | 1 | ✅ |
 | P66-67 | Validation champ téléphone (chiffres + « + ») | 1 | 🟡 |
 | P68-77 | Recherche client cross-ateliers + mesures partagées | 1 | ⬜/🟡 |
