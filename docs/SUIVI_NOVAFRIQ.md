@@ -23,7 +23,7 @@ valider par la direction avant de lancer les corrections.
 | # | Sujet | Statut | Bloc | Réf |
 |---|---|---|---|---|
 | 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; P156 mode gratuit ✅ aussi | ✅ | 1/3 | V1-P1, P153-158 |
-| 2 | **Dashboard admin temps réel** — ✅ auto-refresh 30s + bouton Actualiser livrés ; 🟡 restent delta/graphiques avancés | 🟡 | 3 | V1-P92-103 |
+| 2 | **Dashboard admin temps réel** — ✅ auto-refresh + bouton Actualiser + **fréquence au choix P95** (temps réel 10s/30s/1min/manuel, persistée) + **heure de dernière MAJ P98** ; 🟡 restent graphiques avancés + vue multi-ateliers P100-103 | 🟡 | 3 | V1-P92-103 |
 | 3 | Slogan du logo à l'impératif « Créez, Gérez, Rayonnez » (le logo login avait « Créer ») | ✅ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
 | 5 | ~~Page inscription en anglais malgré l'indicateur FR~~ ✅ **résolu** : audit code — `i18n.js` démarre en `fr` par défaut (`lng: cp_lang \|\| 'fr'`, `fallbackLng: 'fr'`), toutes les clés `auth.inscription.*` présentes et traduites en fr.json ; l'indicateur était déjà corrigé | ✅ | 1 | V1-P145 |
