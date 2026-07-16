@@ -138,7 +138,7 @@ class SocialAuthController extends Controller
             'nom'    => $nom,
         ]);
 
-        return redirect($front . '/inscription?' . $params);
+        return redirect($front . '/register?' . $params);
     }
 
     private function splitName(string $name): array
