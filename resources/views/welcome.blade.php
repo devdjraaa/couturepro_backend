@@ -509,7 +509,7 @@
             <a href="#fonctionnalites">Fonctionnalités</a>
             <a href="#offline">Mode hors-ligne</a>
             <a href="#equipe">Rôles</a>
-            <a href="mailto:contact@couturepro.app">Nous contacter</a>
+            <a href="mailto:contact.gextimo@novafriq.africa">Nous contacter</a>
         </div>
     </div>
 </footer>

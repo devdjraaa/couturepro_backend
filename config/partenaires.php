@@ -4,7 +4,7 @@
 return [
     // Destinataire des alertes internes de candidature (à définir avec la direction).
     // Surchargeable via .env : PARTENAIRES_NOTIFY_EMAIL.
-    'notify_email' => env('PARTENAIRES_NOTIFY_EMAIL', env('MAIL_FROM_ADDRESS', 'contact@gextimo.app')),
+    'notify_email' => env('PARTENAIRES_NOTIFY_EMAIL', 'partenariats@novafriq.africa'),
 
     // Catégories de partenariat proposées dans le formulaire de candidature.
     // ⚠️ Liste PROVISOIRE : les 12 catégories définitives sont dans le Document Maître
