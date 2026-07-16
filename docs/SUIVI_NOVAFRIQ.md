@@ -156,8 +156,17 @@ valider par la direction avant de lancer les corrections.
   (factures illimitées pour un client déjà compté, devis exclus, plus aucune limite sur le nombre de
   factures). Messages d'upgrade affichés côté app (publication + facture). Usage exposé par l'API
   abonnement (`quota_publications`, `quota_clients_factures`).
-- 🔵 **Spec upgrade abonnement reçue** (16/07/2026) : crédit prorata base 31 j + période date-à-date +
-  récap avant paiement — cf. `docs/SPEC_UPGRADE_ABONNEMENT.md` (implémentation en cours).
+- ✅ **Upgrade avec crédit prorata** (spec direction 16/07/2026 — implémenté & déployé, cf.
+  `docs/SPEC_UPGRADE_ABONNEMENT.md`) : crédit = jours restants × valeur mensuelle du plan actuel / 31
+  (base fixe 31 j, annuels via équivalent mensuel, plancher 0, essai/gratuit sans valeur) ; l'utilisateur
+  ne paie que la différence ; échéances **de date à date** (upgrade = démarrage immédiat, renouvellement
+  même plan = prolongation depuis l'échéance) ; **récap avant paiement** dans l'app (plan actuel/nouveau,
+  prix, crédit, à payer, nouvelle échéance) ; points de fidélité jamais retirés ; exemple de la spec
+  validé (8 129 / 21 871) + testé en prod. Correctif au passage : `prix_mensuel_equivalent_xof` restés
+  aux anciens tarifs (→ 2500/2083/5000/4167).
+- ⚠️ **Downgrade à trancher (rappel P53-55)** : en cas de passage vers un plan MOINS cher (ex. Studio
+  annuel → Studio mensuel), le crédit est plafonné au prix du nouveau plan → l'excédent de valeur est
+  perdu. La spec ne couvre que les upgrades ; comportement downgrade à définir par la direction.
 
 #### ⏳ Fonctionnalités promises dans les plans — À CONSTRUIRE (« Bientôt » — P178)
 > Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :
