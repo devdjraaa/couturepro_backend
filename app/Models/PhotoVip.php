@@ -20,6 +20,7 @@ class PhotoVip extends Model
         'file_path',
         'file_url',
         'nom',
+        'categorie',
         'taille_octets',
     ];
 

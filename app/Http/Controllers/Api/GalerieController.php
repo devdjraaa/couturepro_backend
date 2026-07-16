@@ -23,9 +23,11 @@ class GalerieController extends Controller
             return $gate;
         }
 
+        // P152 : filtrage optionnel par catégorie (bibliothèque catégorisée).
         $photos = PhotoVip::where('atelier_id', $atelier->id)
+            ->when($request->filled('categorie'), fn ($q) => $q->where('categorie', $request->input('categorie')))
             ->orderByDesc('created_at')
-            ->get(['id', 'nom', 'file_url', 'taille_octets', 'created_at']);
+            ->get(['id', 'nom', 'categorie', 'file_url', 'taille_octets', 'created_at']);
 
         return response()->json($photos);
     }
@@ -59,8 +61,9 @@ class GalerieController extends Controller
         }
 
         $request->validate([
-            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
-            'nom'   => ['nullable', 'string', 'max:150'],
+            'photo'     => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            'nom'       => ['nullable', 'string', 'max:150'],
+            'categorie' => ['nullable', 'string', 'max:60'],
         ]);
 
         $file     = $request->file('photo');
@@ -73,12 +76,14 @@ class GalerieController extends Controller
             'file_path'    => $path,
             'file_url'     => $url,
             'nom'          => $request->input('nom', $file->getClientOriginalName()),
+            'categorie'    => $request->input('categorie'),
             'taille_octets'=> $file->getSize(),
         ]);
 
         return response()->json([
             'id'           => $photo->id,
             'nom'          => $photo->nom,
+            'categorie'    => $photo->categorie,
             'file_url'     => $photo->file_url,
             'taille_octets'=> $photo->taille_octets,
             'created_at'   => $photo->created_at,
