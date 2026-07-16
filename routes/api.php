@@ -41,6 +41,7 @@ use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\Vitrine\ClientAuthController;
+use App\Http\Controllers\Api\Vitrine\ClientCommandeController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\VitrineStatsController;
 use App\Http\Controllers\Api\WebhookController;
@@ -98,6 +99,12 @@ Route::prefix('vitrine/client')->group(function () {
         Route::get('me',            [ClientAuthController::class, 'me']);
         Route::post('consentement', [ClientAuthController::class, 'consentement']);
         Route::post('logout',       [ClientAuthController::class, 'logout']);
+
+        // Phase 2 : commandes « direct » (atterrissent dans l'outil du designer) + avis + réclamations.
+        Route::get('commandes',                             [ClientCommandeController::class, 'index']);
+        Route::post('commandes',                            [ClientCommandeController::class, 'store'])->middleware('throttle:10,60');
+        Route::post('commandes/{commande}/avis',            [ClientCommandeController::class, 'avis'])->middleware('throttle:5,60');
+        Route::post('commandes/{commande}/reclamation',     [ClientCommandeController::class, 'reclamation'])->middleware('throttle:5,60');
     });
 });
 

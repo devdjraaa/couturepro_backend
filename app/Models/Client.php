@@ -25,6 +25,7 @@ class Client extends Model
         'notes',
         'created_by',
         'created_by_role',
+        'gxt_client_id',
         'is_archived',
         'archived_at',
         'archived_by',

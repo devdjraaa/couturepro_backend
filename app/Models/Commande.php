@@ -44,6 +44,8 @@ class Commande extends Model
         'statut',
         'reference',
         'etape',
+        'source',
+        'gxt_client_id',
         'date_commande',
         'date_livraison_prevue',
         'date_livraison_effective',

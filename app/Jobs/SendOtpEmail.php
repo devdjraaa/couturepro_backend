@@ -24,10 +24,10 @@ class SendOtpEmail implements ShouldQueue
     public function handle(): void
     {
         Mail::raw(
-            "Votre code de vérification CouturePro est : {$this->code}\n\nCe code expire dans 10 minutes. Ne le partagez jamais.",
+            "Votre code de vérification Gextimo est : {$this->code}\n\nCe code expire dans 10 minutes. Ne le partagez jamais.",
             function ($message) {
                 $message->to($this->email)
-                        ->subject('Votre code de vérification CouturePro');
+                        ->subject('Votre code de vérification Gextimo');
             }
         );
     }
