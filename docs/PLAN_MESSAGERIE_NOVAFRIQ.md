@@ -144,9 +144,13 @@ Les e-mails **automatiques** (OTP, factures, reçus, notifications) **ne passent
 (SPF/DKIM) **dans Cloudflare**.
 
 ## 8. DNS — anti-spam (indispensable) — **désormais dans Cloudflare**
-> ⚠️ **La zone DNS est chez Cloudflare** depuis le 16/07. Tous les enregistrements ci-dessous se
-> collent **dans le dashboard Cloudflare** (DNS → Records), **en DNS-only (nuage gris)** pour tout ce
-> qui touche l'e-mail. Les MX/SPF/DKIM Hostinger existants ont déjà été repris dans Cloudflare.
+> ✅ **VÉRIFIÉ le 16/07 dans Cloudflare** — les 3 enregistrements sont **déjà en place** :
+> - SPF : `novafriq.africa` TXT `v=spf1 include:_spf.mail.hostinger.com ~all` ✅
+> - DKIM : signature active (confirmée par `signed-by: novafriq.africa` sur un envoi réel) ✅
+> - DMARC : `_dmarc.novafriq.africa` TXT `v=DMARC1; p=none` ✅
+>
+> ⚠️ **La zone DNS est chez Cloudflare** depuis le 16/07. Tout enregistrement e-mail à venir (ex. Brevo)
+> se colle **dans le dashboard Cloudflare** (DNS → Records), **en DNS-only (nuage gris)**.
 
 - **SPF** : autoriser Hostinger **et** le service transactionnel dans le **même** enregistrement TXT.
   Ex. : `v=spf1 include:_spf.mail.hostinger.com include:spf.brevo.com ~all` *(un seul SPF par domaine !)*.
