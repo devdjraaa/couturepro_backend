@@ -140,8 +140,30 @@ valider par la direction avant de lancer les corrections.
 - ✅ Connexion sociale : Google actif (web + natif) ; Facebook abandonné, Apple différé — V1-P150.
 
 ### 1.5 Abonnements / plans
-- ✅ Onglets Mensuel/Annuel (vitrine `PremiumPage`) — SUG-22/V1-P22 (app `AbonnementTab` à confirmer).
+- ✅ **Plans Designer alignés sur la maquette officielle** (16/07/2026) : Gratuit 0 / Atelier 2 500·25 000 /
+  Studio 5 000·50 000 (label Master→Studio, `cle` inchangée), quotas conformes — cf. `docs/PLANS_OFFICIELS_DESIGNER.md`.
+- ✅ **Quotas gatés & vérifiés** : clients, commandes, créations vitrine, **patrons (nombre — 20/50, corrigé)**,
+  assistants, membres, sous-ateliers/multi-ateliers, caisse, facture perso, devis, sponsorisation, photos VIP.
+- Onglets Mensuel/Annuel (vitrine `PremiumPage`) — SUG-22/V1-P22 (app `AbonnementTab` à confirmer).
 - ✅ Blocage par plan + `FeatureGate` (Caisse, etc.) — V1-P56.
+
+#### ⏳ Fonctionnalités promises dans les plans — À CONSTRUIRE (« Bientôt » — P178)
+> Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :
+> les tracer ici en « Bientôt » et les construire ensuite. Le **gating des quotas**, lui, est déjà en place.
+
+| # | Fonctionnalité | Plan | Réf tracker |
+|---|---|---|---|
+| PL-1 | **Lookbook PDF** (catalogue de collection en PDF) | Atelier+ | s30t1 |
+| PL-2 | **Export groupé** (collections / patrons / mesures en lot) — l'export **individuel** existe déjà | Atelier+ | s30t2 |
+| PL-3 | **Rapport PDF mensuel** (global + par cliente) | Atelier / Studio | s30t3 |
+| PL-4 | **Liste d'attente clients** | Studio | s30t4 |
+| PL-5 | **Simulateur de revenus** | Studio | s30t5 |
+| PL-6 | **Annonce de collection** | Studio | s30t6 |
+| PL-7 | **Vidéos de présentation** (jusqu'à 50) | Studio | s30t7 |
+| PL-8 | **Badge « Designer Pro »** (distinct du badge Vérifié qui existe) | Atelier | s30t8 |
+| PL-9 | **Programme de fidélité avancé** (le basique existe) | Studio | s30t9 |
+| PL-10 | **Sauvegarde cloud par atelier cadencée** (/3 j Atelier, journalière Studio) — flag posé, backup réel à faire | Atelier / Studio | s30t10 |
+
 - ⚠️ Bugs quotas plans à re-tester : Premium annuel assistants/viewers (P50), Magnat annuel 7 ateliers
   mais 3 max (P51), cumul essai après souscription (P47), MAJ tous ateliers (P48).
 - ⬜/🟡 Comportement changement de plan / downgrade ateliers en trop (verrouillés/archivés ?) — V1-P53-55.
