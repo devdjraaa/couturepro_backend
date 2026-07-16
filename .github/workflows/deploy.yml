@@ -133,6 +133,11 @@ jobs:
             # --- Lien storage ---
             [ ! -L public/storage ] && php artisan storage:link
 
+            # --- Package discovery : bootstrap/cache est exclu du rsync, donc les manifests
+            # (packages.php/services.php) doivent être régénérés ici, sinon un nouveau package
+            # (ex. Socialite) n'est jamais enregistré → « Target ... is not instantiable ».
+            php artisan package:discover --ansi
+
             # --- Caches ---
             php artisan config:clear
             php artisan cache:clear
