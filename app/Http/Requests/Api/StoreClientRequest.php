@@ -17,6 +17,7 @@ class StoreClientRequest extends FormRequest
             'type_profil'  => ['nullable', 'string', 'in:homme,femme,enfant,mixte'],
             'avatar_index' => ['nullable', 'integer', 'min:0', 'max:6'],
             'is_vip'       => ['nullable', 'boolean'],
+            'partage'      => ['nullable', 'boolean'],
             'notes'        => ['nullable', 'string', 'max:1000'],
         ];
     }

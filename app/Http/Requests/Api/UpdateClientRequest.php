@@ -17,6 +17,7 @@ class UpdateClientRequest extends FormRequest
             'type_profil'  => ['sometimes', 'nullable', 'string', 'in:homme,femme,enfant,mixte'],
             'avatar_index' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:6'],
             'is_vip'       => ['sometimes', 'boolean'],
+            'partage'      => ['sometimes', 'boolean'],
             'notes'        => ['sometimes', 'nullable', 'string', 'max:1000'],
         ];
     }

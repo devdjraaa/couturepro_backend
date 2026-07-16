@@ -21,6 +21,7 @@ class Client extends Model
         'type_profil',
         'avatar_index',
         'is_vip',
+        'partage',
         'notes',
         'created_by',
         'created_by_role',
@@ -32,6 +33,7 @@ class Client extends Model
 
     protected $casts = [
         'is_vip'      => 'boolean',
+        'partage'     => 'boolean',
         'is_archived' => 'boolean',
         'archived_at' => 'datetime',
         'avatar_index'=> 'integer',

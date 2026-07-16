@@ -37,8 +37,15 @@ class ClientController extends Controller
             $atelierIds = Atelier::where('proprietaire_id', $user->id)->pluck('id')->all();
         }
 
-        $clients = Client::whereIn('atelier_id', $atelierIds)
-            ->actif()
+        // P77 : les clients « partagés » d'un autre atelier du même propriétaire
+        // apparaissent aussi dans l'atelier courant (comptes multi-ateliers).
+        $ownerAtelierIds = Atelier::where('proprietaire_id', $atelier->proprietaire_id)->pluck('id')->all();
+
+        $clients = Client::actif()
+            ->where(function ($q) use ($atelierIds, $ownerAtelierIds) {
+                $q->whereIn('atelier_id', $atelierIds)
+                  ->orWhere(fn ($s) => $s->where('partage', true)->whereIn('atelier_id', $ownerAtelierIds));
+            })
             ->when($search, fn ($q) => $q->where(function ($q2) use ($search) {
                 $q2->where('nom', 'like', "%{$search}%")
                    ->orWhere('prenom', 'like', "%{$search}%")
@@ -90,6 +97,7 @@ class ClientController extends Controller
             'type_profil'     => $request->type_profil ?? 'mixte',
             'avatar_index'    => $request->avatar_index,
             'is_vip'          => $request->boolean('is_vip', false),
+            'partage'         => $request->boolean('partage', false), // P77
             'notes'           => $request->notes,
             'created_by'      => $user->id,
             'created_by_role' => $user instanceof EquipeMembre ? $user->role : 'proprietaire',
