@@ -37,6 +37,15 @@ trait ChecksPlanFeature
             'photos_vip'        => ['cle' => 'premium_mensuel', 'label' => 'Premium', 'avantages' => ['Galerie photos VIP', '5 photos/mois']],
             'facture_personnalisee' => ['cle' => 'premium_mensuel', 'label' => 'Premium', 'avantages' => ['Factures personnalisées avec logo', 'Références IFU / RCCM', 'Mise en page pro']],
             'export_groupe'     => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Export groupé des mesures', 'Exports groupés collections et patrons (PDF)']],
+            'lookbook_pdf'      => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Lookbook PDF de vos collections', 'Catalogue partageable']],
+            'rapport_mensuel'   => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Rapport PDF mensuel', 'Suivi encaissements par cliente']],
+            'liste_attente'     => ['cle' => 'master_mensuel', 'label' => 'Studio', 'avantages' => ['Liste d\'attente clients', 'Gestion de la demande']],
+            'simulateur_revenus' => ['cle' => 'master_mensuel', 'label' => 'Studio', 'avantages' => ['Simulateur de revenus', 'Projections d\'activité']],
+            'annonce_collection' => ['cle' => 'master_mensuel', 'label' => 'Studio', 'avantages' => ['Annonce de collection', 'Mise en avant vitrine']],
+            'videos_presentation' => ['cle' => 'master_mensuel', 'label' => 'Studio', 'avantages' => ['Jusqu\'à 50 vidéos de présentation', 'Vitrine enrichie']],
+            'badge_designer_pro' => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Badge Designer Pro', 'Crédibilité renforcée']],
+            'fidelite_avancee'  => ['cle' => 'master_mensuel', 'label' => 'Studio', 'avantages' => ['Programme de fidélité avancé', 'Paliers et récompenses']],
+            'backup_cloud'      => ['cle' => 'atelier_mensuel', 'label' => 'Atelier', 'avantages' => ['Sauvegarde cloud automatique', 'Données protégées']],
         ];
 
         return $map[$feature] ?? ['cle' => 'premium_mensuel', 'label' => 'Premium ou supérieur', 'avantages' => ['Fonctionnalités avancées']];

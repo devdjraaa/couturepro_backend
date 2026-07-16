@@ -199,6 +199,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Caisse (gated par plan module_caisse)
     Route::get('caisse/stats',   [CaisseController::class, 'stats']);
     Route::get('caisse/clients', [CaisseController::class, 'clients']);
+    Route::get('caisse/rapport-mensuel', [CaisseController::class, 'rapportMensuel']); // PL-3
     // Paiements de commande
     Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index']);
     Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store']);
