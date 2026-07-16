@@ -490,6 +490,43 @@ class PaymentService
         }
     }
 
+    /**
+     * P53-55 (option A) : applique l'échéance d'un abonnement.
+     * - si un downgrade est programmé → active le plan inférieur (nouvelle période
+     *   de date à date depuis l'échéance), sans rien facturer ;
+     * - sinon → passe en « expire » (repli plan Gratuit via getConfigEffective).
+     * Retourne true si un downgrade a été appliqué.
+     */
+    public function appliquerEcheance(Abonnement $abonnement): bool
+    {
+        if (! $abonnement->timestamp_expiration || ! $abonnement->timestamp_expiration->isPast()) {
+            return false;
+        }
+
+        if ($abonnement->downgrade_vers_cle) {
+            $cible = $abonnement->downgrade_vers_cle;
+            $abonnement->update(['downgrade_vers_cle' => null]);
+            // Activation du plan inférieur à partir de l'échéance (pas d'à-payer, déjà « dû »).
+            $this->activerAbonnement($abonnement->atelier_id, $cible, 0);
+
+            \App\Models\NotificationSysteme::create([
+                'atelier_id' => $abonnement->atelier_id,
+                'titre'      => 'Changement de plan appliqué',
+                'contenu'    => "Votre abonnement est passé au plan " . (NiveauConfig::where('cle', $cible)->value('label') ?? $cible) . '.',
+                'type'       => 'abonnement_downgrade',
+                'lien'       => '/parametres?tab=abonnement',
+                'is_read'    => false,
+            ]);
+
+            return true;
+        }
+
+        $abonnement->update(['statut' => 'expire']);
+        Atelier::where('id', $abonnement->atelier_id)->update(['statut' => 'expire']);
+
+        return false;
+    }
+
     private function resolveProvider(string $provider): PaymentProviderContract
     {
         $class = $this->providers[$provider] ?? null;

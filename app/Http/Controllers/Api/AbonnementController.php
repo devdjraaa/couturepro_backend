@@ -77,6 +77,55 @@ class AbonnementController extends Controller
         return response()->json($paymentService->previewChangement($atelier, $nouveau));
     }
 
+    /**
+     * P53-55 (option A) : programme un downgrade différé — le plan inférieur choisi
+     * s'appliquera automatiquement à l'échéance du plan courant (rien à payer, le
+     * plan actuel reste actif jusqu'au bout, annulable à tout moment avant l'échéance).
+     */
+    public function programmerDowngrade(Request $request): JsonResponse
+    {
+        $request->validate(['niveau_cle' => ['required', 'string', 'exists:niveaux_config,cle']]);
+
+        $atelier    = $this->getAtelier($request);
+        $abonnement = Abonnement::where('atelier_id', $atelier->id)->first();
+        $cible      = NiveauConfig::where('cle', $request->niveau_cle)->where('is_actif', true)->firstOrFail();
+
+        abort_unless(
+            $abonnement && $abonnement->statut === 'actif' && $abonnement->timestamp_expiration?->isFuture(),
+            422,
+            "Aucun abonnement actif à modifier."
+        );
+
+        // Le downgrade suppose un plan STRICTEMENT moins cher que le plan courant.
+        $prixActuel = (int) ($abonnement->niveau?->prix_xof ?? 0);
+        abort_if(
+            (int) $cible->prix_xof >= $prixActuel,
+            422,
+            "Ce plan n'est pas inférieur à votre plan actuel — utilisez l'upgrade (paiement immédiat)."
+        );
+
+        $abonnement->update(['downgrade_vers_cle' => $cible->cle]);
+
+        return response()->json([
+            'message'            => "Changement programmé pour la fin de votre période.",
+            'downgrade_vers_cle' => $cible->cle,
+            'downgrade_label'    => $cible->label,
+            'applique_le'        => $abonnement->timestamp_expiration?->toIso8601String(),
+        ]);
+    }
+
+    /** P53-55 : annule un downgrade programmé (revient au maintien du plan actuel). */
+    public function annulerDowngrade(Request $request): JsonResponse
+    {
+        $atelier    = $this->getAtelier($request);
+        $abonnement = Abonnement::where('atelier_id', $atelier->id)->first();
+
+        abort_unless($abonnement, 404, "Aucun abonnement.");
+        $abonnement->update(['downgrade_vers_cle' => null]);
+
+        return response()->json(['message' => "Changement de plan annulé."]);
+    }
+
     public function current(Request $request): JsonResponse
     {
         $atelier    = $this->getAtelier($request);
@@ -89,14 +138,14 @@ class AbonnementController extends Controller
             return response()->json(null);
         }
 
-        // Auto-expirer si la date est passée
+        // Échéance passée : appliquer le downgrade programmé (option A) ou expirer.
         if (
             in_array($abonnement->statut, ['actif', 'essai'])
             && $abonnement->timestamp_expiration?->isPast()
         ) {
-            $abonnement->update(['statut' => 'expire']);
-            $atelier->update(['statut' => 'expire']);
+            app(PaymentService::class)->appliquerEcheance($abonnement);
             $abonnement->refresh();
+            $atelier->refresh();
         }
 
         $config = $abonnement->getConfigEffective();
@@ -141,6 +190,11 @@ class AbonnementController extends Controller
                 : max(0, $abonnement->jours_restants),
             'timestamp_expiration' => $abonnement->timestamp_expiration?->toIso8601String(),
             'prix_xof'             => $abonnement->niveau?->prix_xof,
+            // P53-55 : downgrade programmé à l'échéance (option A), si présent.
+            'downgrade_vers_cle'   => $abonnement->downgrade_vers_cle,
+            'downgrade_label'      => $abonnement->downgrade_vers_cle
+                ? NiveauConfig::where('cle', $abonnement->downgrade_vers_cle)->value('label')
+                : null,
             'config'               => $config,
             'quota_factures'       => $quotaFactures,
             'quota_publications'      => $quotaPublications,

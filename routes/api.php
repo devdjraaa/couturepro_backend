@@ -260,6 +260,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('abonnement/plans',           [AbonnementController::class, 'plans']);
     Route::get('abonnement/current',         [AbonnementController::class, 'current']);
     Route::get('abonnement/upgrade-preview', [AbonnementController::class, 'upgradePreview']);
+    Route::post('abonnement/programmer-downgrade', [AbonnementController::class, 'programmerDowngrade']); // P53-55
+    Route::post('abonnement/annuler-downgrade',    [AbonnementController::class, 'annulerDowngrade']);
     Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
     Route::post('abonnement/sponsoriser',  [AbonnementController::class, 'sponsoriser']);
 

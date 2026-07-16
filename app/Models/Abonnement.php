@@ -23,6 +23,7 @@ class Abonnement extends Model
         'bonus_niveau_cle',
         'bonus_timestamp_debut',
         'config_snapshot',
+        'downgrade_vers_cle',
     ];
 
     protected $casts = [

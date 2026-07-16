@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\AppliquerEcheancesAbonnements;
 use App\Console\Commands\BackupAteliersCloud;
 use App\Console\Commands\CheckPendingPayments;
 use App\Console\Commands\ExpireStalePayments;
@@ -48,6 +49,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command(NotifyAbonnementExpiry::class)->dailyAt('08:00');
         // PL-10 : sauvegarde cloud par atelier (la commande applique la cadence par plan).
         $schedule->command(BackupAteliersCloud::class)->dailyAt('02:30');
+        // P53-55 : downgrades programmés / expirations arrivés à échéance.
+        $schedule->command(AppliquerEcheancesAbonnements::class)->hourly();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Pour les requêtes API, retourner un 401 JSON au lieu de tenter
