@@ -63,6 +63,12 @@ adresses Gextimo prenant un préfixe `.gextimo` (ex. `support.gextimo@novafriq.a
   budget le justifient.
 
 ## 5. Liste d'adresses retenue
+> ✅ **CONFIRMÉE PAR LA DIRECTION le 16/07/2026** — les 9 alias officiels sont exactement :
+> `contact@` · `direction@` · `finance@` · `dpo@` · `partenariats@` (novafriq) +
+> `contact.gextimo@` · `support.gextimo@` · `communaute.gextimo@` · `privacy.gextimo@`
+> (tous `@novafriq.africa`). Le code a été aligné dessus (partenaires→`partenariats@`,
+> alerte inscription→`direction@`).
+
 *Principe : une adresse = quelqu'un qui la relève réellement.*
 
 ### NOVAFRIQ — `@novafriq.africa`
@@ -130,6 +136,13 @@ Dans chaque Gmail concerné : **Paramètres → Comptes et importation → « En
 dans Gmail.
 
 ## 7bis. Courrier automatique de l'app (`noreply.gextimo@`)
+> 🚨 **FINDING 16/07 — à corriger** : aujourd'hui le VPS envoie les OTP/notifs via **le Gmail
+> `kounoumarcus@gmail.com`** avec `MAIL_FROM_ADDRESS="noreply@gextimo.com"` — un **domaine qu'on ne
+> possède pas** (`gextimo.com`). C'est une cause probable de spam. **Solution durable = Brevo** ci-dessous,
+> expéditeur `noreply.gextimo@novafriq.africa` (SPF/DKIM Brevo dans Cloudflare). ⚠️ NE PAS juste changer
+> le `From` en `…@novafriq.africa` tant qu'on envoie via Gmail : SPF/DKIM ne s'aligneraient pas (envoi
+> depuis les IP Google, pas Hostinger/Brevo) → pire délivrabilité.
+
 Les e-mails **automatiques** (OTP, factures, reçus, notifications) **ne passent pas** par Hostinger
 (limite 1 000/jour). → **Service transactionnel dédié.**
 
