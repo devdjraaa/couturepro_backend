@@ -279,8 +279,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P23 | Échéances multiples + note | 1 | ✅ |
 | P24 | Photo du tissu **par article** en commande groupée (grande zone, multipart, backend + app) — vérifié device | 1 | ✅ |
 | P25 | Mode « commande groupée » | 1 | ✅ |
-| P26 | Tri auto par date livraison | 1 | 🟡 |
-| P27 | Urgentes en premier | 1 | 🟡 |
+| P26 | Tri auto par date livraison | 1 | ✅ (groupes retard/aujourd'hui/demain/semaine/plus tard) |
+| P27 | Urgentes en premier | 1 | ✅ (urgentes triées en tête dans chaque groupe de date) |
 | P28 | Défilement horizontal des catégories | 1 | 🟡 |
 | P29-34 | Compteur caractères tickets (255/5000 + blocage) | 1 | ✅ |
 | P35 | Timeout uploads étendu à 120 s (multipart) | 1 | ✅ |
