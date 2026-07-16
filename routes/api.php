@@ -99,7 +99,7 @@ Route::post('suivi-sprints', [SuiviSprintController::class, 'save']);
 
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('inscription',   [ProprietaireAuthController::class, 'inscription']);
+    Route::post('inscription',   [ProprietaireAuthController::class, 'inscription'])->middleware('recaptcha'); // P196
     Route::post('verifier-otp',  [ProprietaireAuthController::class, 'verifierOtp']);
     Route::post('renvoyer-otp',  [ProprietaireAuthController::class, 'renvoyerOtp']);
     // P123 : corriger l'e-mail d'un compte non vérifié (tél + mot de passe) puis renvoi OTP

@@ -34,6 +34,8 @@ class SocialAuthController extends Controller
             // (audience du idToken). Servi par l'API → configurable côté serveur,
             // rien de figé dans l'app. (Un client ID n'est pas un secret.)
             'google_web_client_id' => config('services.google.client_id'),
+            // P196 : site key reCAPTCHA v3 (publique) — vide tant que non configurée.
+            'recaptcha_site_key'   => config('recaptcha.site_key'),
         ]);
     }
 
