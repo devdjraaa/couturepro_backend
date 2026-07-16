@@ -44,6 +44,11 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('chatbot/contexte', [ChatbotAdminController::class, 'contexte']);
     Route::put('chatbot/contexte', [ChatbotAdminController::class, 'setContexte']);
 
+    // Pages légales du footer : édition via l'éditeur riche du back-office.
+    Route::get('pages',        [\App\Http\Controllers\Api\PageLegaleController::class, 'index']);
+    Route::get('pages/{cle}',  [\App\Http\Controllers\Api\PageLegaleController::class, 'showAdmin']);
+    Route::put('pages/{cle}',  [\App\Http\Controllers\Api\PageLegaleController::class, 'update']);
+
     // Veille opportunités (n8n) : consultation des résultats hebdo dans l'admin.
     Route::get('veille', [\App\Http\Controllers\Api\VeilleController::class, 'index']);
 
