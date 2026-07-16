@@ -131,7 +131,11 @@ class VeilleSeo extends Command
             if ($key = config('services.veille_seo.psi_key')) {
                 $params['key'] = $key;
             }
-            $resp = Http::timeout(90)->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', $params);
+            // Force la sortie en IPv4 : la clé PSI est restreinte à l'IPv4 publique du VPS
+            // (le VPS sortirait sinon en IPv6, refusé par la restriction d'IP de la clé).
+            $resp = Http::timeout(90)
+                ->withOptions(['force_ip_resolve' => 'v4'])
+                ->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', $params);
             if (! $resp->successful()) {
                 return null;
             }
