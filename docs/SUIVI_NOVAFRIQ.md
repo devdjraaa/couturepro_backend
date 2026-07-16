@@ -263,7 +263,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P7 | Bouton « Importer des contacts » (multi) | 1 | ✅ |
 | P8 | Clients « 0 commande » erroné | 1 | ✅ |
 | P9 | Recherche clients live (filtre au fil de la frappe) — vérifié device | 1 | ✅ |
-| P10 | Clic avatar client → modifier | 1 | 🟡 |
+| P10 | Clic avatar client → modifier | 1 | ✅ (QA device 1.0.57 : sheet « Modifier le client » s'ouvre) |
 | P11 | Export mesures depuis la fiche | 1 | ✅ |
 | P12 | Export WhatsApp / CSV | 1 | 🟡 (CSV ?) |
 | P13 | Ajout commande sans animation (noAnimation sur les pages de saisie) | 1 | ✅ |
@@ -288,8 +288,8 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P37 | Langue affiche EN au lieu de FR | 1 | ✅ |
 | P38 | Gamification : chaîne vérifiée (attribution au sync, config 1-2 pts/action tous plans, solde test 367 pts accumulés) — fonctionne | 1 | ✅ |
 | P39 | Visibilité des gains de points par action | 1 | ✅ (watcher global `usePointsToast` : toast « +X pts » + notif locale **une seule fois** quand le solde augmente ; points rafraîchis après sync — sobre, pas de bruit) |
-| P40 | Meilleur affichage des points | 1 | 🟡 |
-| P41 | Badge auto au changement de niveau | 1 | 🟡 |
+| P40 | Meilleur affichage des points | 1 | ✅ (QA device : carte points riche — solde, badge Bronze, progression vers Argent, historique) |
+| P41 | Badge auto au changement de niveau | 1 | ✅ (QA device : badge de niveau + barre de progression affichés) |
 | P42 | Notifs commande même app fermée | 7 | ✅ |
 | P43 | Notifs seulement à l'ouverture | 7 | ✅ |
 | P44 | Galerie photos annoncée absente | 1 | ✅ (existe) |
