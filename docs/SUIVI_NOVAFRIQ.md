@@ -36,13 +36,13 @@ valider par la direction avant de lancer les corrections.
 | 12 | ~~Connexion sociale~~ ✅ **Google actif (web + natif)** — Facebook abandonné (décision), Apple différé iOS | ✅ | 1 | V1-P150 |
 | 13 | ~~**Photos dans les avis** clients~~ ✅ **fait** (upload ≤3 photos + affichage vitrine) | ✅ | 1 | V1-P137 |
 | 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
-| 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
-| 16 | **Veille technique SEO hebdo** — ✅ livrée : `veille:seo` (PSI mobile+desktop, HTTPS, dispo, alertes, 2 sites), lundi 7h. 🟡 Search Console API (OAuth à configurer) ; e-mail : définir `VEILLE_SEO_EMAIL` | 🟡 | 2 | V1-P200 |
-| 17 | **Migration Cloudflare** (NS Namecheap → SSL/DDoS/DNSSEC) + **Search Console/Bing/sitemap** | ⬜ | 6 | V1-P197, P199 |
+| 15 | **Protection anti-robot** — ✅ reCAPTCHA v3 ACTIF (clés posées, middleware serveur, badge web, app OTA) | ✅ | 6 | V1-P196 |
+| 16 | **Veille technique SEO hebdo** — ✅ COMPLÈTE : clé PSI + fix IPv4 (scores réels), e-mail direction@novafriq.africa, lundi 7h | ✅ | 2 | V1-P200 |
+| 17 | **Cloudflare** ✅ migré (novafriq.africa actif/protégé ; DNSSEC indispo .africa) + **sitemaps/robots ✅ live** ; restent proxy phase 2 + soumission Search Console | 🟡 | 6 | V1-P197, P199 |
 | 18 | **Sauvegardes VPS** — ✅ quotidiennes **chiffrées AES-256** + ✅ **off-site Backblaze B2** (rclone, testé bout-en-bout) + ✅ **test restore mensuel** auto (61 tables/7 ateliers) + rotation 7j local/30j B2 + alerte. (Spec sécu mobile v5 = doc séparé) | ✅ | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
 | 20 | **Format numéro de reçu** — ✅ majuscules + tirets automatiques livrés | ✅ | 1 | V1-P144 |
-| 21 | ~~e-mail `support@gextimo.africa` erroné (FAQ)~~ ✅ **corrigé** → `support@gextimo.app` | ✅ | 5 | V1-P189 |
+| 21 | ~~e-mails erronés (gextimo.africa/.app/couturepro/gextimo.com)~~ ✅ **corrigés partout** → `*.gextimo@novafriq.africa` (9 alias officiels) | ✅ | 5 | V1-P189 |
 
 > Beaucoup d'autres bugs signalés (⚠️) portent sur du code **existant** (multi-ateliers, OTP, gel de
 > compte, WhatsApp) → voir annexes, à **re-tester** dans l'app avant correction.
@@ -54,12 +54,12 @@ valider par la direction avant de lancer les corrections.
 | Bloc | Domaine | Priorité | État résumé |
 |---|---|---|---|
 | **1** | Backlog produit Gextimo (requêtes antérieures) | 🔴 | Majorité **faite** ; restent des bugs ⚠️ (multi-ateliers, OTP) + features vitrine/créateur ⬜ |
-| **2** | Veille auto (SEO/technique) | 🟡 | ✅ `veille:seo` hebdo livrée (PSI+HTTPS+dispo, 2 sites) ; reste Search Console + destinataire e-mail |
+| **2** | Veille auto (SEO/technique) | ✅ | `veille:seo` hebdo complète (PSI clé+IPv4, HTTPS, dispo, e-mail direction@) |
 | **3** | Volet APK Admin | 🟢 | Codes promo ✅, dashboard temps réel ✅, gel/dégel ✅ (re-testé), diagnostic ✅ |
-| **4** | Gestion VPS | 🟡 | Durcissement ✅ ; sauvegardes quotidiennes locales ✅ ; off-site ⬜ (destination) |
+| **4** | Gestion VPS | ✅ | Durcissement ✅ ; sauvegardes chiffrées AES-256 + off-site B2 ✅ + test restore mensuel ✅ ; cron réparé |
 | **5** | Gestion mailing | 🟢 | Brevo transactionnel ✅ (noreply.gextimo@novafriq.africa, inbox testé 16/07) ; 9 alias validés direction ✅ ; répartition forwarders 🟡 |
-| **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ✅, header/SEO/Cloudflare ⬜, lancement commun |
-| **7** | Updates Gextimo (release/OTA) | ✅ | Système complet livré ; FCM + PWA ⬜ |
+| **6** | Gestion NovAfriq (site mère) | 🟡 | ✅ novafriq.africa EN LIGNE (deploy auto) ; Cloudflare migré ✅ ; reCAPTCHA/sitemaps ✅ ; restent menus header vitrine (P180-184) + soumission Search Console |
+| **7** | Updates Gextimo (release/OTA) | ✅ | Système complet livré ; FCM ✅ ; PWA ✅ |
 
 ---
 
@@ -72,7 +72,7 @@ valider par la direction avant de lancer les corrections.
 - ✅ « novafrique » → « novafriq » (footer/Qui sommes-nous, master) — V1-P127/188.
 - ✅ Indicateur langue affiche bien la langue **courante** (FR en FR) — V1-P37.
 - ⬜ Menus header Solutions/Tarifs/Documentation — V1-P181-184 ; ⬜ barre contact — V1-P180.
-- ✅ PWA livrée (manifest + SW + bannière, web only) — V1-P186 ; ⬜ reCAPTCHA — V1-P196.
+- ✅ PWA livrée (manifest + SW + bannière, web only) — V1-P186 ; ✅ reCAPTCHA v3 actif — V1-P196.
 - 🟡 Pages légales : renommer Mentions→CGU, page unique, CGV complètes, footer confidentialité — V1-P138-142.
 - 🟡 Localisation pays/devise auto + message — V1-P135 ; 🟡 phrases d'accroche — V1-P192/193.
 - ✅ Bannière profil (photo/GIF/vidéo) — V1-P134 (upload Ma Vitrine + couverture vitrine, QA device OK) ; ✅ profil s'ouvre en haut (P133, master).
