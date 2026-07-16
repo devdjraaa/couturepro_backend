@@ -56,6 +56,11 @@ return [
         'clarity_id'    => env('CLARITY_ID'),
     ],
 
+    // Jeton partagé n8n → API (ingestion des résultats de veille).
+    'veille_ingest' => [
+        'token' => env('VEILLE_INGEST_TOKEN'),
+    ],
+
     // Mini-IA locale (Ollama sur le VPS) : 2e étage du chatbot (questions hors intentions)
     // + réutilisable ailleurs. Si injoignable (ex. poste local), repli silencieux sur le
     // message fallback classique — le chatbot ne casse jamais.

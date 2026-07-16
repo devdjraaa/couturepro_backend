@@ -44,6 +44,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('chatbot/contexte', [ChatbotAdminController::class, 'contexte']);
     Route::put('chatbot/contexte', [ChatbotAdminController::class, 'setContexte']);
 
+    // Veille opportunités (n8n) : consultation des résultats hebdo dans l'admin.
+    Route::get('veille', [\App\Http\Controllers\Api\VeilleController::class, 'index']);
+
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);
     Route::post('signalements/{signalement}/traiter', [SignalementController::class, 'traiter']);

@@ -96,6 +96,9 @@ Route::prefix('vitrine')->group(function () {
 // ─── Tracking métier vitrine (P202 Phase 3) : ingestion groupée, connecté ou anonyme ───
 Route::post('vitrine/evenements', [GxtEvenementController::class, 'ingest'])->middleware('throttle:60,1');
 
+// ─── Veille n8n : dépôt des résultats hebdo (jeton partagé X-Veille-Token) ───
+Route::post('veille/ingest', [\App\Http\Controllers\Api\VeilleController::class, 'ingest'])->middleware('throttle:10,1');
+
 // ─── Chatbot vitrine (brief 16/07 pt 1) : assistance + mémoire des échanges ───
 Route::prefix('vitrine/chatbot')->group(function () {
     Route::post('message',    [ChatbotController::class, 'message'])->middleware('throttle:20,1');
