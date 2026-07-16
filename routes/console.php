@@ -30,3 +30,6 @@ Schedule::command('veille:seo')->weeklyOn(1, '07:00');
 // Recalcul nocturne des synthèses client (engagement/segment/RFM/CLV) et designer
 // (score de confiance, revenus/prédiction) à partir de gxt_evenements + commandes.
 Schedule::command('gxt:recalculer-metrics')->dailyAt('02:30');
+
+// Brief 16/07 (pts 3+6) : vœux d'anniversaire aux clients vitrine (message discret, Brevo).
+Schedule::command('gxt:anniversaires')->dailyAt('08:00');

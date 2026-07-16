@@ -82,6 +82,8 @@ Route::prefix('vitrine')->group(function () {
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
     Route::post('signaler',                      [SignalementController::class, 'store']);
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
+    // Brief 16/07 (pt 6) : habillage saisonnier local (overlay d'ouverture, config admin).
+    Route::get('splash-theme',                   [VitrineController::class, 'splashTheme']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
     // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)
@@ -101,6 +103,7 @@ Route::prefix('vitrine/client')->group(function () {
 
     Route::middleware(['auth:sanctum', 'account:client'])->group(function () {
         Route::get('me',            [ClientAuthController::class, 'me']);
+        Route::patch('me',          [ClientAuthController::class, 'majProfil']); // brief 16/07 pt 3
         Route::post('consentement', [ClientAuthController::class, 'consentement']);
         Route::post('logout',       [ClientAuthController::class, 'logout']);
 

@@ -180,6 +180,41 @@ class VitrineController extends Controller
         return response()->json($b ?: ['actif' => false]);
     }
 
+    /**
+     * GET /api/vitrine/splash-theme — thème saisonnier ACTIF aujourd'hui (brief 16/07 point 6).
+     * Habillage local (Ramadan, fêtes…) : overlay de 2-3 s à l'ouverture, configuré par l'admin
+     * (périodes datées, visuels vérifiés béninois). Vide = pas d'overlay.
+     */
+    public function splashTheme(): JsonResponse
+    {
+        $themes = VitrineSetting::where('cle', 'splash_themes')->value('valeur') ?: [];
+        $today = now()->toDateString();
+
+        $actif = collect($themes)->first(fn ($t) => ($t['actif'] ?? false)
+            && ($t['date_debut'] ?? '9999') <= $today
+            && ($t['date_fin'] ?? '0000') >= $today);
+
+        return response()->json($actif ?: ['actif' => false]);
+    }
+
+    /** PUT /api/admin/vitrine/splash-themes — liste des périodes thématiques (admin). */
+    public function setSplashThemes(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'themes'                => ['required', 'array', 'max:20'],
+            'themes.*.nom'          => ['required', 'string', 'max:60'],
+            'themes.*.actif'        => ['required', 'boolean'],
+            'themes.*.image_url'    => ['nullable', 'string', 'max:500'],
+            'themes.*.texte'        => ['nullable', 'string', 'max:150'],
+            'themes.*.date_debut'   => ['required', 'date_format:Y-m-d'],
+            'themes.*.date_fin'     => ['required', 'date_format:Y-m-d', 'after_or_equal:themes.*.date_debut'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'splash_themes'], ['valeur' => $data['themes']]);
+
+        return response()->json($s->valeur);
+    }
+
     /** PUT /api/admin/vitrine/banniere — édition (admin). */
     public function setBanniere(Request $request): JsonResponse
     {
@@ -233,6 +268,23 @@ class VitrineController extends Controller
      */
     public function creations(): JsonResponse
     {
+        // Reco v1 (brief 16/07 point 4) : si un client vitrine est connecté, ses designers
+        // « favoris » (déduits de SES événements : vues, likes, paniers, commandes) remontent
+        // en tête de galerie. Anonyme = ordre chronologique inchangé.
+        $ateliersFavoris = [];
+        $user = auth('sanctum')->user();
+        if ($user instanceof \App\Models\GxtClient) {
+            $ateliersFavoris = \Illuminate\Support\Facades\DB::table('gxt_evenements')
+                ->where('gxt_client_id', $user->id)
+                ->whereNotNull('atelier_id')
+                ->selectRaw('atelier_id, count(*) as n')
+                ->groupBy('atelier_id')
+                ->orderByDesc('n')
+                ->limit(5)
+                ->pluck('atelier_id')
+                ->all();
+        }
+
         $creations = Vetement::query()
             ->where('is_archived', false)
             ->where('publie_vitrine', true)
@@ -241,6 +293,8 @@ class VitrineController extends Controller
             ->latest()
             ->limit(24)
             ->get()
+            ->sortBy(fn ($v) => [array_search($v->atelier_id, $ateliersFavoris) === false ? 99 : array_search($v->atelier_id, $ateliersFavoris), 0])
+            ->values()
             ->map(fn ($v) => [
                 'id'          => (string) $v->id,
                 'titre'       => $v->nom,

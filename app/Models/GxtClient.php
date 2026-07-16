@@ -21,10 +21,11 @@ class GxtClient extends Authenticatable
         'nom', 'prenom', 'email', 'telephone_whatsapp', 'google_id',
         'utm_source', 'utm_medium', 'utm_campaign', 'referrer_url',
         'appareil', 'systeme_os', 'navigateur', 'pays', 'ville', 'langue',
-        'derniere_connexion_at',
+        'date_naissance', 'derniere_connexion_at',
     ];
 
     protected $casts = [
+        'date_naissance'        => 'date',
         'derniere_connexion_at' => 'datetime',
     ];
 

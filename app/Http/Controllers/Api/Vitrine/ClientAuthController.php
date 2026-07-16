@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Vitrine;
 
 use App\Http\Controllers\Controller;
 use App\Models\GxtClient;
-use App\Models\GxtConsent;
 use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -90,6 +89,24 @@ class ClientAuthController extends Controller
             'client'       => $client,
             'consentement' => $client->dernierConsentement,
         ]);
+    }
+
+    /** PATCH /vitrine/client/me — profil basique (brief 16/07 : personnalisation + anniversaire). */
+    public function majProfil(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'nom'                => ['nullable', 'string', 'max:100'],
+            'prenom'             => ['nullable', 'string', 'max:100'],
+            'telephone_whatsapp' => ['nullable', 'string', 'max:25'],
+            'ville'              => ['nullable', 'string', 'max:60'],
+            'date_naissance'     => ['nullable', 'date', 'before:today'],
+        ]);
+
+        $client = $request->user();
+        $client->fill(array_filter($data, fn ($v) => $v !== null));
+        $client->save();
+
+        return response()->json(['client' => $client]);
     }
 
     /** Enregistre/actualise le consentement APDP (interrupteur du tracking). */
