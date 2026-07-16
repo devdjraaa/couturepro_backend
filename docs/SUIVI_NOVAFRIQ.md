@@ -33,7 +33,7 @@ valider par la direction avant de lancer les corrections.
 | 9 | ~~Badges / Mérites (6 catégories × 5 niveaux)~~ ✅ **fait** (config + service + vitrine) | ✅ | 1 | V1-P174-176 |
 | 10 | ~~Profil créateur public (4 compteurs, date intelligente, s'abonner)~~ ✅ **fait** (pseudo = nom public, décidé) | ✅ | 1 | V1-P170-173 |
 | 11 | ~~Téléchargement de patrons payants (récup par code)~~ ✅ **fait & testé sandbox** (FedaPay) | ✅ | 1 | V1-P161-163 |
-| 12 | **Connexion sociale** Google / Facebook / Apple | ⬜ | 1 | V1-P150 |
+| 12 | **Connexion sociale** — 🟡 **Google ACTIF en prod** (testé : 302 accounts.google.com) ; Facebook = clés gratuites à créer ; Apple = Developer Program 99$/an (pour iOS plus tard) | 🟡 | 1 | V1-P150 |
 | 13 | ~~**Photos dans les avis** clients~~ ✅ **fait** (upload ≤3 photos + affichage vitrine) | ✅ | 1 | V1-P137 |
 | 14 | **PWA** — ✅ livrée : manifest + SW conservateur (jamais de site périmé) + bannière d'installation (web only, OTA Capgo intact) | ✅ | 7 | V1-P186 |
 | 15 | **Protection anti-robot** (reCAPTCHA v3 / hCaptcha) sur l'inscription | ⬜ | 6 | V1-P196 |
@@ -137,7 +137,7 @@ valider par la direction avant de lancer les corrections.
   normalisation téléphone (migration dédiée) — V1-P66/67 (front à confirmer).
 - ✅ SMS abandonné (décision chef) : OTP **e-mail uniquement** ; bouton « Renvoyer l'OTP » (V1-P147) ; OTP sur e-mail
   ✅ e-mail fictif débloqué : « E-mail incorrect ? Corrigez-le » sur la page OTP (tél + mdp → correction + renvoi, V1-P123). Format récup OK (V1-P124). ✅ Double œil corrigé (P148).
-- ⬜ Connexion sociale Google/FB/Apple — V1-P150.
+- 🟡 Connexion sociale — Google ACTIF en prod ; Facebook/Apple en attente de clés — V1-P150.
 
 ### 1.5 Abonnements / plans
 - ✅ Onglets Mensuel/Annuel (vitrine `PremiumPage`) — SUG-22/V1-P22 (app `AbonnementTab` à confirmer).
@@ -355,7 +355,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P157 | Import contacts gratuit pour tous — vérifié : aucun verrou de plan (front ni back) | 1 | ✅ |
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
-| P150 | Connexion Google/Facebook/Apple | 1 | ⬜ |
+| P150 | Connexion Google/Facebook/Apple | 1 | 🟡 (**Google ACTIF en prod** : Socialite + boutons conditionnels + callback, testé 302 ; Facebook = clés gratuites à créer ; Apple = 99$/an, différé iOS) |
 | P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
