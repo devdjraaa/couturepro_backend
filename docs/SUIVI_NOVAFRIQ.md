@@ -23,7 +23,7 @@ valider par la direction avant de lancer les corrections.
 | # | Sujet | Statut | Bloc | Réf |
 |---|---|---|---|---|
 | 1 | **Codes promo / ambassadeurs** — ✅ **LIVRÉ & testé prod** : table + API rate-limitée (1×/tél, expiry, anti-course), panel admin, saisie app, GEXT-AMB-001→010 seedés (+17 j au restant, P155 vérifié 365→382) ; P156 mode gratuit ✅ aussi | ✅ | 1/3 | V1-P1, P153-158 |
-| 2 | **Dashboard admin temps réel** — ✅ auto-refresh + bouton Actualiser + **fréquence au choix P95** (temps réel 10s/30s/1min/manuel, persistée) + **heure de dernière MAJ P98** ; 🟡 restent graphiques avancés + vue multi-ateliers P100-103 | 🟡 | 3 | V1-P92-103 |
+| 2 | ~~Dashboard temps réel~~ ✅ **fait** : fréquence au choix (P95), heure MAJ (P98), **vue multi-ateliers consolidée + comparaison (P100-101)**, cache serveur 60s (P102-103) ; graphiques avancés = plus tard | ✅ | 3 | V1-P92-103 |
 | 3 | Slogan du logo à l'impératif « Créez, Gérez, Rayonnez » (le logo login avait « Créer ») | ✅ | 1 | SUG-2 |
 | 4 | ~~« novafrique » → « novafriq »~~ ✅ **corrigé** | ✅ | 6 | V1-P127, P188 |
 | 5 | ~~Page inscription en anglais malgré l'indicateur FR~~ ✅ **résolu** : audit code — `i18n.js` démarre en `fr` par défaut (`lng: cp_lang \|\| 'fr'`, `fallbackLng: 'fr'`), toutes les clés `auth.inscription.*` présentes et traduites en fr.json ; l'indicateur était déjà corrigé | ✅ | 1 | V1-P145 |
@@ -314,7 +314,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P78-81 | WhatsApp preuve de paiement : PDF auto + partage natif (déjà OK) + toast « génération en cours » (P81) | 1 | ✅ |
 | P82-91 | Module facturation par plan + modèles + preview | 1 | ✅/🟡 |
 | P92-95 | Dashboard admin : auto-refresh 30s + bouton Actualiser | 3 | ✅ |
-| P96-103 | Dashboard admin : delta/graphiques/filtres avancés | 3 | ⬜ |
+| P96-103 | Dashboard : bouton refresh (P96), rechargement ciblé react-query (P97), vue multi-ateliers + comparaison (P100-101), cache 60s (P102-103) | 3 | ✅ (graphiques avancés P99 = plus tard) |
 | P104-106 | Permissions au changement de plan — snapshot régénéré au sync + à l'activation ; immédiateté UI/P106 à re-tester | 1 | 🟡 |
 | P107 | Transitions d'écran plus fluides | 1 | 🟡 |
 | P108 | Skeleton loaders | 1 | ✅ |
