@@ -525,7 +525,8 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 **Ajouts fin de session** :
 - **Downgrade option A** (P53-55) : différé à l'échéance, annulable, testé prod.
 - **P115** : indicateur « modifications en attente de synchronisation » (SyncContext + bouton réseau), OTA 1.0.64.
-- **P202 (espace client) / P204 (partenaires)** : les **documents maîtres détaillés ne sont PAS dans le repo** (transmis à Markus/Aquilas) → non implémentables « telles quelles » sans eux. Déjà en place de P202 : connexion Google + OTP (P150), avis clients, bandeau cookies. Le reste (tracking comportemental, scores d'engagement, segmentation, CLV, Meta Pixel, Clarity, e-mails comportementaux, dashboard analytics) nécessite le doc + des clés externes (Meta/Clarity).
+- **P204 (Partenaires) ✅ LIVRÉ** (Document Maître reçu 16/07) : page `/partenaires` (liste par catégorie + modale de candidature), lien footer, bandeau accueil défilant (auto, boutons → /partenaires), admin CRUD + candidatures, e-mails confirmation/alerte SANS document contractuel auto. Catégories éditables (`config/partenaires.php`) — les 12 définitives du doc maître (Partie 2) à y reporter ; mentions pied de page laissées optionnelles (point ouvert du doc).
+- **P202 (espace client)** : le **document détaillé n'est PAS dans le repo** → non implémentable « telle quelle » sans lui. Déjà en place : connexion Google + OTP (P150), avis clients, bandeau cookies. Le reste (tracking comportemental, scores, segmentation, CLV, Meta Pixel, Clarity, e-mails comportementaux, dashboard analytics) nécessite le doc + clés externes (Meta/Clarity).
 
 **Restants (mis de côté — hors de mon contrôle)** :
 - **Clés/accès externes** : P196 reCAPTCHA, P197 Cloudflare, P198 Brevo, P199 Search Console, P200 (clé PSI + e-mail veille), P203 (destination off-site).
