@@ -164,9 +164,13 @@ valider par la direction avant de lancer les corrections.
   prix, crédit, à payer, nouvelle échéance) ; points de fidélité jamais retirés ; exemple de la spec
   validé (8 129 / 21 871) + testé en prod. Correctif au passage : `prix_mensuel_equivalent_xof` restés
   aux anciens tarifs (→ 2500/2083/5000/4167).
-- ⚠️ **Downgrade à trancher (rappel P53-55)** : en cas de passage vers un plan MOINS cher (ex. Studio
-  annuel → Studio mensuel), le crédit est plafonné au prix du nouveau plan → l'excédent de valeur est
-  perdu. La spec ne couvre que les upgrades ; comportement downgrade à définir par la direction.
+- ✅ **Downgrade — option A retenue (direction) & livrée** : le plan inférieur choisi s'applique
+  automatiquement à l'échéance du plan courant (rien à payer, plan actuel gardé jusqu'au bout,
+  **annulable** avant). Backend : `abonnements.downgrade_vers_cle` + `PaymentService::appliquerEcheance`
+  (downgrade date-à-date sinon expiration) + endpoints programmer/annuler + commande horaire
+  `abonnements:appliquer-echeances` ; front : détection auto upgrade vs downgrade, confirmation,
+  bandeau + annulation. **Testé sur le code prod** (transaction annulée). Refuse un downgrade vers un
+  plan plus cher (→ upgrade payant). Données au rétrécissement des quotas : cf. `docs/PROPOSITION_DOWNGRADE.md`.
 
 #### ✅ Fonctionnalités promises dans les plans — LIVRÉES (16/07/2026)
 > Vendues sur les cartes officielles mais **absentes du code** (audit 16/07/2026). Choix direction :
@@ -517,6 +521,11 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 - **Outils Créatifs** refondus (4 outils distincts + PDF fiche technique).
 - **Corrections** : P48 (abonnement couvre tous les ateliers du proprio), P66 (saisie tél), P152 (bibliothèque photos catégorisée), P189 (e-mail support), P46/SUG-23 (cartes d'abonnement valorisées).
 - **Vérifiés faits** : P21, P28, P49, P50, P51, P58, P104, P107, P167, SUG-1.
+
+**Ajouts fin de session** :
+- **Downgrade option A** (P53-55) : différé à l'échéance, annulable, testé prod.
+- **P115** : indicateur « modifications en attente de synchronisation » (SyncContext + bouton réseau), OTA 1.0.64.
+- **P202 (espace client) / P204 (partenaires)** : les **documents maîtres détaillés ne sont PAS dans le repo** (transmis à Markus/Aquilas) → non implémentables « telles quelles » sans eux. Déjà en place de P202 : connexion Google + OTP (P150), avis clients, bandeau cookies. Le reste (tracking comportemental, scores d'engagement, segmentation, CLV, Meta Pixel, Clarity, e-mails comportementaux, dashboard analytics) nécessite le doc + des clés externes (Meta/Clarity).
 
 **Restants (mis de côté — hors de mon contrôle)** :
 - **Clés/accès externes** : P196 reCAPTCHA, P197 Cloudflare, P198 Brevo, P199 Search Console, P200 (clé PSI + e-mail veille), P203 (destination off-site).
