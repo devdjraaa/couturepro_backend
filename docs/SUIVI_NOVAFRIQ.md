@@ -2,7 +2,7 @@
 
 > **Fichier de suivi maître.** NovAfriq est la maison-mère ; **Gextimo** est un de ses produits.
 > Ce document remplace `roadmap.md` (périmé). Organisé par les **7 blocs** définis par la direction.
-> Dernière mise à jour : **13 juillet 2026**.
+> Dernière mise à jour : **16 juillet 2026**.
 
 **Légende des statuts** — ✅ Fait (vérifié dans le code) · 🟡 Partiel / à peaufiner · ⬜ À faire
 (absent après recherche) · ⚠️ Bug confirmé (présent mais défectueux, à re-tester) · 🔵 Spec fournie à
@@ -42,7 +42,7 @@ valider par la direction avant de lancer les corrections.
 | 18 | **Sauvegardes VPS** — ✅ quotidiennes locales (pg_dump + storage, 3h30, rotation 7 j, intégrité vérifiée) ; ⬜ off-site (destination à choisir) + chiffrement + test restore mensuel | 🟡 | 4 | V1-P203 |
 | 19 | ~~Push FCM (notifs même app fermée)~~ ✅ **fait** (HTTP v1 + observer) | ✅ | 7 | V1-P42-43, P168 |
 | 20 | **Format numéro de reçu** — ✅ majuscules + tirets automatiques livrés | ✅ | 1 | V1-P144 |
-| 21 | **e-mail `support@gextimo.africa`** erroné (FAQ) → mettre la bonne adresse | ⬜ | 5 | V1-P189 |
+| 21 | ~~e-mail `support@gextimo.africa` erroné (FAQ)~~ ✅ **corrigé** → `support@gextimo.app` | ✅ | 5 | V1-P189 |
 
 > Beaucoup d'autres bugs signalés (⚠️) portent sur du code **existant** (multi-ateliers, OTP, gel de
 > compte, WhatsApp) → voir annexes, à **re-tester** dans l'app avant correction.
@@ -506,3 +506,22 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 ---
 
 *Ce fichier remplace `roadmap.md`. Il est évolutif : mettre à jour les statuts au fil des corrections.*
+
+---
+
+## Journal — Session 16/07/2026 (features de plan + finitions)
+
+**Livré & déployé (prod + OTA)** :
+- **Plans Gratuit** : logique définitive (5 publications/période, 10 clients distincts facturés/période) ; **upgrade avec crédit prorata** (base 31 j, date-à-date, récap avant paiement) ; **essai « accès complet »** designer→Studio ; **prix_mensuel_equivalent** corrigés.
+- **PL-1..10 (toutes les fonctionnalités promises des plans)** : Lookbook PDF, Export groupé mesures, Rapport mensuel par cliente, Liste d'attente (page Studio), Simulateur de revenus, Annonce de collection, Vidéos de présentation (≤50), Badge Designer Pro, Fidélité avancé (paliers), Sauvegarde cloud par atelier cadencée.
+- **Outils Créatifs** refondus (4 outils distincts + PDF fiche technique).
+- **Corrections** : P48 (abonnement couvre tous les ateliers du proprio), P66 (saisie tél), P152 (bibliothèque photos catégorisée), P189 (e-mail support), P46/SUG-23 (cartes d'abonnement valorisées).
+- **Vérifiés faits** : P21, P28, P49, P50, P51, P58, P104, P107, P167, SUG-1.
+
+**Restants (mis de côté — hors de mon contrôle)** :
+- **Clés/accès externes** : P196 reCAPTCHA, P197 Cloudflare, P198 Brevo, P199 Search Console, P200 (clé PSI + e-mail veille), P203 (destination off-site).
+- **Décisions direction** : P53-55 downgrade (proposition fournie), P165 paiement 2 phases, P146 OTP SMS (SMS abandonné).
+- **Specs à suivre telles quelles** : P202 espace client, P204 partenaires.
+- **Infra sync offline (android, en cours)** : P109, P114, P115-117, P118.
+- **Vitrine (confié au frontend, cf. VITRINE_TODO_FRONTEND.md)** : P180, P181-184.
+- **Revue UX transversale** : SUG-24.
