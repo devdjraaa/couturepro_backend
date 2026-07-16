@@ -57,7 +57,7 @@ valider par la direction avant de lancer les corrections.
 | **2** | Veille auto (SEO/technique) | 🟡 | ✅ `veille:seo` hebdo livrée (PSI+HTTPS+dispo, 2 sites) ; reste Search Console + destinataire e-mail |
 | **3** | Volet APK Admin | 🟢 | Codes promo ✅, dashboard temps réel ✅, gel/dégel ✅ (re-testé), diagnostic ✅ |
 | **4** | Gestion VPS | 🟡 | Durcissement ✅ ; sauvegardes quotidiennes locales ✅ ; off-site ⬜ (destination) |
-| **5** | Gestion mailing | 🟡 | Archi + queue ✅ ; Brevo/délivrabilité + adresses ⬜ |
+| **5** | Gestion mailing | 🟢 | Brevo transactionnel ✅ (noreply.gextimo@novafriq.africa, inbox testé 16/07) ; 9 alias validés direction ✅ ; répartition forwarders 🟡 |
 | **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ✅, header/SEO/Cloudflare ⬜, lancement commun |
 | **7** | Updates Gextimo (release/OTA) | ✅ | Système complet livré ; FCM + PWA ⬜ |
 
@@ -266,10 +266,14 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 
 ## Bloc 5 — Gestion mailing
 
-- ✅ Architecture e-mails NovAfriq (boîte 10 Go + aliases + forwarders Gmail) documentée ; worker queue
-  OTP/notifs opérationnel (Gmail SMTP app-password).
-- ⬜/🟡 **Brevo** : domaine `novafriq.africa` validé, adresse d'envoi, délivrabilité (pas en spam) — V1-P198.
-- ⬜ Adresses officielles (remplacer `support@gextimo.africa` erroné) — V1-P189.
+- ✅ Architecture e-mails NovAfriq documentée (`docs/PLAN_MESSAGERIE_NOVAFRIQ.md`, Option B — tout sur
+  `@novafriq.africa`, 9 alias validés par la direction le 16/07) ; worker queue OTP/notifs opérationnel.
+- ✅ **Brevo** (V1-P198) : domaine `novafriq.africa` **authentifié** (DKIM Brevo dans Cloudflare), envoi
+  transactionnel via `noreply.gextimo@novafriq.africa` — **testé, arrive en boîte de réception** (16/07).
+  Remplace l'ancien `noreply@gextimo.com` envoyé depuis un Gmail perso (mauvais domaine + spam).
+- ✅ Adresses officielles corrigées (V1-P189) : `gextimo.app` / `couturepro.com` / `gextimo.com` erronés
+  → `*.gextimo@novafriq.africa` (front master + android + configs backend). ✅ `support.gextimo@` opérationnel
+  (réception + « envoyer en tant que » via SMTP Hostinger). 🟡 Reste : 7 forwarders à créer (fait par le boss).
 
 ---
 
@@ -438,11 +442,11 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P193 | Phrase « né en Afrique, pour le monde » | 6 | 🟡 |
 | P194 | Logo à gauche / bouton connexion à droite | 6 | 🟡 |
 | P195 | Bloquer overscroll/pull-to-refresh (desktop) | 6 | ✅ |
-| P196 | Anti-robot (reCAPTCHA v3 / hCaptcha) | 6 | ⬜ |
-| P197 | Migration Cloudflare (NS Namecheap) | 6 | ⬜ |
-| P198 | Config Brevo (domaine, from, spam) | 5 | ⬜/🟡 |
-| P199 | Search Console + Bing + sitemap.xml | 6 | ⬜ |
-| P200 | Veille technique SEO hebdo (2 sites) | 2 | ⬜ |
+| P196 | Anti-robot (reCAPTCHA v3 / hCaptcha) | 6 | ✅ (v3 actif, clés posées) |
+| P197 | Migration Cloudflare (NS Namecheap) | 6 | ✅ migré ; proxy/SSL phase 2 🟡 |
+| P198 | Config Brevo (domaine, from, spam) | 5 | ✅ authentifié + testé inbox |
+| P199 | Search Console + Bing + sitemap.xml | 6 | 🟡 (sitemaps + fichier vérif prêts ; soumission à finir) |
+| P200 | Veille technique SEO hebdo (2 sites) | 2 | ✅ (PSI + HTTPS + e-mail, déployé) |
 | P201 | Alerte inscription + messages bienvenue/retour | 5 | 🟡 (dit fait) |
 | P202 | Spec « espace client » (à suivre telle quelle) | 1 | 🔵 |
 | P203 | Spec sécurité mobile v5 + sauvegardes VPS | 4 | 🔵/⬜ |
@@ -529,7 +533,9 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 - **P202 (espace client)** : le **document détaillé n'est PAS dans le repo** → non implémentable « telle quelle » sans lui. Déjà en place : connexion Google + OTP (P150), avis clients, bandeau cookies. Le reste (tracking comportemental, scores, segmentation, CLV, Meta Pixel, Clarity, e-mails comportementaux, dashboard analytics) nécessite le doc + clés externes (Meta/Clarity).
 
 **Restants (mis de côté — hors de mon contrôle)** :
-- **Clés/accès externes** : P196 reCAPTCHA, P197 Cloudflare, P198 Brevo, P199 Search Console, P200 (clé PSI + e-mail veille), P203 (destination off-site).
+- **Clés/accès externes** : ✅ FAITS cette session — P196 reCAPTCHA, P197 Cloudflare (migré), P198 Brevo
+  (authentifié + testé), P200 veille (clé PSI + e-mail), P203 sauvegardes off-site chiffrées (B2 + test
+  restore mensuel). **Restant** : 🟡 P199 (soumission Search Console + sitemap.xml, en cours côté boss).
 - **Décisions direction** : P53-55 downgrade (proposition fournie), P165 paiement 2 phases, P146 OTP SMS (SMS abandonné).
 - **Specs à suivre telles quelles** : P202 espace client, P204 partenaires.
 - **Infra sync offline (android, en cours)** : P109, P114, P115-117, P118.

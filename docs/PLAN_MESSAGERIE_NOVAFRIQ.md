@@ -136,12 +136,11 @@ Dans chaque Gmail concerné : **Paramètres → Comptes et importation → « En
 dans Gmail.
 
 ## 7bis. Courrier automatique de l'app (`noreply.gextimo@`)
-> 🚨 **FINDING 16/07 — à corriger** : aujourd'hui le VPS envoie les OTP/notifs via **le Gmail
-> `kounoumarcus@gmail.com`** avec `MAIL_FROM_ADDRESS="noreply@gextimo.com"` — un **domaine qu'on ne
-> possède pas** (`gextimo.com`). C'est une cause probable de spam. **Solution durable = Brevo** ci-dessous,
-> expéditeur `noreply.gextimo@novafriq.africa` (SPF/DKIM Brevo dans Cloudflare). ⚠️ NE PAS juste changer
-> le `From` en `…@novafriq.africa` tant qu'on envoie via Gmail : SPF/DKIM ne s'aligneraient pas (envoi
-> depuis les IP Google, pas Hostinger/Brevo) → pire délivrabilité.
+> ✅ **RÉSOLU le 16/07 — Brevo en production.** L'app envoie désormais ses OTP/notifs via **Brevo**
+> (`smtp-relay.brevo.com`, expéditeur `noreply.gextimo@novafriq.africa`), domaine **authentifié** (DKIM
+> Brevo dans Cloudflare). **Testé → arrive en boîte de réception** (plus de spam). Fini l'ancien
+> `noreply@gextimo.com` via le Gmail perso `kounoumarcus@gmail.com`. Sauvegarde `.env` conservée sur le
+> VPS (`.env.bak-brevo-*`) pour rollback. Plan Free = **300 e-mails/jour** (upgrade/SES si dépassé).
 
 Les e-mails **automatiques** (OTP, factures, reçus, notifications) **ne passent pas** par Hostinger
 (limite 1 000/jour). → **Service transactionnel dédié.**
