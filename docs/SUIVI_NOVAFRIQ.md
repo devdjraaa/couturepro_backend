@@ -203,7 +203,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 - ⬜ **Espace création de codes** d'activation/promo côté admin — V1-P1.
 - ⬜ **Dashboard admin temps réel** (auto-refresh configurable, bouton rafraîchir, delta, filtre atelier,
   perf multi-ateliers) — V1-P92-103.
-- ⬜ Outil de diagnostic admin (bugs, syncs échouées, lenteurs) — V1-P110-111.
+- ✅ Outil de diagnostic admin (queue/jobs échoués, base, stockage, dernières erreurs de log) — V1-P110-111.
 
 ---
 
@@ -319,7 +319,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P107 | Transitions d'écran plus fluides | 1 | 🟡 |
 | P108 | Skeleton loaders | 1 | ✅ |
 | P109 | Expérience mobile (petits écrans, réseau lent) | 1 | 🟡 |
-| P110-111 | Logs + outil de diagnostic admin | 3 | ⬜ |
+| P110-111 | Logs + outil de diagnostic admin | 3 | ✅ (page **Diagnostic** admin : queue/jobs échoués, base+taille, stockage, modules, **dernières erreurs de log** ; refresh 30s. Testé prod : a remonté d'emblée 5 jobs échoués + 17 erreurs) |
 | P112-113 | Erreurs techniques jamais brutes (messages i18n, 500 masqué) | 1 | ✅ |
 | P114 | Tâches longues en arrière-plan | 1 | 🟡 |
 | P115-117 | Offline / file de sync « en attente » | 1 | ✅/🟡 |
