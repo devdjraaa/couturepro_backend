@@ -48,6 +48,34 @@ class NiveauConfig extends Model
         return $typeAtelier === 'designer' ? 'master_mensuel' : 'standard_mensuel';
     }
 
+    /** Plan facturé à l'année (échéance de date à date : +1 an). */
+    public function estAnnuel(): bool
+    {
+        return (int) $this->duree_jours >= 360 && ! $this->estPermanent();
+    }
+
+    /** Plan « permanent » (gratuit — durée symbolique très longue, pas d'échéance réelle). */
+    public function estPermanent(): bool
+    {
+        return (int) $this->duree_jours >= 1000;
+    }
+
+    /**
+     * Échéance « de date à date » depuis $depuis (spec upgrade direction 16/07/2026) :
+     * mensuel → même jour du mois suivant, annuel → même date l'année suivante,
+     * jamais un nombre fixe de jours calendaires. Sans débordement de fin de mois.
+     */
+    public function prochaineEcheance(\Carbon\CarbonInterface $depuis): \Carbon\CarbonInterface
+    {
+        if ($this->estPermanent()) {
+            return $depuis->copy()->addDays((int) $this->duree_jours);
+        }
+
+        return $this->estAnnuel()
+            ? $depuis->copy()->addYearsNoOverflow(1)
+            : $depuis->copy()->addMonthsNoOverflow(1);
+    }
+
     // Relations
     public function abonnements(): HasMany
     {

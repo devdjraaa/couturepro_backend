@@ -62,6 +62,21 @@ class AbonnementController extends Controller
         return response()->json($plans);
     }
 
+    /**
+     * Récapitulatif AVANT paiement d'un changement de plan (spec upgrade 16/07/2026) :
+     * crédit prorata du temps restant (base 31 j), montant réel à payer, nouvelle
+     * échéance de date à date. À afficher tel quel côté app avant la validation.
+     */
+    public function upgradePreview(Request $request, PaymentService $paymentService): JsonResponse
+    {
+        $request->validate(['niveau_cle' => ['required', 'string', 'exists:niveaux_config,cle']]);
+
+        $atelier = $this->getAtelier($request);
+        $nouveau = NiveauConfig::where('cle', $request->niveau_cle)->where('is_actif', true)->firstOrFail();
+
+        return response()->json($paymentService->previewChangement($atelier, $nouveau));
+    }
+
     public function current(Request $request): JsonResponse
     {
         $atelier    = $this->getAtelier($request);

@@ -21,19 +21,74 @@ class PaymentService
         'fedapay' => FedaPayProvider::class,
     ];
 
+    /**
+     * Récapitulatif d'un changement/souscription de plan (spec upgrade, direction 16/07/2026).
+     * Crédit prorata du temps restant : base FIXE de 31 jours quel que soit le mois —
+     * crédit = jours_restants × (valeur mensuelle du plan actuel / 31), plancher 0 sur le
+     * montant. Les plans annuels utilisent leur équivalent mensuel (base 31 uniforme).
+     * L'essai et le plan gratuit n'ont pas de valeur financière → crédit 0.
+     */
+    public function previewChangement(Atelier $atelier, NiveauConfig $nouveau): array
+    {
+        $abonnement = Abonnement::where('atelier_id', $atelier->id)->first();
+        $actuel     = $abonnement?->niveau;
+
+        $actif = $abonnement
+            && $abonnement->statut === 'actif'
+            && $abonnement->timestamp_expiration?->isFuture();
+
+        $renouvellement = $actif && $actuel && $actuel->cle === $nouveau->cle;
+        $changement     = $actif && $actuel && $actuel->cle !== $nouveau->cle;
+
+        $joursRestants = $actif
+            ? (int) ceil(now()->diffInMinutes($abonnement->timestamp_expiration, false) / 1440)
+            : 0;
+
+        $credit = 0;
+        if ($changement && ! $actuel->estPermanent() && (int) $actuel->prix_xof > 0) {
+            $valeurMensuelle = (float) ($actuel->prix_mensuel_equivalent_xof ?: $actuel->prix_xof);
+            $credit = (int) round(max(0, $joursRestants) * $valeurMensuelle / 31);
+            $credit = min($credit, (int) $nouveau->prix_xof); // le montant ne devient jamais négatif
+        }
+
+        // Nouvelle période « de date à date » : un changement démarre immédiatement,
+        // un renouvellement du même plan prolonge depuis l'échéance en cours.
+        $base     = $renouvellement ? $abonnement->timestamp_expiration : now();
+        $echeance = $nouveau->prochaineEcheance($base);
+
+        return [
+            'plan_actuel'         => $actuel?->label,
+            'plan_actuel_cle'     => $actuel?->cle,
+            'plan_nouveau'        => $nouveau->label,
+            'plan_nouveau_cle'    => $nouveau->cle,
+            'prix_nouveau'        => (int) $nouveau->prix_xof,
+            'jours_restants'      => max(0, $joursRestants),
+            'credit_prorata'      => $credit,
+            'montant_a_payer'     => max(0, (int) $nouveau->prix_xof - $credit),
+            'nouvelle_echeance'   => $echeance->toIso8601String(),
+            'renouvellement'      => $renouvellement,
+            'demarrage_immediat'  => ! $renouvellement,
+        ];
+    }
+
     public function initiate(Atelier $atelier, string $niveauCle, string $provider = 'fedapay', ?string $returnUrl = null): Paiement
     {
         $niveau = NiveauConfig::where('cle', $niveauCle)->where('is_actif', true)->firstOrFail();
 
-        // Plan gratuit (prix 0) : rien à encaisser → activation directe, sans passer
-        // par le provider. FedaPay rejette un montant nul (« amount doit être > 0 »),
-        // ce qui provoquait un 500. On enregistre un paiement déjà « completed ».
-        if ((int) $niveau->prix_xof <= 0) {
+        // Crédit prorata du plan en cours (spec upgrade) : on ne facture que la différence.
+        $recap   = $this->previewChangement($atelier, $niveau);
+        $montant = $recap['montant_a_payer'];
+
+        // Rien à encaisser (plan gratuit, ou crédit couvrant tout le nouveau plan) :
+        // activation directe, sans passer par le provider. FedaPay rejette un montant
+        // nul (« amount doit être > 0 »), ce qui provoquait un 500.
+        if ($montant <= 0) {
             $paiement = Paiement::create([
                 'atelier_id'   => $atelier->id,
                 'niveau_cle'   => $niveau->cle,
                 'duree_jours'  => $niveau->duree_jours,
                 'montant'      => 0,
+                'meta'         => ['recap_upgrade' => $recap],
                 'devise'       => 'XOF',
                 'provider'     => $provider,
                 'statut'       => 'completed',
@@ -51,7 +106,8 @@ class PaymentService
             'atelier_id'   => $atelier->id,
             'niveau_cle'   => $niveau->cle,
             'duree_jours'  => $niveau->duree_jours,
-            'montant'      => $niveau->prix_xof,
+            'montant'      => $montant,
+            'meta'         => ['recap_upgrade' => $recap],
             'devise'       => 'XOF',
             'provider'     => $provider,
             'statut'       => 'pending',
@@ -320,20 +376,27 @@ class PaymentService
             $configSnapshot = json_decode($configSnapshot, true);
         }
 
-        $debut       = now();
-        $expiration  = now()->addDays($dureeJours);
+        // Échéance « de date à date » (spec upgrade, direction 16/07/2026) :
+        //  - renouvellement du MÊME plan encore actif → prolonge depuis l'échéance en cours ;
+        //  - changement de plan (upgrade — le temps restant a été crédité au paiement) ou
+        //    nouveau départ → démarre immédiatement, échéance au même jour du mois/an suivant.
+        $debut  = now();
+        $actif  = $abonnement
+            && $abonnement->statut === 'actif'
+            && $abonnement->timestamp_expiration?->isFuture();
+
+        $base       = ($actif && $abonnement->niveau_cle === $niveauCle) ? $abonnement->timestamp_expiration : $debut;
+        $expiration = $niveau
+            ? $niveau->prochaineEcheance($base)
+            : $base->copy()->addDays($dureeJours);
+
+        $joursRestants = max(0, (int) ceil($debut->diffInMinutes($expiration, false) / 1440));
 
         if ($abonnement) {
-            // Proroger si encore actif, sinon repartir de zéro
-            if ($abonnement->statut === 'actif' && $abonnement->timestamp_expiration?->isFuture()) {
-                $expiration = $abonnement->timestamp_expiration->addDays($dureeJours);
-                $dureeJours = (int) $abonnement->jours_restants + $dureeJours;
-            }
-
             $abonnement->update([
                 'niveau_cle'           => $niveauCle,
                 'statut'               => 'actif',
-                'jours_restants'       => $dureeJours,
+                'jours_restants'       => $joursRestants,
                 'timestamp_debut'      => $debut,
                 'timestamp_expiration' => $expiration,
                 'config_snapshot'      => $configSnapshot,
@@ -343,7 +406,7 @@ class PaymentService
                 'atelier_id'           => $atelierId,
                 'niveau_cle'           => $niveauCle,
                 'statut'               => 'actif',
-                'jours_restants'       => $dureeJours,
+                'jours_restants'       => $joursRestants,
                 'timestamp_debut'      => $debut,
                 'timestamp_expiration' => $expiration,
                 'config_snapshot'      => $configSnapshot,

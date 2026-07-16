@@ -252,8 +252,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('paiements/{paiement}/status', [PaiementController::class, 'status']);
 
     // Abonnement
-    Route::get('abonnement/plans',         [AbonnementController::class, 'plans']);
-    Route::get('abonnement/current',       [AbonnementController::class, 'current']);
+    Route::get('abonnement/plans',           [AbonnementController::class, 'plans']);
+    Route::get('abonnement/current',         [AbonnementController::class, 'current']);
+    Route::get('abonnement/upgrade-preview', [AbonnementController::class, 'upgradePreview']);
     Route::post('abonnement/activer-code', [AbonnementController::class, 'activerCode']);
     Route::post('abonnement/sponsoriser',  [AbonnementController::class, 'sponsoriser']);
 
