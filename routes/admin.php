@@ -38,9 +38,11 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('analytique', [AnalytiqueController::class, 'index']);
 
     // Brief 16/07 (pt 1) : dashboard chatbot (questions mal traitées → FAQ) + base d'intentions.
-    Route::get('chatbot/analyse', [ChatbotAdminController::class, 'analyse']);
-    Route::get('chatbot/intents', [ChatbotAdminController::class, 'intents']);
-    Route::put('chatbot/intents', [ChatbotAdminController::class, 'setIntents']);
+    Route::get('chatbot/analyse',  [ChatbotAdminController::class, 'analyse']);
+    Route::get('chatbot/intents',  [ChatbotAdminController::class, 'intents']);
+    Route::put('chatbot/intents',  [ChatbotAdminController::class, 'setIntents']);
+    Route::get('chatbot/contexte', [ChatbotAdminController::class, 'contexte']);
+    Route::put('chatbot/contexte', [ChatbotAdminController::class, 'setContexte']);
 
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);

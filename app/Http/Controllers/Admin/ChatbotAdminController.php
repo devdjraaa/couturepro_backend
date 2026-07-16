@@ -38,6 +38,32 @@ class ChatbotAdminController extends Controller
         ]);
     }
 
+    /** GET /admin/chatbot/contexte — connaissance injectée à la mini-IA locale. */
+    public function contexte(): JsonResponse
+    {
+        $v = DB::table('vitrine_settings')->where('cle', 'chatbot_contexte')->value('valeur');
+
+        return response()->json(['texte' => $v ? (json_decode($v, true)['texte'] ?? '') : '']);
+    }
+
+    /** PUT /admin/chatbot/contexte — édition sans code (direction/admin). */
+    public function setContexte(Request $request): JsonResponse
+    {
+        $data = $request->validate(['texte' => ['required', 'string', 'max:8000']]);
+
+        DB::table('vitrine_settings')->updateOrInsert(
+            ['cle' => 'chatbot_contexte'],
+            [
+                'id'         => DB::table('vitrine_settings')->where('cle', 'chatbot_contexte')->value('id') ?? (string) Str::uuid(),
+                'valeur'     => json_encode(['texte' => $data['texte']]),
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        return response()->json(['texte' => $data['texte']]);
+    }
+
     /** GET /admin/chatbot/intents — base de connaissances. */
     public function intents(): JsonResponse
     {

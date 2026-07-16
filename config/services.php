@@ -56,6 +56,14 @@ return [
         'clarity_id'    => env('CLARITY_ID'),
     ],
 
+    // Mini-IA locale (Ollama sur le VPS) : 2e étage du chatbot (questions hors intentions)
+    // + réutilisable ailleurs. Si injoignable (ex. poste local), repli silencieux sur le
+    // message fallback classique — le chatbot ne casse jamais.
+    'ollama' => [
+        'url'   => env('OLLAMA_URL', 'http://127.0.0.1:11434'),
+        'model' => env('OLLAMA_MODEL', 'qwen2.5:3b'),
+    ],
+
     // P150 : connexion sociale (Laravel Socialite). Chaque provider n'est ACTIF que si
     // ses client_id + client_secret sont renseignés dans .env → le jour où le boss a les
     // clés, il les colle ici (via .env) + `config:cache` et les boutons s'activent seuls.
