@@ -356,7 +356,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
 | P150 | Connexion sociale | 1 | ✅ (**Google actif web + natif** — web testé jusqu'à l'écran Google, natif via plugin Credential Manager APK ≥ 1.0.10 + OTA 1.0.58 ; **Facebook abandonné (décision boss : Google suffit)**, Apple différé iOS) |
-| P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
+| P151 | Renommer catalogue « Modèles Courants » | 1 | ✅ (titre + menu = « Modèles Courants », i18n fr/en) |
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
 | P156 | Expiration → repli **mode gratuit** : plus de mur, bannière « Renouveler », données visibles, quotas/features free (getConfigEffective) — **vérifié device** | 1 | ✅ |
@@ -380,7 +380,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P181 | Menu déroulant « Solutions » | 6 | ⬜ |
 | P182 | Menu déroulant « Tarifs » | 6 | ⬜ |
 | P183-184 | Menu « Documentation » (cartes) + page | 6 | ⬜ |
-| P185 | APK sur le site + guide d'installation | 7 | ✅ (guide à confirmer) |
+| P185 | APK sur le site + guide d'installation | 7 | ✅ (bouton « Télécharger » vitrine câblé → /Gextimo.apk ; **rsync CI n'efface plus l'APK** — fix --exclude 16/07) |
 | P186 | PWA (manifest + SW + bannière) | 7 | ✅ **déjà fait** (audit code) : `public/manifest.webmanifest` complet (icônes 192/512/maskable), `public/sw.js` (SW conservateur : navigations réseau-d'abord, assets hashés cache-d'abord, API non interceptée), `src/utils/pwa.js` (register web-only + `beforeinstallprompt` + `promptInstall`), `PwaInstallBanner` rendu dans `main.jsx`, i18n `pwa.*`. Web uniquement (désactivé dans Capacitor pour ne pas gêner l'OTA) |
 | P187 | Texte d'accueil page inscription | 6 | 🟡 |
 | P188 | Remplacer « novafrique » (Qui sommes-nous, footer) | 6 | ✅ |
