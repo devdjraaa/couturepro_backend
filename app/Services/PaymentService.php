@@ -362,6 +362,22 @@ class PaymentService
                 "Activation abonnement {$niveauCle}",
             );
         }
+
+        // P49 : message de bienvenue après souscription — points crédités + instructions
+        // du plan (description_courte de niveaux_config → éditable admin, zéro hardcoding).
+        $contenu = trim(
+            ($niveau?->description_courte ? $niveau->description_courte . ' ' : '')
+            . ($ptsActivation > 0 ? "{$ptsActivation} points de fidélité crédités." : '')
+        ) ?: 'Votre abonnement est actif.';
+
+        \App\Models\NotificationSysteme::create([
+            'atelier_id' => $atelierId,
+            'titre'      => 'Bienvenue sur le plan ' . ($niveau?->label ?? $niveauCle) . ' !',
+            'contenu'    => $contenu,
+            'type'       => 'abonnement_active',
+            'lien'       => '/parametres?tab=abonnement',
+            'is_read'    => false,
+        ]);
     }
 
     private function resolveProvider(string $provider): PaymentProviderContract
