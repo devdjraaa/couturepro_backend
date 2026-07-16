@@ -25,3 +25,8 @@ Schedule::command('abonnements:process-bonus-expiry')->dailyAt('01:00');
 // ─── Veille SEO (P200) ──────────────────────────────────────────────────────
 // Rapport technique hebdo (PageSpeed, HTTPS, dispo) — lundi 7h, 2 sites.
 Schedule::command('veille:seo')->weeklyOn(1, '07:00');
+
+// ─── Espace client (P202 Phase 4) ───────────────────────────────────────────
+// Recalcul nocturne des synthèses client (engagement/segment/RFM/CLV) et designer
+// (score de confiance, revenus/prédiction) à partir de gxt_evenements + commandes.
+Schedule::command('gxt:recalculer-metrics')->dailyAt('02:30');

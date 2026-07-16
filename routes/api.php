@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\SignalementController;
 use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\Vitrine\ClientAuthController;
 use App\Http\Controllers\Api\Vitrine\ClientCommandeController;
+use App\Http\Controllers\Api\Vitrine\GxtEvenementController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\VitrineStatsController;
 use App\Http\Controllers\Api\WebhookController;
@@ -88,6 +89,9 @@ Route::prefix('vitrine')->group(function () {
     Route::get('partenaires/cles',               [PartenairePublicController::class, 'cles']);
     Route::post('partenaires/candidature',       [PartenairePublicController::class, 'candidater']);
 });
+
+// ─── Tracking métier vitrine (P202 Phase 3) : ingestion groupée, connecté ou anonyme ───
+Route::post('vitrine/evenements', [GxtEvenementController::class, 'ingest'])->middleware('throttle:60,1');
 
 // ─── Espace client vitrine (P202) : auth sans mot de passe (Google / OTP e-mail) ───
 Route::prefix('vitrine/client')->group(function () {

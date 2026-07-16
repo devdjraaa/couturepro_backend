@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminsController;
+use App\Http\Controllers\Admin\AnalytiqueController;
 use App\Http\Controllers\Admin\PartenaireController as AdminPartenaireController;
 use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\CodePromoController as AdminCodePromoController;
@@ -31,6 +32,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // P110-111 : diagnostic système (queue, jobs échoués, base, stockage, dernières erreurs).
     Route::get('diagnostic', [DiagnosticController::class, 'index']);
+
+    // P202 Phase 5 : tableau de bord analytique (vues globale/clients/designers/tendances).
+    Route::get('analytique', [AnalytiqueController::class, 'index']);
 
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);
