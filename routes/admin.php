@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\CodePromoController as AdminCodePromoController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DiagnosticController;
 use App\Http\Controllers\Admin\FideliteController;
 use App\Http\Controllers\Admin\ListeNoireController;
 use App\Http\Controllers\Admin\NotificationController;
@@ -26,6 +27,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::post('auth/logout',           [AuthController::class, 'logout']);
     Route::get('auth/me',               [AuthController::class, 'me']);
     Route::put('auth/change-password',  [AuthController::class, 'changePassword']);
+
+    // P110-111 : diagnostic système (queue, jobs échoués, base, stockage, dernières erreurs).
+    Route::get('diagnostic', [DiagnosticController::class, 'index']);
 
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);
