@@ -55,7 +55,7 @@ valider par la direction avant de lancer les corrections.
 |---|---|---|---|
 | **1** | Backlog produit Gextimo (requêtes antérieures) | 🔴 | Majorité **faite** ; restent des bugs ⚠️ (multi-ateliers, OTP) + features vitrine/créateur ⬜ |
 | **2** | Veille auto (SEO/technique) | 🟡 | ✅ `veille:seo` hebdo livrée (PSI+HTTPS+dispo, 2 sites) ; reste Search Console + destinataire e-mail |
-| **3** | Volet APK Admin | 🟡 | App admin existe ; codes promo + dashboard temps réel ⬜ ; gel/dégel ⚠️ |
+| **3** | Volet APK Admin | 🟢 | Codes promo ✅, dashboard temps réel ✅, gel/dégel ✅ (re-testé), diagnostic ✅ |
 | **4** | Gestion VPS | 🟡 | Durcissement ✅ ; sauvegardes quotidiennes locales ✅ ; off-site ⬜ (destination) |
 | **5** | Gestion mailing | 🟡 | Archi + queue ✅ ; Brevo/délivrabilité + adresses ⬜ |
 | **6** | Gestion NovAfriq (site mère) | 🔴 | Nom « novafriq » ✅, header/SEO/Cloudflare ⬜, lancement commun |
@@ -324,11 +324,11 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P114 | Tâches longues en arrière-plan | 1 | 🟡 |
 | P115-117 | Offline / file de sync « en attente » | 1 | ✅/🟡 |
 | P118 | Séparation stricte + sync fiable (synthèse) | 1 | 🟡 |
-| P119 | Dégel restaure essai/actif valide (ne force plus « expire ») | 3 | ✅ |
+| P119 | Dégel restaure essai/actif valide | 3 | ✅ (**re-testé prod 16/07** : essai valide → gel → dégel → statut « essai » restauré ; essai expiré → « expire », correct) |
 | P124 | Récup : format tél normalisé (espaces strippés à l'écriture + lookup) | 3 | ✅ |
 | P120 | Page détail atelier admin **blanche** pour comptes non-actifs — **corrigé** (`UNITE_OPTIONS` hors scope → ReferenceError ; la réactivation/dégel se fait sur cette page) | 3 | ✅ |
 | P123 | E-mail fictif : « E-mail incorrect ? Corrigez-le » sur la page OTP (tél + mdp → renvoi) | 3 | ✅ |
-| P121-122 | Tél dé-enregistré (vérif) ; compte expiré non réutilisable (voulu, P122) | 3 | ⚠️/ℹ️ |
+| P121-122 | Tél dé-enregistré ; compte expiré non réutilisable (voulu, P122) | 3 | ✅/ℹ️ (P121 : changement de numéro via récupération = OTP e-mail obligatoire (étapes 3-4) + refus si numéro déjà pris par un autre compte (durci 16/07)) |
 | P125 | Point après « gextimo » sur l'accueil — retiré | 1 | ✅ |
 | P126 | Logo officiel #5 partout | 1/6 | ✅ |
 | P127 | « novafrique » → « novafriq » | 6 | ✅ |
