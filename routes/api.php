@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\PermissionsEquipeController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\TicketSupportController;
 use App\Http\Controllers\Api\PatronController;
+use App\Http\Controllers\Api\PartenairePublicController;
 use App\Http\Controllers\Api\PatronPublicController;
 use App\Http\Controllers\Api\VetementController;
 use App\Http\Controllers\Api\SignalementController;
@@ -77,6 +78,10 @@ Route::prefix('vitrine')->group(function () {
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
+    // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)
+    Route::get('partenaires',                    [PartenairePublicController::class, 'index']);
+    Route::get('partenaires/cles',               [PartenairePublicController::class, 'cles']);
+    Route::post('partenaires/candidature',       [PartenairePublicController::class, 'candidater']);
 });
 
 // ─── Mises à jour de l'app (version-gate natif + OTA bundle web) ─────────────

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminsController;
+use App\Http\Controllers\Admin\PartenaireController as AdminPartenaireController;
 use App\Http\Controllers\Admin\AtelierController;
 use App\Http\Controllers\Admin\CodePromoController as AdminCodePromoController;
 use App\Http\Controllers\Admin\AuditLogController;
@@ -129,6 +130,16 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // Notifications
     Route::middleware('admin.permission:notifications.broadcast')->post('notifications', [NotificationController::class, 'store']);
+
+    // P204 : partenaires + candidatures
+    Route::middleware('admin.permission:partenaires.manage')->group(function () {
+        Route::get('partenaires',                       [AdminPartenaireController::class, 'index']);
+        Route::post('partenaires',                      [AdminPartenaireController::class, 'store']);
+        Route::match(['put', 'post'], 'partenaires/{partenaire}', [AdminPartenaireController::class, 'update']);
+        Route::delete('partenaires/{partenaire}',       [AdminPartenaireController::class, 'destroy']);
+        Route::get('candidatures-partenaires',          [AdminPartenaireController::class, 'candidatures']);
+        Route::post('candidatures-partenaires/{candidature}/statut', [AdminPartenaireController::class, 'statutCandidature']);
+    });
 
     // Gestion des admins (super_admin seulement via admins.manage)
     Route::middleware('admin.permission:admins.manage')->group(function () {

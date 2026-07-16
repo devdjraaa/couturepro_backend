@@ -25,6 +25,7 @@ class AdminPermission
         'tickets.close'           => 'Fermer / rouvrir un ticket',
         'notifications.broadcast' => 'Envoyer une notification broadcast',
         'blacklist.manage'        => 'Gérer la liste noire',
+        'partenaires.manage'      => 'Gérer les partenaires et candidatures',
         'audit.view'              => "Voir le journal d'audit",
         'stats.view'              => 'Voir les statistiques et rentabilité',
         'admins.manage'           => 'Gérer les comptes admins (super_admin seulement)',
