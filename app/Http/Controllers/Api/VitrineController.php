@@ -141,7 +141,8 @@ class VitrineController extends Controller
             'inscrit_depuis' => $atelier->created_at ? $this->inscritDepuis($atelier->created_at) : null, // P172
             'abonne'         => $visitorKey ? $atelier->abonnes()->where('visitor_key', $visitorKey)->exists() : false, // P173
             'merites'        => $badges,             // P174-176
-            'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom']),
+            'badge_pro'      => (bool) ($atelier->abonnement?->getConfigEffective()['badge_designer_pro'] ?? false), // PL-8
+            'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
             'creations'   => $creations,
             // RBAC : la demande de devis est-elle incluse dans le plan du créateur ?
