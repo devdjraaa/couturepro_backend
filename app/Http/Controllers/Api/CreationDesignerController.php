@@ -30,6 +30,11 @@ class CreationDesignerController extends Controller
     {
         $atelier = $this->getAtelier($request);
 
+        // Le front envoie metadata en JSON (FormData) → décoder avant la validation array.
+        if (is_string($request->input('metadata'))) {
+            $request->merge(['metadata' => json_decode($request->input('metadata'), true) ?? []]);
+        }
+
         $data = $request->validate([
             'categorie'   => ['required', 'in:croquis,fiche_technique,patron,moodboard'],
             'titre'       => ['required', 'string', 'max:255'],
@@ -70,6 +75,11 @@ class CreationDesignerController extends Controller
     public function update(Request $request, CreationDesigner $creation): JsonResponse
     {
         $this->authorizeCreation($request, $creation);
+
+        // Même décodage qu'au store : metadata arrive en JSON via FormData.
+        if (is_string($request->input('metadata'))) {
+            $request->merge(['metadata' => json_decode($request->input('metadata'), true) ?? []]);
+        }
 
         $data = $request->validate([
             'titre'       => ['sometimes', 'string', 'max:255'],
