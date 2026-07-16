@@ -355,7 +355,7 @@ Hors périmètre (travail humain) : contenu, backlinks, réseaux sociaux.
 | P157 | Import contacts gratuit pour tous — vérifié : aucun verrou de plan (front ni back) | 1 | ✅ |
 | P148 | Une seule icône « œil » mot de passe (native masquée) | 1 | ✅ |
 | P149 | Récup via « mot de passe oublié » (OTP e-mail) | 1 | ✅/🟡 |
-| P150 | Connexion Google/Facebook/Apple | 1 | 🟡 (**Google ACTIF en prod** : Socialite + boutons conditionnels + callback, testé 302 ; Facebook = clés gratuites à créer ; Apple = 99$/an, différé iOS) |
+| P150 | Connexion Google/Facebook/Apple | 1 | 🟡 (**Google WEB actif en prod** (testé jusqu'à l'écran Google) ; **flux NATIF livré** : endpoint idToken + plugin Credential Manager + client Android déclaré (SHA-1), APK en cours ; Facebook = clés à créer ; Apple = 99$/an différé) |
 | P151 | Renommer catalogue « Modèles Courants » | 1 | 🟡 |
 | P152 | Bibliothèque photos catégorisée (réf/sexe/occasion…) | 1 | 🟡 |
 | P153-155, P157-158 | Codes promo + ambassadeurs — livré & testé prod (API sécurisée, panel admin, app, GEXT-AMB seedés) | 1/3 | ✅ |
