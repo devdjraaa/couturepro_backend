@@ -2,13 +2,13 @@
 
 **Objet** : organisation des adresses e-mail professionnelles, confidentialité et routage.
 **Domaines** : `novafriq.africa` (corporate) · `gextimo.novafriq.africa` (produit).
-**Version** : 1.1 — Document interne *(corrigé le 16/07/2026)*.
+**Version** : 1.2 — Document interne *(corrigé le 16/07/2026)*.
 
-> **⚠️ Changements clés vs v1.0** — (1) la **zone DNS est désormais chez Cloudflare** (migration
-> faite le 16/07), donc SPF/DKIM/DMARC se collent **dans Cloudflare**, plus chez Namecheap/Hostinger ;
-> (2) doublon `direction@` supprimé au §5 ; (3) contrainte **« 1 seule vraie boîte »** clarifiée pour
-> l'envoi (§6) ; (4) **décision à trancher** sur les adresses Gextimo (sous-domaine vs domaine parent, §4) ;
-> (5) DMARC : commencer par `p=none` avant `p=quarantine` (§8).
+> **✅ Décisions actées** — (1) la **zone DNS est chez Cloudflare** (migration faite le 16/07,
+> `novafriq.africa` désormais **actif/protégé** sur Cloudflare), donc SPF/DKIM/DMARC se collent **dans
+> Cloudflare** ; (2) doublon `direction@` supprimé (§5) ; (3) contrainte **« 1 seule vraie boîte »**
+> intégrée (§6-7) ; (4) **Option B retenue** : toutes les adresses sur `@novafriq.africa` avec préfixe
+> `.gextimo` (§4) ; (5) DMARC : `p=none` d'abord, puis `p=quarantine` (§8).
 
 ---
 
@@ -50,22 +50,17 @@ Une messagerie pro qui garantit :
 - ⚠️ **Les réponses humaines « en tant que »** passent, elles, par le SMTP Hostinger et **comptent**
   dans les 1 000/jour. C'est sans risque au volume humain, mais à garder en tête.
 
-## 4. ⚖️ DÉCISION À TRANCHER : adresses Gextimo — sous-domaine OU domaine parent ?
+## 4. ✅ DÉCISION ACTÉE : Option B — tout sur `@novafriq.africa`
 
-Point important lié à ta contrainte **« 1 seule vraie boîte + 10 forwarders + 50 alias »** :
+Vu la contrainte **« 1 seule vraie boîte + 10 forwarders + 50 alias »**, on retient l'**Option B** :
+toutes les adresses (corporate ET Gextimo) sont sur le **domaine parent `@novafriq.africa`**, les
+adresses Gextimo prenant un préfixe `.gextimo` (ex. `support.gextimo@novafriq.africa`).
 
-- **Option A — sous-domaine** (`support@gextimo.novafriq.africa`) : branding le plus propre, MAIS
-  demande de **configurer l'e-mail du sous-domaine** (ajouter `gextimo.novafriq.africa` comme domaine
-  e-mail chez Hostinger + créer des **MX pour le sous-domaine dans Cloudflare**). Cela peut compter comme
-  une **2ᵉ boîte/domaine** dans ton offre → à vérifier (peut-être un surcoût).
-- **Option B — domaine parent avec préfixe** (`support.gextimo@novafriq.africa`, ce que tu as déjà
-  commencé) : **une seule boîte, un seul domaine e-mail**, tes 9 redirections tiennent dans la limite
-  de 10 d'**une** boîte. Plus simple, gratuit, mais branding un peu moins « premium ».
-
-> **Reco** : vu ta contrainte (1 boîte), **Option B** pour démarrer (simple, gratuit, immédiat). On
-> pourra basculer en Option A plus tard si le volume/le budget le justifient. **Le reste du document
-> suppose l'Option B** (adresses `xxx.gextimo@novafriq.africa`). Si tu choisis A, on ajoutera les MX du
-> sous-domaine dans Cloudflare + les boîtes côté Hostinger.
+- **Une seule boîte, un seul domaine e-mail** → les 9 redirections tiennent dans la limite de 10.
+- **Simple, gratuit, immédiat** (pas de MX de sous-domaine à créer, pas de 2ᵉ boîte à payer).
+- Compromis accepté : branding `support.gextimo@novafriq.africa` (au lieu de
+  `support@gextimo.novafriq.africa`). On pourra basculer en sous-domaine plus tard si le volume/le
+  budget le justifient.
 
 ## 5. Liste d'adresses retenue
 *Principe : une adresse = quelqu'un qui la relève réellement.*
