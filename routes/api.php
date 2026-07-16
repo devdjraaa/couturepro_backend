@@ -102,6 +102,9 @@ Route::prefix('auth')->group(function () {
     Route::get('social/providers',          [SocialAuthController::class, 'providers']);
     Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect']);
     Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback']);
+    // Flux natif (app mobile) : le plugin fournit un idToken, vérifié serveur-à-serveur.
+    Route::post('social/{provider}/token',   [SocialAuthController::class, 'tokenLogin'])
+        ->middleware('throttle:10,1');
 
     Route::prefix('recuperation')->group(function () {
         Route::post('initier',              [RecuperationController::class, 'etape1']);

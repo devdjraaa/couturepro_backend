@@ -56,6 +56,9 @@ return [
         'client_id'     => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect'      => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/api/auth/social/google/callback'),
+        // Client OAuth « Android » (flux natif Credential Manager) : sert à valider
+        // l'audience des idToken émis pour l'app mobile.
+        'android_client_id' => env('GOOGLE_ANDROID_CLIENT_ID'),
     ],
 
     'facebook' => [

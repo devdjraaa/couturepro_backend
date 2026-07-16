@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Proprietaire;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
 
 // P150 : connexion sociale (Google / Facebook / Apple) via Laravel Socialite.
@@ -26,7 +28,65 @@ class SocialAuthController extends Controller
     /** GET /api/auth/social/providers — liste publique des providers actifs (pour afficher les boutons). */
     public function providers(): JsonResponse
     {
-        return response()->json(['providers' => $this->enabled()]);
+        return response()->json([
+            'providers' => $this->enabled(),
+            // Flux NATIF (app mobile) : le plugin Google a besoin du client ID web
+            // (audience du idToken). Servi par l'API → configurable côté serveur,
+            // rien de figé dans l'app. (Un client ID n'est pas un secret.)
+            'google_web_client_id' => config('services.google.client_id'),
+        ]);
+    }
+
+    /**
+     * POST /api/auth/social/{provider}/token  { id_token } — connexion NATIVE (app mobile).
+     * Le plugin natif obtient un idToken Google (Credential Manager) ; on le vérifie auprès
+     * de Google puis on applique la même logique que le callback web, en réponse JSON.
+     */
+    public function tokenLogin(Request $request, string $provider): JsonResponse
+    {
+        abort_unless($provider === 'google' && in_array('google', $this->enabled(), true), 404);
+
+        $data = $request->validate(['id_token' => ['required', 'string']]);
+
+        // Vérification serveur-à-serveur du idToken (signature + expiration gérées par Google).
+        $info = Http::timeout(10)
+            ->get('https://oauth2.googleapis.com/tokeninfo', ['id_token' => $data['id_token']])
+            ->json();
+
+        $audiences = array_filter([
+            config('services.google.client_id'),
+            config('services.google.android_client_id'),
+        ]);
+
+        if (! is_array($info)
+            || empty($info['email'])
+            || ($info['email_verified'] ?? 'false') !== 'true'
+            || ! in_array($info['aud'] ?? '', $audiences, true)) {
+            return response()->json(['message' => 'Jeton Google invalide.'], 401);
+        }
+
+        $proprietaire = Proprietaire::where('email', $info['email'])->first();
+
+        if ($proprietaire) {
+            if (! $proprietaire->email_verified_at) {
+                $proprietaire->forceFill(['email_verified_at' => now()])->save();
+            }
+
+            return response()->json([
+                'status' => 'ok',
+                'token'  => $proprietaire->createToken('auth_token')->plainTextToken,
+            ]);
+        }
+
+        // Nouvel utilisateur → le front pré-remplit l'inscription.
+        [$prenom, $nom] = $this->splitName((string) ($info['name'] ?? ''));
+
+        return response()->json([
+            'status' => 'inscription',
+            'email'  => $info['email'],
+            'prenom' => $info['given_name'] ?? $prenom,
+            'nom'    => $info['family_name'] ?? $nom,
+        ]);
     }
 
     /** GET /api/auth/social/{provider}/redirect */
