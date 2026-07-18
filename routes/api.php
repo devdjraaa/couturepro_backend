@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\FactureController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
 use App\Http\Controllers\Api\GalerieController;
+use App\Http\Controllers\Api\RealisationController;
 use App\Http\Controllers\Api\ListeAttenteController;
 use App\Http\Controllers\Api\MesureController;
 use App\Http\Controllers\Api\NotificationController;
@@ -395,6 +396,16 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('galerie',             [GalerieController::class, 'store']);
     Route::delete('galerie/{photo}',   [GalerieController::class, 'destroy']);
     Route::get('galerie/quota',        [GalerieController::class, 'quota']);
+
+    // Point 101 : Mes Réalisations (publication modérée de photos)
+    Route::get('realisations/quota',                    [RealisationController::class, 'quota']);
+    Route::get('realisations',                          [RealisationController::class, 'index']);
+    Route::post('realisations',                         [RealisationController::class, 'store']);
+    Route::put('realisations/{realisation}',            [RealisationController::class, 'update']);
+    Route::post('realisations/{realisation}/photo',     [RealisationController::class, 'ajouterPhoto']);
+    Route::delete('realisations/{realisation}/photo',   [RealisationController::class, 'retirerPhoto']);
+    Route::post('realisations/{realisation}/soumettre', [RealisationController::class, 'soumettre']);
+    Route::delete('realisations/{realisation}',         [RealisationController::class, 'destroy']);
 });
 
 // ─── Webhooks (pas d'auth) ───────────────────────────────────────────────────

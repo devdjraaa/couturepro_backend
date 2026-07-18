@@ -150,6 +150,20 @@ class VitrineController extends Controller
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
             'creations'   => $creations,
+            // Point 101 : réalisations publiées (photos filigranées, modérées).
+            'realisations' => \App\Models\Realisation::where('atelier_id', $atelier->id)
+                ->publiees()
+                ->latest('publie_at')
+                ->get()
+                ->map(fn ($r) => [
+                    'id'          => $r->id,
+                    'titre'       => $r->titre,
+                    'description' => $r->description,
+                    'images'      => collect($r->images ?? [])
+                        ->map(fn ($im) => $im['watermark_url'] ?? ($im['url'] ?? null))
+                        ->filter()->values(),
+                    'publie_at'   => $r->publie_at,
+                ]),
             // RBAC : la demande de devis est-elle incluse dans le plan du créateur ?
             'devis'       => (bool) ($atelier->abonnement?->getConfigEffective()['devis_vitrine'] ?? false),
         ]));
