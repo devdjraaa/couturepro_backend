@@ -8,7 +8,7 @@
 - **✅ Faits : ~70 points** (dont ~20 livrés/vérifiés le 17-18/07)
 - **🟡 Partiels / à re-tester sur device : ~30**
 - **⬜ À faire : ~20**
-- **🔵 Gros chantiers : 4** (57 événements, 68-69 flux mesures, 101 Mes Réalisations, 124-125 SEO SSR)
+- **🔵 Gros chantiers : 3** (68-69 flux mesures, 101 Mes Réalisations, 125 SEO SSR) — *57 événements ✅ et 124 audit SEO ✅ livrés le 18/07*
 - **⚖️ Décisions direction : 3** (128, 129, 130)
 
 ---
@@ -63,7 +63,7 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 ## Événements dynamiques (57-59)
 | Pt | Sujet | Statut |
 |---|---|---|
-| 57 | Système d'événements dynamiques complet | 🔵 splash saisonnier config-driven ✅ ; 5 familles + JSON serveur + priorités + overlay perso = à construire |
+| 57 | Système d'événements dynamiques complet | ✅ **FAIT (18/07)** — `EvenementCelebrationService` : 5 familles (fixe/lunaire/gextimo/utilisateur/marketing), catalogue config-driven (`VitrineSetting::evenementsCelebration()`, jours fériés Bénin + Aïd/Tabaski + gabarit anniversaire `{prenom}`), règle de priorité perso>Gextimo>national/religieux>marketing, fuseau Bénin, 1×/jour côté client ; `GET /vitrine/evenements` (anniversaire perso si connecté) + admin GET/PUT ; front `EvenementCelebration` (splash + toast + animations confettis/cœurs/neige/étoiles) ; legacy `splash_themes` ré-ingéré. **App mobile (android) = intégration à venir via `?contexte=app`** |
 | 58 | Champ date de naissance | ✅ espace client + PROS (jour/mois) — 18/07 |
 | 59 | Test 3-4 jours | ⏳ process |
 
