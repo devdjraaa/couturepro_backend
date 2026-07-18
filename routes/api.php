@@ -85,6 +85,8 @@ Route::prefix('vitrine')->group(function () {
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
     // Brief 16/07 (pt 6) : habillage saisonnier local (overlay d'ouverture, config admin).
     Route::get('splash-theme',                   [VitrineController::class, 'splashTheme']);
+    // Point 57 : événements dynamiques du jour (auth optionnelle pour l'anniversaire perso).
+    Route::get('evenements',                     [VitrineController::class, 'evenements']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
     // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)

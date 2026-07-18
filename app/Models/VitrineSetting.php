@@ -33,4 +33,86 @@ class VitrineSetting extends Model
             ],
         ];
     }
+
+    /**
+     * Point 57 — Catalogue d'événements dynamiques (célébrations), config-driven
+     * et éditable depuis l'admin (clé `evenements_celebration`). Valeurs par défaut
+     * FACTUELLES si rien n'est configuré : jours fériés du Bénin + fêtes religieuses
+     * mobiles (dates explicites par année, à ajuster chaque année) + un gabarit
+     * d'anniversaire client + un gabarit interne Gextimo (désactivé jusqu'à ce que
+     * l'admin renseigne la vraie date).
+     *
+     * 5 familles : fixe (MM-JJ), lunaire (dates explicites), gextimo (interne),
+     * utilisateur (anniversaire calculé), marketing (fenêtre datée).
+     */
+    public static function evenementsCelebration(): array
+    {
+        $cfg = static::where('cle', 'evenements_celebration')->value('valeur');
+        if ($cfg) {
+            return $cfg;
+        }
+
+        // Fêtes nationales fixes du Bénin (jours fériés officiels).
+        $fixes = [
+            ['code' => 'nouvel_an',    'date_fixe' => '01-01', 'anim' => 'confettis', 'fr' => 'Bonne année !',            'en' => 'Happy New Year!',        'mfr' => 'Toute l\'équipe Gextimo vous souhaite une excellente année.', 'men' => 'The Gextimo team wishes you a wonderful year.'],
+            ['code' => 'fete_vodoun',  'date_fixe' => '01-10', 'anim' => 'etoiles',   'fr' => 'Fête des religions traditionnelles', 'en' => 'Traditional Religions Day', 'mfr' => 'Bonne fête du Vodoun à toute la communauté.', 'men' => 'Happy Vodun Festival to the whole community.'],
+            ['code' => 'fete_travail', 'date_fixe' => '05-01', 'anim' => 'aucune',    'fr' => 'Bonne fête du travail',   'en' => 'Happy Labour Day',       'mfr' => 'Hommage à toutes les artisanes et à tous les artisans.', 'men' => 'A tribute to all craftspeople.'],
+            ['code' => 'independance', 'date_fixe' => '08-01', 'anim' => 'confettis', 'fr' => 'Joyeuse fête de l\'Indépendance', 'en' => 'Happy Independence Day', 'mfr' => 'Bonne fête nationale du Bénin.', 'men' => 'Happy Benin Independence Day.'],
+            ['code' => 'assomption',   'date_fixe' => '08-15', 'anim' => 'aucune',    'fr' => 'Bonne fête de l\'Assomption', 'en' => 'Happy Assumption Day',  'mfr' => '', 'men' => ''],
+            ['code' => 'toussaint',    'date_fixe' => '11-01', 'anim' => 'aucune',    'fr' => 'Toussaint',               'en' => 'All Saints\' Day',       'mfr' => '', 'men' => ''],
+            ['code' => 'noel',         'date_fixe' => '12-25', 'anim' => 'neige',     'fr' => 'Joyeux Noël !',           'en' => 'Merry Christmas!',       'mfr' => 'De belles fêtes de fin d\'année à vous et vos proches.', 'men' => 'Season\'s greetings to you and your loved ones.'],
+        ];
+
+        $catalogue = [];
+        foreach ($fixes as $f) {
+            $catalogue[] = [
+                'code' => $f['code'], 'type' => 'fixe', 'date_fixe' => $f['date_fixe'],
+                'titre' => ['fr' => $f['fr'], 'en' => $f['en']],
+                'message' => ['fr' => $f['mfr'], 'en' => $f['men']],
+                'animation' => $f['anim'], 'couleur' => '#C4162A', 'image_url' => null,
+                'priorite' => 0, 'cible' => 'tous', 'mode_affichage' => 'splash',
+                'frequence_affichage' => 'quotidien', 'actif' => true,
+            ];
+        }
+
+        // Fêtes religieuses mobiles (dates explicites — À AJUSTER CHAQUE ANNÉE côté admin).
+        $catalogue[] = [
+            'code' => 'aid_el_fitr', 'type' => 'lunaire', 'dates' => ['2026-03-20', '2027-03-10'],
+            'titre' => ['fr' => 'Aïd el-Fitr moubarak', 'en' => 'Eid al-Fitr Mubarak'],
+            'message' => ['fr' => 'Bonne fête à toute la communauté musulmane.', 'en' => 'Blessings to the whole Muslim community.'],
+            'animation' => 'etoiles', 'couleur' => '#1F7A5A', 'image_url' => null,
+            'priorite' => 0, 'cible' => 'tous', 'mode_affichage' => 'splash',
+            'frequence_affichage' => 'quotidien', 'actif' => true,
+        ];
+        $catalogue[] = [
+            'code' => 'tabaski', 'type' => 'lunaire', 'dates' => ['2026-05-27', '2027-05-17'],
+            'titre' => ['fr' => 'Tabaski moubarak', 'en' => 'Eid al-Adha Mubarak'],
+            'message' => ['fr' => 'Bonne fête de la Tabaski à toutes et à tous.', 'en' => 'Happy Eid al-Adha to everyone.'],
+            'animation' => 'etoiles', 'couleur' => '#1F7A5A', 'image_url' => null,
+            'priorite' => 0, 'cible' => 'tous', 'mode_affichage' => 'splash',
+            'frequence_affichage' => 'quotidien', 'actif' => true,
+        ];
+
+        // Gabarit anniversaire client (famille « utilisateur », calculé) — {prenom} substitué.
+        $catalogue[] = [
+            'code' => 'anniversaire_client', 'type' => 'utilisateur',
+            'titre' => ['fr' => 'Joyeux anniversaire {prenom} !', 'en' => 'Happy birthday {prenom}!'],
+            'message' => ['fr' => 'Toute l\'équipe Gextimo vous souhaite une merveilleuse journée.', 'en' => 'The whole Gextimo team wishes you a wonderful day.'],
+            'animation' => 'coeurs', 'couleur' => '#C4162A', 'image_url' => null,
+            'priorite' => 0, 'cible' => 'clients', 'mode_affichage' => 'toast',
+            'frequence_affichage' => 'quotidien', 'actif' => true,
+        ];
+
+        // Gabarit interne Gextimo (désactivé : l'admin renseigne la vraie date d'anniversaire).
+        $catalogue[] = [
+            'code' => 'anniversaire_gextimo', 'type' => 'gextimo', 'date_fixe' => null,
+            'titre' => ['fr' => 'Gextimo fête son anniversaire', 'en' => 'Gextimo celebrates its birthday'],
+            'message' => ['fr' => 'Merci de faire grandir la mode africaine avec nous.', 'en' => 'Thank you for growing African fashion with us.'],
+            'animation' => 'confettis', 'couleur' => '#C4162A', 'image_url' => null,
+            'priorite' => 0, 'cible' => 'tous', 'mode_affichage' => 'splash',
+            'frequence_affichage' => 'quotidien', 'actif' => false,
+        ];
+
+        return $catalogue;
+    }
 }

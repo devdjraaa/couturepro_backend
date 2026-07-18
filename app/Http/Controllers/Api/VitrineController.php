@@ -10,8 +10,10 @@ use App\Models\CreationLike;
 use App\Models\NiveauConfig;
 use App\Models\Patron;
 use App\Models\Vetement;
+use App\Models\GxtClient;
 use App\Models\VitrineEvenement;
 use App\Models\VitrineSetting;
+use App\Services\EvenementCelebrationService;
 use App\Services\MeritesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -213,6 +215,62 @@ class VitrineController extends Controller
         $s = VitrineSetting::updateOrCreate(['cle' => 'splash_themes'], ['valeur' => $data['themes']]);
 
         return response()->json($s->valeur);
+    }
+
+    /**
+     * GET /api/vitrine/evenements — événements de célébration du jour (point 57).
+     * Auth optionnelle : si un client est connecté, son anniversaire est injecté.
+     * Triés par priorité décroissante ; le front affiche le plus prioritaire non
+     * encore vu (fréquence gérée côté client).
+     */
+    public function evenements(Request $request, EvenementCelebrationService $moteur): JsonResponse
+    {
+        $user = auth('sanctum')->user();
+        $client = $user instanceof GxtClient ? $user : null;
+        $contexte = $request->query('contexte') === 'app' ? 'app' : 'vitrine';
+
+        return response()->json([
+            'evenements' => $moteur->duJour($client, $contexte),
+        ]);
+    }
+
+    /** GET /api/admin/vitrine/evenements — catalogue brut (admin). */
+    public function getEvenements(EvenementCelebrationService $moteur): JsonResponse
+    {
+        return response()->json(['catalogue' => VitrineSetting::evenementsCelebration()]);
+    }
+
+    /** PUT /api/admin/vitrine/evenements — édition du catalogue d'événements (admin). */
+    public function setEvenements(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'catalogue'                        => ['required', 'array', 'max:100'],
+            'catalogue.*.code'                 => ['required', 'string', 'max:60'],
+            'catalogue.*.type'                 => ['required', 'in:fixe,lunaire,gextimo,utilisateur,marketing'],
+            'catalogue.*.date_fixe'            => ['nullable', 'date_format:m-d'],
+            'catalogue.*.dates'                => ['nullable', 'array', 'max:20'],
+            'catalogue.*.dates.*'              => ['date_format:Y-m-d'],
+            'catalogue.*.date_debut'           => ['nullable', 'date_format:Y-m-d'],
+            'catalogue.*.date_fin'             => ['nullable', 'date_format:Y-m-d'],
+            'catalogue.*.titre'                => ['required', 'array'],
+            'catalogue.*.titre.fr'             => ['required', 'string', 'max:120'],
+            'catalogue.*.titre.en'             => ['required', 'string', 'max:120'],
+            'catalogue.*.message'              => ['nullable', 'array'],
+            'catalogue.*.message.fr'           => ['nullable', 'string', 'max:300'],
+            'catalogue.*.message.en'           => ['nullable', 'string', 'max:300'],
+            'catalogue.*.animation'            => ['required', 'in:confettis,coeurs,neige,etoiles,aucune'],
+            'catalogue.*.couleur'              => ['nullable', 'string', 'max:9'],
+            'catalogue.*.image_url'            => ['nullable', 'string', 'max:500'],
+            'catalogue.*.priorite'             => ['nullable', 'integer', 'min:0', 'max:999'],
+            'catalogue.*.cible'                => ['required', 'in:tous,clients,pros'],
+            'catalogue.*.mode_affichage'       => ['required', 'in:splash,toast'],
+            'catalogue.*.frequence_affichage'  => ['required', 'in:quotidien,unique'],
+            'catalogue.*.actif'                => ['required', 'boolean'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'evenements_celebration'], ['valeur' => $data['catalogue']]);
+
+        return response()->json(['catalogue' => $s->valeur]);
     }
 
     /** PUT /api/admin/vitrine/banniere — édition (admin). */

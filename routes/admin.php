@@ -67,6 +67,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Brief 16/07 (pt 6) : périodes d'habillage saisonnier (splash local, config-driven)
     Route::put('vitrine/splash-themes', [VitrineController::class, 'setSplashThemes']);
 
+    // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
+    Route::get('vitrine/evenements', [VitrineController::class, 'getEvenements']);
+    Route::put('vitrine/evenements', [VitrineController::class, 'setEvenements']);
+
     // Ateliers
     Route::middleware('admin.permission:ateliers.view')->group(function () {
         Route::get('ateliers',          [AtelierController::class, 'index']);
