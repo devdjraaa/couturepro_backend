@@ -139,8 +139,19 @@ Bandeau/panneau conforme (115), rendu visuel charte (116), contenu des catégori
 ## SEO indexabilité (124-125)
 | Pt | Sujet | Statut |
 |---|---|---|
-| 124 | Audit lisibilité par les robots (SPA) | ⬜ (audit à faire — la vitrine est une SPA React) |
-| 125 | Rendu serveur / pré-rendu des pages clés | ⬜ (dépend du 124) |
+| 124 | Audit lisibilité par les robots | ✅ **FAIT (18/07)** — voir finding ci-dessous |
+| 125 | Rendu serveur / pré-rendu des pages clés | ⬜ reco prête (à valider avant prod) |
+
+**Finding audit 124 (curl User-Agent Googlebot, sans exécution JS) :**
+- `/`, `/createurs`, `/confidentialite` renvoient **toutes le même `<title>` générique** (« Gextimo — La marketplace… ») — aucun titre par page.
+- Le HTML brut ne contient **quasiment aucun texte réel** : tout le contenu (créateurs, texte légal, produits) est injecté par JavaScript après coup. Un robot qui n'exécute pas le JS voit une coquille vide.
+- Confirmation exacte du risque du pt 124 : Google finit par exécuter le JS (donc pas critique), mais c'est plus lent, non garanti, et les robots simples / aperçus sociaux ne voient rien.
+
+**Reco pt 125 (à valider avant de toucher la prod) :** la vitrine est une **SPA Vite/React**. Le plus léger et sûr, sans réécrire en SSR :
+1. **Pré-rendu au build** des pages statiques (accueil + 11 pages légales) → HTML complet dans le bundle (plugin de prerender Vite ou script Puppeteer).
+2. **Métadonnées par page** (title/description) injectées dans ce HTML pré-rendu.
+3. Pour les pages dynamiques (créateurs/produits) : **rendu bot via nginx** selon le User-Agent (le mécanisme `og/createurs` existe déjà pour les robots sociaux → à étendre).
+⚠️ Touche la façon dont le site est servi à Google → à faire avec validation + test, pas à l'aveugle.
 
 ## ✅ Décisions tranchées par la direction (128-130) — le 18/07
 | Pt | Décision | Statut |
