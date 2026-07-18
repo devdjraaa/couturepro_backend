@@ -29,6 +29,8 @@ class ParametresController extends Controller
         $data = $request->validate([
             'nom'       => ['required', 'string', 'max:255'],
             'prenom'    => ['nullable', 'string', 'max:100'], // pt 71 : éditable depuis Réglages > Profil
+            'naissance_jour' => ['nullable', 'integer', 'between:1,31'], // pt 58 : anniversaire (jour/mois)
+            'naissance_mois' => ['nullable', 'integer', 'between:1,12'],
             // Format téléphone : sinon une saisie non numérique est normalisée à
             // vide/null → violation NOT NULL en base → 500 au lieu d'un 422 clair.
             'telephone' => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s]{6,}$/',
@@ -48,10 +50,12 @@ class ParametresController extends Controller
         $user->update($data);
 
         return response()->json([
-            'nom'       => $user->nom,
-            'prenom'    => $user->prenom,
-            'telephone' => $user->telephone,
-            'email'     => $user->email,
+            'nom'            => $user->nom,
+            'prenom'         => $user->prenom,
+            'telephone'      => $user->telephone,
+            'email'          => $user->email,
+            'naissance_jour' => $user->naissance_jour,
+            'naissance_mois' => $user->naissance_mois,
         ]);
     }
 

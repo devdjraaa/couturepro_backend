@@ -26,6 +26,8 @@ class Proprietaire extends Authenticatable
         'password',
         'telephone_verified_at',
         'derniere_connexion_at',
+        'naissance_jour',
+        'naissance_mois',
         'fcm_token',
         'fcm_platform',
     ];
