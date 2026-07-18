@@ -13,10 +13,12 @@ class ProcessBonusExpiry extends Command
 
     public function handle(): void
     {
-        // Bonus dont bonus_timestamp_debut + 31 jours <= maintenant
+        // Bonus dont bonus_timestamp_debut + 31 jours <= maintenant.
+        // Condition équivalente et portable : debut <= maintenant - 31 jours
+        // (DATE_ADD est du MySQL — plantait chaque nuit sur la prod PostgreSQL).
         $expires = Abonnement::where('bonus_actif', true)
             ->whereNotNull('bonus_timestamp_debut')
-            ->where(DB::raw("DATE_ADD(bonus_timestamp_debut, INTERVAL 31 DAY)"), '<=', now())
+            ->where('bonus_timestamp_debut', '<=', now()->subDays(31))
             ->get();
 
         $count = 0;
