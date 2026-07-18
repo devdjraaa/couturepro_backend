@@ -78,8 +78,8 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 | 65 | Icônes par type de vêtement | ✅ (18/07) |
 | 66 | Catalogue alphabétique | ✅ (18/07) |
 | 67 | Onboarding 3 étapes | ⬜ |
-| 68 | Refonte flux création commande | 🔵 renommage + client visible ✅ ; menu déroulant + « Éditer les mesures » ⬜ |
-| 69 | Mesures définies par type de vêtement | 🔵 `libelles_mesures` existe par vêtement ; chargement auto à la commande ⬜ (décision : mesures par client vs par commande) |
+| 68 | Refonte flux création commande | 🟡 renommage + client visible + **menu déroulant ✅** (18/07) ; « Éditer les mesures » inline = à itérer sur device |
+| 69 | Mesures définies par type de vêtement | 🟡 **décidé : mesures PAR CLIENT** (pas de refonte modèle) ; `libelles_mesures` par vêtement existe ; chargement auto à la commande = à itérer device |
 | 70 | WhatsApp : libellés de mesures | ✅ (déjà inclus) |
 | 71 | Prénom dans Réglages > Profil | ✅ (18/07) |
 | 72 | Fidélité : 1 client = 1 point | 🟡 |
@@ -142,9 +142,9 @@ Bandeau/panneau conforme (115), rendu visuel charte (116), contenu des catégori
 | 124 | Audit lisibilité par les robots (SPA) | ⬜ (audit à faire — la vitrine est une SPA React) |
 | 125 | Rendu serveur / pré-rendu des pages clés | ⬜ (dépend du 124) |
 
-## ⚖️ Décisions à trancher (128-130) — **bloquent une implémentation correcte**
-| Pt | Sujet | À décider |
+## ✅ Décisions tranchées par la direction (128-130) — le 18/07
+| Pt | Décision | Statut |
 |---|---|---|
-| 128 | Casse de « Novafriq » dans le copyright | NovAfriq / Novafriq / NOVAFRIQ ? |
-| 129 | « Gestimo » vs « Gextimo » | confirmer **Gextimo** partout (coquille dans certains docs) |
-| 130 | Méthodes d'authentification espace client | l'archi v3 livrée = **e-mail OTP + Google** ; la spec (pt 8) en évoque d'autres → lesquelles retenir ? |
+| 128 | Copyright = **« Novafriq »** | ✅ appliqué (textes visibles) |
+| 129 | **« Gextimo »** partout | ✅ confirmé (aucune coquille « Gestimo » dans le code) |
+| 130 | Espace client : **on garde e-mail OTP + Google** (pas d'ajout) | ✅ rien à changer |
