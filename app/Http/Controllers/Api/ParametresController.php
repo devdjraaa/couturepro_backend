@@ -28,6 +28,7 @@ class ParametresController extends Controller
 
         $data = $request->validate([
             'nom'       => ['required', 'string', 'max:255'],
+            'prenom'    => ['nullable', 'string', 'max:100'], // pt 71 : éditable depuis Réglages > Profil
             // Format téléphone : sinon une saisie non numérique est normalisée à
             // vide/null → violation NOT NULL en base → 500 au lieu d'un 422 clair.
             'telephone' => ['required', 'string', 'max:20', 'regex:/^\+?[\d\s]{6,}$/',
@@ -48,6 +49,7 @@ class ParametresController extends Controller
 
         return response()->json([
             'nom'       => $user->nom,
+            'prenom'    => $user->prenom,
             'telephone' => $user->telephone,
             'email'     => $user->email,
         ]);
