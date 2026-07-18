@@ -64,7 +64,7 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 | Pt | Sujet | Statut |
 |---|---|---|
 | 57 | Système d'événements dynamiques complet | 🔵 splash saisonnier config-driven ✅ ; 5 familles + JSON serveur + priorités + overlay perso = à construire |
-| 58 | Champ date de naissance | 🟡 espace client ✅ ; **PROS (jour/mois) ⬜** |
+| 58 | Champ date de naissance | ✅ espace client + PROS (jour/mois) — 18/07 |
 | 59 | Test 3-4 jours | ⏳ process |
 
 ## Corrections app (60-79) — **majorité ✅ le 17-18/07**
