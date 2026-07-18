@@ -8,7 +8,7 @@
 - **✅ Faits : ~70 points** (dont ~20 livrés/vérifiés le 17-18/07)
 - **🟡 Partiels / à re-tester sur device : ~30**
 - **⬜ À faire : ~20**
-- **🔵 Gros chantiers : 3** (68-69 flux mesures, 101 Mes Réalisations, 125 SEO SSR) — *57 événements ✅ et 124 audit SEO ✅ livrés le 18/07*
+- **🔵 Gros chantiers : 2** (68-69 flux mesures, 125 SEO SSR) — *57 événements ✅, 101 Mes Réalisations ✅ et 124 audit SEO ✅ livrés le 18/07*
 - **⚖️ Décisions direction : 3** (128, 129, 130)
 
 ---
@@ -114,7 +114,7 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 ## Modules & divers (101-114)
 | Pt | Sujet | Statut |
 |---|---|---|
-| 101 | Module « Mes Réalisations » | 🔵 spec (nouveau module) |
+| 101 | Module « Mes Réalisations » | ✅ **FAIT (18/07, full-stack, déployé)** — table `realisations` + `Realisation` (4 statuts brouillon/en_attente/publiee/refusee) ; API pro (brouillon, photos max 6, **certification auteur + consentement bloquants** à la soumission, **anti-abus 10 envois/7j**, cap cache local 100, IDOR multi-ateliers) ; **modération admin** (file par statut + compteurs, approuver→**filigrane GD à la publication**, refuser+motif, permission `realisations.moderate`) ; **profil vitrine** expose les réalisations publiées (images filigranées). Front : page pro (AtelierPage→Mes Réalisations), page admin (sidebar), section profil créateur, i18n fr/en. Vérifié prod (profil 200 `realisations:[]`, routes 401). **App mobile : cache offline WatermelonDB = à ajouter sur android (QA device).** |
 | 102 | Distinction Notifications / Gextimo Infos | ✅ |
 | 103 | Compte à rebours de lancement | 🟡 |
 | 104 | Messages de récupération | 🟡 |
