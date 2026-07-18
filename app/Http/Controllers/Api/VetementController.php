@@ -29,6 +29,7 @@ class VetementController extends Controller
                   ->orWhere('is_systeme', true);
             })
             ->actif()
+            ->orderBy('nom') // pt 66 : catalogue classé alphabétiquement (recherche facilitée)
             ->get();
 
         return response()->json($vetements);
