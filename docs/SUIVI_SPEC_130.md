@@ -132,9 +132,9 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 Bandeau/panneau conforme (115), rendu visuel charte (116), contenu des catégories (117), identité Makila (118), menu chatbot (119), liens légaux chatbot (120), cookies décochés par défaut (126), persistance du consentement (127).
 | Pt | Sujet | Statut |
 |---|---|---|
-| 121 | Pages légales en sidebar (module unique) | ⬜ (refonte à faire) |
-| 122 | Compléments légaux surlignés en vert | ⬜ |
-| 123 | Conformité (code du numérique Bénin + RGPD) | ⬜ |
+| 121 | Pages légales en sidebar (module unique) | ✅ **FAIT (18/07)** — `LegalShell` : sidebar des 11 pages + contenu, navigation SPA sans rechargement, appliqué aux 3 rendus (i18n / articles / contenu back-office) |
+| 122 | Compléments légaux surlignés en vert | ✅ **FAIT (18/07)** — blocs `ajout:true` surlignés (bordure/emerald) + légende « à valider par l'équipe » ; ajouts sur Mentions légales + Contact/Réclamations |
+| 123 | Conformité (code du numérique Bénin + RGPD) | 🟡 compléments rédigés selon standards APDP Bénin/RGPD et **marqués pour relecture légale** (relecture par un juriste = tâche équipe) |
 
 ## SEO indexabilité (124-125)
 | Pt | Sujet | Statut |
