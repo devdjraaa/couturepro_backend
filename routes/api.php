@@ -392,6 +392,8 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::delete('liste-attente/{liste_attente}', [ListeAttenteController::class, 'destroy']);
 
     // PL-7 : vidéos de présentation (Studio)
+    // VID-2 : compteur de vidéos selon le plan (0/1, 2/3, 5/5) — avant la route {atelier_video}.
+    Route::get('atelier-videos/quota',             [AtelierVideoController::class, 'quota']);
     Route::get('atelier-videos',                   [AtelierVideoController::class, 'index']);
     Route::post('atelier-videos',                  [AtelierVideoController::class, 'store']);
     Route::delete('atelier-videos/{atelier_video}', [AtelierVideoController::class, 'destroy']);
