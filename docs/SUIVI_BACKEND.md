@@ -20,8 +20,8 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 |---|---|---|
 | 1 | **Les points 27 et 28 sont déjà faits.** L'architecture centralisée d'abonnement existe et fonctionne (`NiveauConfig` → `Abonnement::getConfigEffective()` → `ChecksPlanFeature` → hooks front), ~37 clés de configuration. | Ce n'est **pas un chantier**, seulement de la dette à nettoyer (S02A-27/28). |
 | 2 | **Les avis ne sont pas liés aux collections.** Le modèle `Avis` ne porte que `atelier_id` — la notion d'avis par collection n'existe nulle part. | Le Pt 29 tel qu'écrit suppose une fonctionnalité inexistante. **Décision à prendre** : créer le lien, ou traiter les avis au niveau créateur. |
-| 3 | **C'est le créateur qui modère ses propres avis** (`AvisController::moderer`, route dans le groupe atelier authentifié). Il est juge et partie : il peut rejeter tout avis négatif. | C'est exactement ce que la direction veut supprimer (Pt 29). |
-| 4 | **La route de signalement d'un avis est publique, sans authentification ni limitation.** N'importe qui peut faire disparaître un avis validé de la vitrine. | Faille à corriger en priorité (S08C-29). |
+| 3 | ~~**C'est le créateur qui modère ses propres avis**~~ ✅ **CORRIGÉ le 19/07** — validation retirée, publication automatique. | Reste au front à retirer l'écran (la route répond 410 en attendant). |
+| 4 | ~~**La route de signalement d'un avis est publique, sans authentification ni limitation**~~ ✅ **CORRIGÉ le 19/07** — le signalement ne dépublie plus rien (compteur + horodatage), limitation de débit ajoutée sur le signalement et sur le dépôt d'avis. | Faille fermée, vérifiée en production. |
 | 5 | **L'interface annonce 3 règles de fidélité qui n'existent pas** (parrainage 50 pts, 1 000 XOF = 1 pt, mois actif = 5 pts). Vérifié : zéro occurrence de parrainage dans le backend. | Promesse non tenue visible par les utilisateurs. Voir `SYSTEME_FIDELITE.md`. |
 | 6 | **Le socle du workflow photos existe déjà.** Le module « Mes Réalisations » (livré le 18/07) a déjà les statuts, la modération admin, le filigrane à la publication et l'anti-abus. | **Étendre**, ne pas refaire (PHOTO-*). |
 | 7 | **L'abonnement aux créateurs est 100 % anonyme** (clé visiteur en stockage local). Vider son cache = perdre ses abonnements. | ⚠️ **Décision** : que fait-on des abonnements anonymes existants lors de la bascule vers un compte ? |
@@ -35,9 +35,9 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | S02A-25 | Libellé du bouton d'édition | ℹ️ | **100 % frontend** ↔ `SUIVI_FRONTEND.md#S02A-25`. Rien à faire côté serveur. |
 | S02A-26 | Positionnement du bouton | ℹ️ | **100 % frontend** ↔ `SUIVI_FRONTEND.md#S02A-26`. |
 | S02A-27 | Quota galerie piloté par l'abonnement | ✅ | **Déjà fait.** `GalerieController` lit `max_photos_vip_par_mois` via `getConfigEffective()`, expose `GET /galerie/quota` (`utilise`/`max`/`restant`/`illimite`), `-1` et `null` = illimité. |
-| S02A-27b | Nettoyer les messages d'upsell en dur | 🟡 | `app/Traits/ChecksPlanFeature.php` contient « 5 photos/mois » en dur, et `GalerieController` renvoie `plan_requis => premium_annuel` codé en dur. À dériver de la config réelle. |
+| S02A-27b | Nettoyer les messages d'upsell en dur | ✅ | **FAIT (19/07)** — plan proposé dérivé de la grille active + libellés issus du référentiel ; `planRequisPourLimite()` ajouté pour les quotas numériques. |
 | S02A-28 | Configuration centralisée des abonnements | ✅ | **Déjà fait.** `NiveauConfig` (table `niveaux_config`) → `Abonnement::getConfigEffective()` (snapshot + fusion + repli sur `free` si expiré) → `ChecksPlanFeature::planGate()` + `AtelierLimitsService`. 26 points d'appel. |
-| S02A-28b | Dette : mapping « feature → plan requis » en dur | 🟡 | `ChecksPlanFeature.php` embarque une table de 16 features en dur en PHP, sans lien avec `niveaux_config`. Si un plan change en base, ce mapping ne suit pas. À déplacer en configuration. |
+| S02A-28b | Dette : mapping « feature → plan requis » en dur | ✅ | **FAIT (19/07)** — la table PHP figée est supprimée : le plan requis est le plan ACTIF le moins cher activant la fonctionnalité. 23 clés sans libellé complétées dans `fonctionnalites`. |
 
 ---
 
@@ -45,9 +45,9 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| S08C-29a | Publication automatique des avis | ⬜ | Aujourd'hui l'avis naît en `en_attente` et n'apparaît qu'une fois passé à `valide`. À basculer en publication directe (ou modération **globale** côté admin, pas côté créateur). |
-| S08C-29b | Retirer la modération par le créateur | ⚠️ | Route `POST avis/{avis}/moderation` dans le groupe atelier → le créateur valide/rejette ses propres avis. **À supprimer** et, si une modération est souhaitée, la déplacer côté admin (aucune route admin n'existe aujourd'hui). |
-| S08C-29c | Sécuriser le signalement d'un avis | ⚠️ | `POST avis/{avis}/signaler` est **public, sans auth ni limitation** : un avis validé passe en `signale` et disparaît instantanément de la vitrine, sans arbitrage ni retour possible. Ajouter authentification + limitation + file de modération. |
+| S08C-29a | Publication automatique des avis | ✅ | **FAIT (19/07)** — publication immédiate à la soumission. La migration a publié l'avis resté en attente (vérifié en prod : 5 valides, 0 en attente). |
+| S08C-29b | Retirer la modération par le créateur | ✅ | **FAIT (19/07)** — la validation par le créateur est retirée ; la route répond 410 le temps que le front retire l'écran ↔ `SUIVI_FRONTEND.md#S08C-29`. À supprimer ensuite. |
+| S08C-29c | Sécuriser le signalement d'un avis | ✅ | **FAIT (19/07)** — le signalement n'affecte plus le statut : il incrémente un compteur + horodate. Limitation de débit ajoutée (10/h) ainsi que sur le dépôt d'avis (5/h). |
 | S08C-29d | Autoriser plusieurs avis par utilisateur | 🟡 | Aucune contrainte d'unicité sur le chemin public (l'auteur est un simple champ texte). Sur le chemin espace client, l'unicité est **par commande** (applicative, pas d'index en base). À clarifier avec la direction : la limite voulue est-elle « 1 avis par commande » ? |
 | S08C-29e | Lier les avis aux collections | ⬜ | `Avis` n'a pas de `collection_id`. Migration + relation à créer **si** la direction confirme vouloir des avis par collection (voir écart n°2). |
 | S08C-30 | Moyens de paiement → FedaPay uniquement | 🟡 | Côté serveur, `mode_paiement` d'une facture accepte **n'importe quelle chaîne** (aucune énumération). Les commandes/caisse ont une énumération figée en base (`especes`, `mobile_money`, `virement`), incohérente avec la facturation. → Exposer **une liste unique et configurable** consommée par le front. ↔ `SUIVI_FRONTEND.md#S08C-30` |
