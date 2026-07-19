@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Atelier;
 use App\Models\Realisation;
+use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class RealisationController extends Controller
 {
-    use ResolvesAtelier;
+    use ResolvesAtelier, ChecksPlanFeature;
 
     private const MAX_IMAGES = 6;
 
@@ -30,13 +32,22 @@ class RealisationController extends Controller
             ->orderByDesc('updated_at')
             ->get();
 
-        return response()->json(['realisations' => $items, 'quota' => $this->infoQuota($atelier->id)]);
+        return response()->json([
+            'realisations' => $items,
+            'quota'        => $this->infoQuota($atelier->id),
+            'cycle'        => $this->quotaCycle($atelier),
+        ]);
     }
 
-    /** GET /realisations/quota — état anti-abus + cap du cache local. */
+    /** GET /realisations/quota — solde du cycle + anti-abus + cap du cache local. */
     public function quota(Request $request): JsonResponse
     {
-        return response()->json($this->infoQuota($this->getAtelier($request)->id));
+        $atelier = $this->getAtelier($request);
+
+        return response()->json(array_merge(
+            $this->infoQuota($atelier->id),
+            ['cycle' => $this->quotaCycle($atelier)]
+        ));
     }
 
     /** POST /realisations — crée un brouillon. */
@@ -188,6 +199,23 @@ class RealisationController extends Controller
             ], 429);
         }
 
+        // PHOTO-4 : quota du cycle. Le solde est décrémenté par cet envoi ; il sera
+        // réattribué si la réalisation est refusée ou supprimée avant publication.
+        $atelier = Atelier::find($realisation->atelier_id);
+        $cycle   = $this->quotaCycle($atelier);
+        if ($cycle['bloque']) {
+            $superieur = $this->planRequisPourLimite('max_realisations_cycle', $cycle['max']);
+
+            return response()->json([
+                'message'           => "Vous avez atteint votre limite de photos pour ce mois. Renouvellement le {$cycle['prochain_reset']}.",
+                'code'              => 'quota_cycle',
+                'cycle'             => $cycle,
+                'plan_requis'       => $superieur['cle'] ?? null,
+                'plan_requis_label' => $superieur['label'] ?? null,
+                'action'            => 'upgrade',
+            ], 403);
+        }
+
         $realisation->update([
             'statut'                 => Realisation::STATUT_EN_ATTENTE,
             'certifie_auteur'        => true,
@@ -231,7 +259,30 @@ class RealisationController extends Controller
         return null;
     }
 
-    /** Compteurs anti-abus + cap local pour l'UI. */
+    /** Quota du cycle (PHOTO-4/5) : solde restant, alerte, prochain renouvellement. */
+    private function quotaCycle(Atelier $atelier): array
+    {
+        $config = $atelier->abonnement?->getConfigEffective() ?? [];
+        $max    = $config['max_realisations_cycle'] ?? null;
+        $max    = ($max === null || (int) $max === -1) ? null : (int) $max;
+
+        $utilise = Realisation::where('atelier_id', $atelier->id)->consommeesCycle()->count();
+        $restant = $max === null ? null : max(0, $max - $utilise);
+
+        return [
+            'utilise'          => $utilise,
+            'max'              => $max,
+            'restant'          => $restant,
+            'illimite'         => $max === null,
+            'bloque'           => $restant !== null && $restant === 0,
+            // Alerte à 80 % de consommation, avec incitation à monter en gamme.
+            'alerte'           => $max !== null && $max > 0 && ($utilise / $max) >= 0.8,
+            'cycle_debut'      => Realisation::debutCycle()->toDateString(),
+            'prochain_reset'   => Realisation::prochainReset()->toDateString(),
+        ];
+    }
+
+    /** Compteurs anti-abus + cap local + quota de cycle, pour l'UI. */
     private function infoQuota(string $atelierId): array
     {
         $envoiesSemaine = Realisation::where('atelier_id', $atelierId)

@@ -48,6 +48,25 @@ class Realisation extends Model
     /** Anti-abus : nombre maximum d'envois en modération par semaine et par atelier. */
     public const MAX_ENVOIS_SEMAINE = 10;
 
+    /** PHOTO-5 — Cycle de publication : reset le 22 de chaque mois à 00h00, heure de Cotonou. */
+    public const FUSEAU     = 'Africa/Porto-Novo';
+    public const JOUR_RESET = 22;
+
+    /** Début du cycle en cours (le 22 le plus récent). */
+    public static function debutCycle(): \Carbon\CarbonImmutable
+    {
+        $maintenant = \Carbon\CarbonImmutable::now(self::FUSEAU);
+        $resetDuMois = $maintenant->startOfMonth()->addDays(self::JOUR_RESET - 1)->startOfDay();
+
+        return $maintenant->gte($resetDuMois) ? $resetDuMois : $resetDuMois->subMonth();
+    }
+
+    /** Date du prochain renouvellement (affichée en permanence au designer). */
+    public static function prochainReset(): \Carbon\CarbonImmutable
+    {
+        return self::debutCycle()->addMonth();
+    }
+
     /** Cap du cache local (brouillons + en attente uniquement), aligné avec la spec. */
     public const CAP_CACHE_LOCAL = 100;
 
@@ -64,6 +83,24 @@ class Realisation extends Model
     public function scopeEnAttente($q)
     {
         return $q->where('statut', self::STATUT_EN_ATTENTE);
+    }
+
+    /**
+     * PHOTO-4 — Réalisations consommant le quota du cycle en cours.
+     *
+     * Le solde n'est PAS stocké : il se déduit des faits, ce qui rend toute dérive
+     * impossible. La règle de la direction tombe alors d'elle-même :
+     *   • décrément À L'ENVOI  → on ne compte que les `soumis_at` renseignés
+     *     (un brouillon n'a rien consommé) ;
+     *   • +1 si REFUS définitif → les refusées sont exclues du décompte ;
+     *   • +1 si SUPPRESSION avant publication → la ligne n'existe plus ;
+     *   • jamais de réattribution après publication → les publiées restent comptées.
+     */
+    public function scopeConsommeesCycle($q)
+    {
+        return $q->whereNotNull('soumis_at')
+            ->where('soumis_at', '>=', self::debutCycle()->utc())
+            ->whereIn('statut', [self::STATUT_EN_ATTENTE, self::STATUT_PUBLIEE]);
     }
 
     /** Modifiable par l'atelier tant qu'elle n'est pas soumise/publiée. */
