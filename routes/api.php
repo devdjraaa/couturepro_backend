@@ -77,9 +77,11 @@ Route::prefix('vitrine')->group(function () {
     Route::get('patrons/achats/{code}/telecharger',      [PatronPublicController::class, 'telecharger']);
     // Rendu OG côté serveur pour les robots sociaux (proxifié par nginx selon l'User-Agent).
     Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
-    Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store']);
+    // S08C-29 : routes publiques d'avis — limitées en débit (aucune limitation
+    // auparavant : dépôt d'avis et signalements pouvaient être envoyés en boucle).
+    Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store'])->middleware('throttle:5,60');
     Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
-    Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler']);
+    Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
     Route::post('signaler',                      [SignalementController::class, 'store']);

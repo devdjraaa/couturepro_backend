@@ -16,9 +16,17 @@ class Avis extends Model
 
     protected $table = 'avis';
 
-    protected $fillable = ['atelier_id', 'auteur_nom', 'note', 'texte', 'photos', 'statut', 'gxt_client_id', 'commande_id'];
+    protected $fillable = [
+        'atelier_id', 'auteur_nom', 'note', 'texte', 'photos', 'statut',
+        'gxt_client_id', 'commande_id', 'signalements_count', 'signale_at',
+    ];
 
-    protected $casts = ['note' => 'integer', 'photos' => 'array'];
+    protected $casts = [
+        'note'               => 'integer',
+        'photos'             => 'array',
+        'signalements_count' => 'integer',
+        'signale_at'         => 'datetime',
+    ];
 
     protected $appends = ['photos_urls'];
 

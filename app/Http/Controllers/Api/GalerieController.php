@@ -52,10 +52,15 @@ class GalerieController extends Controller
                 ->count();
 
             if ($photosCoMois >= $maxPhotos) {
+                // S02A-28 : le plan à proposer est dérivé de la grille active
+                // (auparavant « premium_annuel » en dur — un plan désactivé).
+                $superieur = $this->planRequisPourLimite('max_photos_vip_par_mois', $maxPhotos);
+
                 return response()->json([
-                    'message'    => "Quota mensuel de photos atteint ({$maxPhotos} photos/mois).",
-                    'plan_requis'=> 'premium_annuel',
-                    'action'     => 'upgrade',
+                    'message'           => "Quota mensuel de photos atteint ({$maxPhotos} photos/mois).",
+                    'plan_requis'       => $superieur['cle'] ?? null,
+                    'plan_requis_label' => $superieur['label'] ?? null,
+                    'action'            => 'upgrade',
                 ], 403);
             }
         }

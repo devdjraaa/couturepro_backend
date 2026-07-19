@@ -36,25 +36,28 @@ class AvisController extends Controller
             }
         }
 
+        // S08C-29 : publication AUTOMATIQUE. Le créateur ne valide plus les avis
+        // déposés sur son propre profil (il était juge et partie et pouvait
+        // rejeter tout avis négatif).
         Avis::create([
             'atelier_id' => $atelier->id,
             'auteur_nom' => $data['auteur_nom'],
             'note'       => $data['note'],
             'texte'      => $data['texte'] ?? null,
             'photos'     => $photos ?: null,
-            'statut'     => 'en_attente',
+            'statut'     => 'valide',
         ]);
 
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
             'titre'      => 'Nouvel avis reçu',
-            'contenu'    => $data['auteur_nom'] . ' a laissé un avis ' . $data['note'] . '★ (à valider).',
+            'contenu'    => $data['auteur_nom'] . ' a laissé un avis ' . $data['note'] . '★.',
             'type'       => 'avis_recu',
             'lien'       => '/ma-vitrine',
             'is_read'    => false,
         ]);
 
-        return response()->json(['message' => 'Avis soumis, en attente de validation.'], 201);
+        return response()->json(['message' => 'Merci, votre avis est publié.'], 201);
     }
 
     // GET /api/avis — avis de mon atelier (tous statuts).
@@ -67,25 +70,40 @@ class AvisController extends Controller
         );
     }
 
-    // POST /api/avis/{avis}/moderation — valider / rejeter (créateur).
-    public function moderer(Request $request, Avis $avis): JsonResponse
+    /**
+     * POST /api/avis/{avis}/moderation — RETIRÉ (S08C-29).
+     *
+     * La validation des avis par le créateur lui-même est supprimée : il était
+     * juge et partie et pouvait rejeter tout avis négatif. Les avis sont désormais
+     * publiés automatiquement ; le recours passe par le signalement, arbitré côté admin.
+     *
+     * On répond 410 (au lieu de supprimer la route) le temps que le front retire
+     * l'écran correspondant, pour ne pas casser l'application déjà déployée.
+     * → à supprimer une fois SUIVI_FRONTEND.md#S08C-29 livré.
+     */
+    public function moderer(): JsonResponse
     {
-        $atelier = $this->getAtelier($request);
-        abort_unless($avis->atelier_id === $atelier->id, 403);
-
-        $data = $request->validate(['statut' => ['required', 'in:valide,rejete']]);
-        $avis->update(['statut' => $data['statut']]);
-
-        return response()->json($avis);
+        return response()->json([
+            'message' => 'Les avis sont désormais publiés automatiquement : la validation par le créateur a été retirée.',
+        ], 410);
     }
 
-    // POST /api/vitrine/avis/{avis}/signaler — signalement public (repasse en attente de modération).
-    public function signaler(Avis $avis): JsonResponse
+    /**
+     * POST /api/vitrine/avis/{avis}/signaler — signalement public.
+     *
+     * Ne dépublie PLUS l'avis (faille corrigée : un seul appel anonyme suffisait
+     * à faire disparaître un avis de la vitrine, sans arbitrage ni retour possible).
+     * On enregistre le signal ; l'arbitrage revient à l'administration.
+     */
+    public function signaler(Request $request, Avis $avis): JsonResponse
     {
+        $request->validate(['motif' => ['nullable', 'string', 'max:200']]);
+
         if ($avis->statut === 'valide') {
-            $avis->update(['statut' => 'signale']);
+            $avis->increment('signalements_count');
+            $avis->update(['signale_at' => now()]);
         }
 
-        return response()->json(['message' => 'Avis signalé. Merci.']);
+        return response()->json(['message' => 'Signalement enregistré. Merci, notre équipe va vérifier.']);
     }
 }
