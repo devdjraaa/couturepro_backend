@@ -127,6 +127,8 @@ Route::prefix('vitrine/client')->group(function () {
         Route::get('me',            [ClientAuthController::class, 'me']);
         Route::patch('me',          [ClientAuthController::class, 'majProfil']); // brief 16/07 pt 3
         Route::post('consentement', [ClientAuthController::class, 'consentement']);
+        // ABO-7 : mes créateurs suivis (consultation + désabonnement via le toggle).
+        Route::get('abonnements',   [VitrineController::class, 'mesAbonnements']);
         Route::post('logout',       [ClientAuthController::class, 'logout']);
 
         // Phase 2 : commandes « direct » (atterrissent dans l'outil du designer) + avis + réclamations.

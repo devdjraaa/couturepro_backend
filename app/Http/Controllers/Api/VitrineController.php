@@ -538,23 +538,86 @@ HTML;
             return response()->json(['message' => 'Créateur introuvable'], 404);
         }
 
-        $data = $request->validate(['visitor_key' => ['required', 'string', 'max:64']]);
+        // ABO-1 : un compte est désormais OBLIGATOIRE. Auparavant l'abonnement était
+        // anonyme (clé visiteur en stockage navigateur) : il ne garantissait ni suivi,
+        // ni notification, ni fiabilité du compteur.
+        $user = auth('sanctum')->user();
+        if (! $user instanceof GxtClient) {
+            return response()->json([
+                'message' => 'Créez un compte ou connectez-vous pour suivre ce créateur.',
+                'code'    => 'auth_requise',   // le front ouvre le module d'inscription
+            ], 401);
+        }
 
-        $existant = AtelierAbonne::where('atelier_id', $atelier->id)
-            ->where('visitor_key', $data['visitor_key'])->first();
+        // ABO-6 : un créateur ne peut pas s'abonner à lui-même (compteur gonflé).
+        if ($user->email && $user->email === optional($atelier->proprietaire)->email) {
+            return response()->json([
+                'message' => 'Vous ne pouvez pas vous abonner à votre propre profil.',
+                'code'    => 'auto_abonnement',
+            ], 422);
+        }
 
-        if ($existant) {
-            $existant->delete();
+        $data = $request->validate([
+            'notifications_optin' => ['nullable', 'boolean'],   // ABO-5 : consentement distinct
+        ]);
+
+        $ligne = AtelierAbonne::where('atelier_id', $atelier->id)
+            ->where('gxt_client_id', $user->id)
+            ->first();
+
+        if ($ligne && $ligne->actif) {
+            // Désabonnement : la ligne est conservée pour la traçabilité (ABO-8).
+            $ligne->update(['actif' => false, 'desabonne_at' => now()]);
             $abonne = false;
+        } elseif ($ligne) {
+            $ligne->update([
+                'actif'               => true,
+                'desabonne_at'        => null,
+                'notifications_optin' => (bool) ($data['notifications_optin'] ?? $ligne->notifications_optin),
+            ]);
+            $abonne = true;
         } else {
-            AtelierAbonne::create(['atelier_id' => $atelier->id, 'visitor_key' => $data['visitor_key']]);
+            AtelierAbonne::create([
+                'atelier_id'          => $atelier->id,
+                'gxt_client_id'       => $user->id,
+                'notifications_optin' => (bool) ($data['notifications_optin'] ?? false),
+                'actif'               => true,
+            ]);
             $abonne = true;
         }
 
         return response()->json([
             'abonne'  => $abonne,
-            'abonnes' => AtelierAbonne::where('atelier_id', $atelier->id)->count(),
+            'abonnes' => AtelierAbonne::where('atelier_id', $atelier->id)->actifs()->count(),
         ]);
+    }
+
+    /**
+     * GET /api/vitrine/client/abonnements — mes créateurs suivis (ABO-7).
+     * Route authentifiée : permet de consulter et de se désabonner depuis l'espace client.
+     */
+    public function mesAbonnements(Request $request): JsonResponse
+    {
+        $client = $request->user();
+
+        $abonnements = AtelierAbonne::where('gxt_client_id', $client->id)
+            ->actifs()
+            // logo_url est un accesseur calculé : c'est logo_path qu'il faut sélectionner.
+            ->with('atelier:id,nom,logo_path')
+            ->latest('created_at')
+            ->get()
+            ->map(fn ($a) => [
+                'id'                  => $a->id,
+                'notifications_optin' => $a->notifications_optin,
+                'depuis'              => $a->created_at,
+                'createur'            => [
+                    'id'       => $a->atelier?->id,
+                    'nom'      => $a->atelier?->nom,
+                    'logo_url' => $a->atelier?->logo_url,
+                ],
+            ]);
+
+        return response()->json(['abonnements' => $abonnements]);
     }
 
     /**
