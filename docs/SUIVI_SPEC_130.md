@@ -1,3 +1,9 @@
+⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
+Le reliquat encore ouvert a été repris dans **`SUIVI_BACKEND.md`** (backend) et **`SUIVI_FRONTEND.md`** (frontend).
+*Ce fichier est conservé pour l'historique des 130 points livrés.*
+
+---
+
 # Suivi — Spécification Gextimo (130 points)
 
 > Statut audité de chaque point de `Gextimo_Specification_COMPLETE_1_130.md`.

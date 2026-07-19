@@ -1,3 +1,11 @@
+⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
+Le suivi est désormais **séparé par couche** :
+· backend → **`SUIVI_BACKEND.md`** · frontend (Aquilas) → **`SUIVI_FRONTEND.md`**
+· tracker cochable → **`couturepro_frontend/public/suivi-v2.html`**
+*Ce fichier est conservé pour l'historique uniquement.*
+
+---
+
 # Suivi — Écosystème NovAfriq
 
 > **Fichier de suivi maître.** NovAfriq est la maison-mère ; **Gextimo** est un de ses produits.

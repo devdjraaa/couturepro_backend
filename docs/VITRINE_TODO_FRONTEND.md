@@ -1,3 +1,9 @@
+⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
+Le suivi frontend est désormais centralisé dans **`SUIVI_FRONTEND.md`** (Aquilas), ligne `REL-V1`.
+*Ce fichier reste la source des points vitrine encore ouverts, à basculer au fil de l'eau.*
+
+---
+
 # Vitrine Gextimo — À faire (frontend)
 
 > Document extrait du suivi général NovAfriq le **16 juillet 2026**. Il regroupe **tout ce qui
