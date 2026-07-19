@@ -139,7 +139,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| REL-1 | Correctif cache nginx (`immutable`) | ⚠️ | **CAUSE RACINE TROUVÉE** — ce n'est pas le jeton nginx : l'étape « Setup SSH » du workflow backend n'a ni délai d'attente ni tolérance, donc un `ssh-keyscan` lent fait échouer TOUT le déploiement (2 déploiements perdus le 19/07, rattrapés à la main). Correctif prêt (`ssh-keyscan -T 10 … || true`, déjà appliqué au front) mais **NON POUSSABLE : le jeton n'a pas la portée `workflow`**. → action direction. |
+| REL-1 | Déploiement automatique + cache nginx | ✅ | **RÉSOLU (19-20/07)** — trois problèmes distincts empilés : (1) le jeton HTTPS n'avait pas la portée `workflow` → **les 2 dépôts sont passés en SSH** (`github-djraa`), blocage levé ; (2) l'étape « Setup SSH » du CI n'avait ni délai ni tolérance → corrigée ; (3) **la vraie cause** des déploiements perdus : le secret `SSH_HOST` du dépôt backend, réécrit avec l'IP littérale. Déploiement automatique rétabli et vérifié. Le correctif nginx (immutable réservé aux assets hashés) est également poussé. |
 | REL-2 | Pré-rendu SEO (pt 125) | ⬜ | Recommandation prête, **à valider avant de toucher la production**. La vitrine est une application monopage : un robot sans JavaScript reçoit une coquille vide. |
 | REL-3 | « Mes Réalisations » sur mobile | ⬜ | Cache hors-ligne (100 brouillons/attente) à ajouter côté application native. |
 | REL-4 | Flux « Éditer les mesures » (pts 68-69) | ⬜ | Charger les libellés de mesures du type de vêtement dans l'éditeur existant. Mesures **par client** (arbitrage acté). Nécessite un test sur appareil. |
