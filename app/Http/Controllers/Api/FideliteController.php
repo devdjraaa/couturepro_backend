@@ -80,6 +80,21 @@ class FideliteController extends Controller
     {
         $atelier = $this->getAtelier($request);
 
+        // La permission `points.convert` était DÉCLARÉE dans le référentiel d'équipe
+        // mais jamais vérifiée : n'importe quel membre pouvait consommer les points
+        // de l'atelier. Le propriétaire n'est pas un membre d'équipe : il n'est donc
+        // pas concerné par ce contrôle.
+        $user = $request->user();
+        if ($user instanceof \App\Models\EquipeMembre) {
+            $permissions = \App\Models\PermissionEquipe::getForAtelier($atelier->id, $user->role);
+            if (! in_array('points.convert', $permissions, true)) {
+                return response()->json([
+                    'message' => 'Votre rôle ne permet pas de convertir les points de fidélité.',
+                    'code'    => 'permission_refusee',
+                ], 403);
+            }
+        }
+
         try {
             $abonnement = $this->service->convertirEnBonus($atelier);
         } catch (\DomainException $e) {
