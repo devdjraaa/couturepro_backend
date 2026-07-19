@@ -82,9 +82,9 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ANN-2 | Durée 1→10 jours + date de fin calculée | ✅ | **FAIT (19/07)** — durée 1→10 jours, date de fin calculée côté serveur (durée inclusive : 1 jour = le jour même), publication gratuite. |
 | ANN-3 | Limite d'une annonce par jour | ✅ | **FAIT (19/07)** — une annonce par jour et par atelier (jour calendaire, heure de Cotonou), avec le message d'information renvoyant vers le Boost. |
 | ANN-4 | Historique + statuts | ✅ | **FAIT (19/07)** — historique complet + statuts DÉDUITS des dates (programmee/en_cours/boostee/terminee), donc jamais désynchronisés. 8/8 cas testés. |
-| ANN-5 | Boost — modèle et planification | 🟡 | Colonnes de Boost en place (début, durée, fin, prix, paiement) ; reste l'API de planification. ↔ front peut déjà construire la modale avec les tarifs exposés. |
-| ANN-6 | Boost — paiement | ⬜ | 100 / 200 / 300 FCFA. Réutiliser le tunnel de paiement existant (FedaPay), ajouter un type « boost annonce ». |
-| ANN-7 | Diffusion 3× par jour pendant le boost | ⬜ | Logique de diffusion + exposition à la vitrine. |
+| ANN-5 | Boost — modèle et planification | ✅ | **FAIT (19/07)** — planification du Boost (date de début libre tant que l'annonce est diffusée) + durées 1/3/7 jours issues de la configuration. |
+| ANN-6 | Boost — paiement | ✅ | **FAIT (19/07)** — `POST /annonces/{annonce}/boost` : tunnel FedaPay réutilisé, prix lu côté SERVEUR (le client ne peut pas l'imposer). 5/5 garde-fous testés. Activation branchée dans `activate()` — sans ce dispatch un Boost payé n'aurait jamais démarré. |
+| ANN-7 | Diffusion 3× par jour pendant le boost | ✅ | **FAIT (19/07)** — `diffusions_par_jour` (3) exposé dans la config + les annonces boostées sont marquées et remontées en tête du flux public. La rotation d'affichage est côté front ↔ `SUIVI_FRONTEND.md#ANN-7`. |
 | ANN-8 | Flux public des annonces actives | ✅ | **FAIT (19/07)** — `GET /vitrine/annonces` : annonces en cours, boostées d'abord. Vérifié en prod. ↔ `SUIVI_FRONTEND.md#ANN-8` |
 | ANN-9 | Upload de la bannière | ✅ | **FAIT (19/07)** — upload et retrait de la bannière (avec/sans image géré côté rendu). |
 | ANN-10 | Modération des annonces | ⬜ | Aucun statut de validation ni route admin aujourd'hui. À arbitrer : modère-t-on les annonces ? |
