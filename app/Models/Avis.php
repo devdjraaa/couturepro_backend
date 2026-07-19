@@ -17,7 +17,7 @@ class Avis extends Model
     protected $table = 'avis';
 
     protected $fillable = [
-        'atelier_id', 'auteur_nom', 'note', 'texte', 'photos', 'statut',
+        'atelier_id', 'collection_id', 'auteur_nom', 'note', 'texte', 'photos', 'statut',
         'gxt_client_id', 'commande_id', 'signalements_count', 'signale_at',
     ];
 
@@ -41,5 +41,17 @@ class Avis extends Model
     public function atelier(): BelongsTo
     {
         return $this->belongsTo(Atelier::class, 'atelier_id');
+    }
+
+    /** S08C-29e — collection visée par l'avis (facultatif : sinon l'avis vise le créateur). */
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(Collection::class, 'collection_id');
+    }
+
+    /** Avis visibles publiquement. */
+    public function scopeValides($q)
+    {
+        return $q->where('statut', 'valide');
     }
 }

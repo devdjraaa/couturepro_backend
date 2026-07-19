@@ -150,7 +150,10 @@ class VitrineController extends Controller
                 ? \App\Models\AtelierVideo::where('atelier_id', $atelier->id)->publiees()->orderBy('position')->get(['titre', 'url', 'source'])
                 : [],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
-            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
+            // S08C-29e : `collection_id` accompagne chaque avis pour permettre au
+            // front de les regrouper par collection (null = avis sur le créateur).
+            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()
+                ->get(['id', 'collection_id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
             'creations'   => $creations,
             // Point 101 : réalisations publiées (photos filigranées, modérées).
             'realisations' => \App\Models\Realisation::where('atelier_id', $atelier->id)

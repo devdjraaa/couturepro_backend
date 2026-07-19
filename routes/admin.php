@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\NiveauConfigController;
 use App\Http\Controllers\Admin\OffreSpecialeController;
 use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\AtelierVideoController as AdminAtelierVideoController;
+use App\Http\Controllers\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Admin\RealisationController as AdminRealisationController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
@@ -76,6 +77,14 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
     Route::get('vitrine/evenements', [VitrineController::class, 'getEvenements']);
     Route::put('vitrine/evenements', [VitrineController::class, 'setEvenements']);
+
+    // S08C-29 : modération des avis A POSTERIORI (les signalements alimentent la file)
+    Route::middleware('admin.permission:realisations.moderate')->group(function () {
+        Route::get('avis/compteurs',          [AdminAvisController::class, 'compteurs']);
+        Route::get('avis',                    [AdminAvisController::class, 'index']);
+        Route::post('avis/{avis}/masquer',    [AdminAvisController::class, 'masquer']);
+        Route::post('avis/{avis}/retablir',   [AdminAvisController::class, 'retablir']);
+    });
 
     // VID-5 : modération des vidéos de présentation (validation sous 24 h)
     Route::middleware('admin.permission:realisations.moderate')->group(function () {

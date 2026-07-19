@@ -22,12 +22,27 @@ class AvisController extends Controller
         }
 
         $data = $request->validate([
-            'auteur_nom' => ['required', 'string', 'max:80'],
-            'note'       => ['required', 'integer', 'min:1', 'max:5'],
-            'texte'      => ['nullable', 'string', 'max:600'],
-            'photos'     => ['nullable', 'array', 'max:3'],   // P137 : jusqu'à 3 photos
-            'photos.*'   => ['image', 'max:4096'],            // 4 Mo par photo
+            'auteur_nom'    => ['required', 'string', 'max:80'],
+            'note'          => ['required', 'integer', 'min:1', 'max:5'],
+            'texte'         => ['nullable', 'string', 'max:600'],
+            'photos'        => ['nullable', 'array', 'max:3'],   // P137 : jusqu'à 3 photos
+            'photos.*'      => ['image', 'max:4096'],            // 4 Mo par photo
+            // S08C-29e : avis ciblant une collection précise (facultatif).
+            'collection_id' => ['nullable', 'uuid'],
         ]);
+
+        // La collection doit appartenir à CE créateur, sinon on ignore le lien
+        // (empêche de rattacher un avis à la collection d'un autre atelier).
+        $collectionId = null;
+        if (! empty($data['collection_id'])) {
+            $collectionId = \App\Models\Collection::where('id', $data['collection_id'])
+                ->where('atelier_id', $atelier->id)
+                ->value('id');
+
+            if (! $collectionId) {
+                return response()->json(['message' => 'Collection introuvable pour ce créateur.'], 422);
+            }
+        }
 
         $photos = [];
         if ($request->hasFile('photos')) {
@@ -40,7 +55,8 @@ class AvisController extends Controller
         // déposés sur son propre profil (il était juge et partie et pouvait
         // rejeter tout avis négatif).
         Avis::create([
-            'atelier_id' => $atelier->id,
+            'atelier_id'    => $atelier->id,
+            'collection_id' => $collectionId,
             'auteur_nom' => $data['auteur_nom'],
             'note'       => $data['note'],
             'texte'      => $data['texte'] ?? null,
