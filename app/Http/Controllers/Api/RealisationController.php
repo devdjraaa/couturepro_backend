@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Atelier;
 use App\Models\Realisation;
+use App\Services\QualitePhotoService;
+use App\Services\WatermarkService;
 use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +23,11 @@ class RealisationController extends Controller
     use ResolvesAtelier, ChecksPlanFeature;
 
     private const MAX_IMAGES = 6;
+
+    public function __construct(
+        private QualitePhotoService $qualite,
+        private WatermarkService $watermark,
+    ) {}
 
     /** GET /realisations — toutes les réalisations de l'atelier (tous statuts). */
     public function index(Request $request): JsonResponse
@@ -133,10 +140,34 @@ class RealisationController extends Controller
         ]);
 
         $path = $request->file('photo')->store('realisations/' . $realisation->atelier_id, 'public');
-        $images[] = ['path' => $path, 'url' => url(Storage::url($path))];
+
+        // PHOTO-1 : contrôle qualité automatique, immédiat. Si la photo est refusée,
+        // on ne la conserve pas : le créateur reprend et renvoie autant de fois qu'il
+        // veut, sans pénalité. Les codes sont traduits en icônes côté interface.
+        $verdict = $this->qualite->analyser($path);
+        if (! $verdict['ok']) {
+            Storage::disk('public')->delete($path);
+
+            return response()->json([
+                'message'   => 'Photo non retenue par le contrôle automatique.',
+                'code'      => 'qualite',
+                'problemes' => $verdict['problemes'],
+                'mesures'   => $verdict['mesures'],
+            ], 422);
+        }
+
+        $images[] = [
+            'path' => $path,
+            'url'  => url(Storage::url($path)),
+            // Avertissements non bloquants (ex. netteté) : affichés au créateur.
+            'avertissements' => $verdict['avertissements'],
+        ];
         $realisation->update(['images' => array_values($images)]);
 
-        return response()->json(['realisation' => $realisation->fresh()], 201);
+        return response()->json([
+            'realisation'    => $realisation->fresh(),
+            'avertissements' => $verdict['avertissements'],
+        ], 201);
     }
 
     /** DELETE /realisations/{realisation}/photo — retire une photo (par son path). */
@@ -216,15 +247,53 @@ class RealisationController extends Controller
             ], 403);
         }
 
-        $realisation->update([
-            'statut'                 => Realisation::STATUT_EN_ATTENTE,
+        $commun = [
             'certifie_auteur'        => true,
             'consentement_personnes' => true,
             'motif_refus'            => null,
             'soumis_at'              => now(),
-        ]);
+        ];
 
-        return response()->json(['realisation' => $realisation->fresh()]);
+        // PHOTO-2 — ARTISAN : le contrôle automatique a déjà validé les photos à
+        // l'envoi, donc publication IMMÉDIATE (le portefeuille d'un artisan est
+        // volumineux : une modération humaine systématique créerait un goulot
+        // d'étranglement). Le contrôle humain se fait a posteriori, par
+        // échantillonnage et signalement, sans bloquer la publication.
+        //
+        // PHOTO-3 — DESIGNER : enjeu commercial, donc validation humaine explicite
+        // dans une fenêtre de 24 h. Aucune publication sans accord d'un admin.
+        if ($atelier?->type === 'artisan') {
+            $realisation->update($commun + [
+                'statut'    => Realisation::STATUT_PUBLIEE,
+                'publie_at' => now(),
+                'images'    => $this->filigraner($realisation->images ?? []),
+            ]);
+
+            return response()->json([
+                'realisation' => $realisation->fresh(),
+                'publication' => 'immediate',
+            ]);
+        }
+
+        $realisation->update($commun + ['statut' => Realisation::STATUT_EN_ATTENTE]);
+
+        return response()->json([
+            'realisation'        => $realisation->fresh(),
+            'publication'        => 'moderation',
+            'delai_moderation_h' => 24,
+        ]);
+    }
+
+    /** Applique le filigrane à la publication (jamais à l'envoi). */
+    private function filigraner(array $images): array
+    {
+        return array_map(function (array $img) {
+            $wm = ! empty($img['path']) ? $this->watermark->appliquer($img['path']) : null;
+
+            return $wm
+                ? array_merge($img, ['watermark_path' => $wm['path'], 'watermark_url' => $wm['url']])
+                : $img;   // si le filigrane échoue, on publie l'original plutôt que de bloquer
+        }, $images);
     }
 
     /** DELETE /realisations/{realisation} — supprime (avec ses fichiers). */

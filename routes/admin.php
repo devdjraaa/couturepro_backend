@@ -86,6 +86,7 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::get('realisations/compteurs',              [AdminRealisationController::class, 'compteurs']);
         Route::get('realisations',                        [AdminRealisationController::class, 'index']);
         Route::post('realisations/{realisation}/approuver', [AdminRealisationController::class, 'approuver']);
+        Route::post('realisations/{realisation}/retoucher', [AdminRealisationController::class, 'retoucher']);
         Route::post('realisations/{realisation}/refuser',   [AdminRealisationController::class, 'refuser']);
     });
 
