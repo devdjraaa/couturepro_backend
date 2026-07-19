@@ -10,6 +10,7 @@ use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -47,7 +48,14 @@ class FactureController extends Controller
             'lignes.*.description'   => ['required', 'string', 'max:255'],
             'lignes.*.quantite'      => ['required', 'numeric', 'min:0'],
             'lignes.*.prix_unitaire' => ['required', 'numeric', 'min:0'],
-            'mode_paiement'          => ['nullable', 'string', 'max:30'],
+            // S08C-30 : le mode de paiement doit appartenir à la liste configurée
+            // (le champ acceptait auparavant N'IMPORTE QUELLE chaîne).
+            //
+            // ⚠️ TRANSITION : les anciennes valeurs restent acceptées tant que le front
+            // déployé les envoie (il a « wave » par défaut). Sans cette tolérance, la
+            // création de factures casserait en production dès ce déploiement.
+            // → retirer self::MODES_HERITES une fois SUIVI_FRONTEND.md#S08C-30 livré.
+            'mode_paiement'          => ['nullable', 'string', 'max:30', Rule::in($this->modesAutorises())],
             'gabarit'                => ['nullable', 'string', 'max:30'],
             'acompte'                => ['nullable', 'numeric', 'min:0'],
             'notes'                  => ['nullable', 'string', 'max:1000'],
@@ -173,6 +181,23 @@ class FactureController extends Controller
         }
 
         return response()->json($facture);
+    }
+
+    /**
+     * Anciennes valeurs codées en dur dans le front, tolérées le temps de la bascule.
+     * À supprimer une fois le front passé sur /moyens-paiement.
+     */
+    private const MODES_HERITES = ['wave', 'om', 'especes', 'virement', 'autre', 'mobile_money'];
+
+    /** Modes acceptés = liste configurée + héritage transitoire. */
+    private function modesAutorises(): array
+    {
+        $configures = collect(\App\Models\VitrineSetting::moyensPaiement())
+            ->filter(fn ($m) => $m['actif'] ?? true)
+            ->pluck('cle')
+            ->all();
+
+        return array_values(array_unique(array_merge($configures, self::MODES_HERITES)));
     }
 
     private function authorizeFacture(Request $request, Facture $facture): void

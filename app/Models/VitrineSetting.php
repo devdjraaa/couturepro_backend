@@ -35,6 +35,26 @@ class VitrineSetting extends Model
     }
 
     /**
+     * S08C-30 — Moyens de paiement proposés en facturation (devis/factures).
+     *
+     * Décision direction : pour la première version, **FedaPay uniquement**, même si
+     * l'intégration n'est pas finalisée — la structure doit rester évolutive.
+     *
+     * Cette liste devient la source unique : auparavant le front embarquait
+     * `['wave','om','especes','virement','autre']` EN DUR, avec une seconde liste
+     * incohérente (`especes`/`mobile_money`/`virement`) côté commandes et caisse.
+     * Éditable en admin, donc ajouter un moyen ne demande plus de redéploiement.
+     */
+    public static function moyensPaiement(): array
+    {
+        $cfg = static::where('cle', 'moyens_paiement')->value('valeur');
+
+        return $cfg ?: [
+            ['cle' => 'fedapay', 'label' => 'FedaPay', 'actif' => true, 'defaut' => true],
+        ];
+    }
+
+    /**
      * ANN-6 — Tarifs du Boost d'annonce (mise en avant payante), config-driven
      * et éditables depuis l'admin. La publication d'une annonce reste gratuite ;
      * seul le Boost est payant. `diffusions_par_jour` = nombre de passages

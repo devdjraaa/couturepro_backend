@@ -344,6 +344,8 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('support/tickets/{id}/repondre', [TicketSupportController::class, 'repondre']);
 
     // Paramètres
+    // S08C-30 : moyens de paiement de la facturation (source unique, éditable en admin)
+    Route::get('moyens-paiement',                [VitrineController::class, 'moyensPaiement']);
     Route::put('parametres/profil',              [ParametresController::class, 'updateProfil']);
     Route::put('parametres/atelier',             [ParametresController::class, 'updateAtelier']);
     Route::post('parametres/atelier/logo',       [ParametresController::class, 'uploadAtelierLogo']);

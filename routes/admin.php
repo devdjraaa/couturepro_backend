@@ -69,6 +69,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Brief 16/07 (pt 6) : périodes d'habillage saisonnier (splash local, config-driven)
     Route::put('vitrine/splash-themes', [VitrineController::class, 'setSplashThemes']);
 
+    // S08C-30 : moyens de paiement de la facturation (FedaPay en V1)
+    Route::get('vitrine/moyens-paiement', [VitrineController::class, 'moyensPaiement']);
+    Route::put('vitrine/moyens-paiement', [VitrineController::class, 'setMoyensPaiement']);
+
     // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
     Route::get('vitrine/evenements', [VitrineController::class, 'getEvenements']);
     Route::put('vitrine/evenements', [VitrineController::class, 'setEvenements']);

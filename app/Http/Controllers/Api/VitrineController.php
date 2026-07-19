@@ -277,6 +277,38 @@ class VitrineController extends Controller
         ]);
     }
 
+    /**
+     * GET /api/moyens-paiement — moyens de paiement actifs (facturation).
+     * Source unique consommée par le front : plus aucune liste en dur.
+     */
+    public function moyensPaiement(): JsonResponse
+    {
+        $actifs = collect(VitrineSetting::moyensPaiement())
+            ->filter(fn ($m) => $m['actif'] ?? true)
+            ->values();
+
+        return response()->json([
+            'moyens' => $actifs,
+            'defaut' => $actifs->firstWhere('defaut', true)['cle'] ?? $actifs->first()['cle'] ?? null,
+        ]);
+    }
+
+    /** PUT /api/admin/vitrine/moyens-paiement — édition de la liste (admin). */
+    public function setMoyensPaiement(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'moyens'         => ['required', 'array', 'min:1', 'max:20'],
+            'moyens.*.cle'   => ['required', 'string', 'max:30'],
+            'moyens.*.label' => ['required', 'string', 'max:60'],
+            'moyens.*.actif' => ['required', 'boolean'],
+            'moyens.*.defaut'=> ['nullable', 'boolean'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'moyens_paiement'], ['valeur' => $data['moyens']]);
+
+        return response()->json(['moyens' => $s->valeur]);
+    }
+
     /** GET /api/admin/vitrine/evenements — catalogue brut (admin). */
     public function getEvenements(EvenementCelebrationService $moteur): JsonResponse
     {
