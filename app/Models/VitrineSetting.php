@@ -35,6 +35,27 @@ class VitrineSetting extends Model
     }
 
     /**
+     * ANN-6 — Tarifs du Boost d'annonce (mise en avant payante), config-driven
+     * et éditables depuis l'admin. La publication d'une annonce reste gratuite ;
+     * seul le Boost est payant. `diffusions_par_jour` = nombre de passages
+     * quotidiens pendant la durée du Boost.
+     */
+    public static function boostAnnonce(): array
+    {
+        $cfg = static::where('cle', 'boost_annonce')->value('valeur');
+
+        return $cfg ?: [
+            'actif'               => true,
+            'diffusions_par_jour' => 3,
+            'offres'              => [
+                ['jours' => 1, 'prix' => 100],
+                ['jours' => 3, 'prix' => 200],
+                ['jours' => 7, 'prix' => 300],
+            ],
+        ];
+    }
+
+    /**
      * Point 57 — Catalogue d'événements dynamiques (célébrations), config-driven
      * et éditable depuis l'admin (clé `evenements_celebration`). Valeurs par défaut
      * FACTUELLES si rien n'est configuré : jours fériés du Bénin + fêtes religieuses

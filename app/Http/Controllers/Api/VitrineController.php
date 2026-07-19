@@ -188,6 +188,33 @@ class VitrineController extends Controller
         ]);
     }
 
+    /**
+     * GET /api/vitrine/annonces — annonces en cours de diffusion (publique).
+     * Alimente la bande défilante en haut de l'application : les annonces boostées
+     * passent en premier. Aucune route ne listait les annonces de TOUS les ateliers.
+     */
+    public function annonces(): JsonResponse
+    {
+        $annonces = \App\Models\Annonce::actives()
+            ->ordreDiffusion()
+            ->with('atelier:id,nom')
+            ->limit(30)
+            ->get()
+            ->map(fn ($a) => [
+                'id'        => $a->id,
+                'titre'     => $a->titre,
+                'message'   => $a->message,
+                'image_url' => $a->image_url,
+                'boostee'   => $a->boost_en_cours,
+                'createur'  => ['id' => $a->atelier?->id, 'nom' => $a->atelier?->nom],
+            ]);
+
+        return response()->json([
+            'annonces'            => $annonces,
+            'diffusions_par_jour' => VitrineSetting::boostAnnonce()['diffusions_par_jour'] ?? 3,
+        ]);
+    }
+
     /** GET /api/vitrine/banniere — bannière publicitaire (publique). */
     public function banniere(): JsonResponse
     {

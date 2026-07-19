@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\DevisController;
 use App\Http\Controllers\Api\FactureController;
 use App\Http\Controllers\Api\EquipeMembreController;
 use App\Http\Controllers\Api\FideliteController;
+use App\Http\Controllers\Api\AnnonceController;
 use App\Http\Controllers\Api\GalerieController;
 use App\Http\Controllers\Api\RealisationController;
 use App\Http\Controllers\Api\ListeAttenteController;
@@ -90,6 +91,8 @@ Route::prefix('vitrine')->group(function () {
     Route::get('splash-theme',                   [VitrineController::class, 'splashTheme']);
     // Point 57 : événements dynamiques du jour (auth optionnelle pour l'anniversaire perso).
     Route::get('evenements',                     [VitrineController::class, 'evenements']);
+    // ANN-8 : annonces en cours de diffusion (bande défilante), boostées d'abord.
+    Route::get('annonces',                       [VitrineController::class, 'annonces']);
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
     // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)
@@ -398,6 +401,15 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('galerie',             [GalerieController::class, 'store']);
     Route::delete('galerie/{photo}',   [GalerieController::class, 'destroy']);
     Route::get('galerie/quota',        [GalerieController::class, 'quota']);
+
+    // ANN-1..9 : module Annonces (Espace Designer) — publication gratuite, 1/jour
+    Route::get('annonces/quota',                [AnnonceController::class, 'quota']);
+    Route::get('annonces',                      [AnnonceController::class, 'index']);
+    Route::post('annonces',                     [AnnonceController::class, 'store']);
+    Route::put('annonces/{annonce}',            [AnnonceController::class, 'update']);
+    Route::post('annonces/{annonce}/image',     [AnnonceController::class, 'image']);
+    Route::delete('annonces/{annonce}/image',   [AnnonceController::class, 'retirerImage']);
+    Route::delete('annonces/{annonce}',         [AnnonceController::class, 'destroy']);
 
     // Point 101 : Mes Réalisations (publication modérée de photos)
     Route::get('realisations/quota',                    [RealisationController::class, 'quota']);
