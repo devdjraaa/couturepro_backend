@@ -65,8 +65,8 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | PHOTO-1 | Contrôle qualité automatique | ⬜ | Analyse à l'envoi : netteté/flou, luminosité, résolution minimale, cadrage. Aucune analyse d'image aujourd'hui. Le retour visuel est frontend ↔ `SUIVI_FRONTEND.md#PHOTO-1`. |
 | PHOTO-2 | Workflow Artisan (publication immédiate) | 🟡 | Aujourd'hui **toute** réalisation passe en modération. À différencier : artisan = publication directe après contrôle auto + modération a posteriori (échantillonnage/signalement). |
 | PHOTO-3 | Workflow Designer (fenêtre admin 24 h) | 🟡 | La modération admin existe ; manquent la **fenêtre de 24 h**, le compte à rebours et l'action « retoucher légèrement puis valider ». |
-| PHOTO-4 | Quota designer (compteur de solde) | ⬜ | Compteur = **solde restant**, décrémenté **à l'envoi**, réattribué (+1) si refus définitif ou suppression avant publication ; **jamais** réattribué après publication. Blocage à 0, alerte à 80 %, upgrade appliqué immédiatement. |
-| PHOTO-5 | Cycle de renouvellement | ⬜ | Reset unique pour tous : **le 22 de chaque mois à 00h00 (heure de Cotonou)**, nouveau cycle le 23. Tâche planifiée + exposition de la date du prochain reset. |
+| PHOTO-4 | Quota designer (compteur de solde) | ✅ | **FAIT (20/07)** — quota par cycle (5/10/20), solde **déduit des faits** (pas de compteur stocké, donc pas de dérive) : décrément à l'envoi, réattribution automatique si refus ou suppression avant publication. Alerte à 80 %, blocage à 0 avec message + plan supérieur. |
+| PHOTO-5 | Cycle de renouvellement | ✅ | **FAIT (20/07)** — reset le 22 de chaque mois à 00h00 heure de Cotonou, date du prochain renouvellement exposée. Testé sur 7 dates (bascule à minuit pile, passage d'année). |
 | PHOTO-6 | Statuts de suivi | 🟡 | `Realisation` a déjà 4 statuts. À compléter : `contrôle auto en cours`, `validée auto`, `refusée auto`. |
 | PHOTO-7 | API de modération admin | 🟡 | File + compteurs existent. À ajouter : compte à rebours 24 h, retouche, et **archivage de l'original** même après retouche (traçabilité / droits d'auteur). ↔ `SUIVI_FRONTEND.md#PHOTO-7` |
 
@@ -127,9 +127,9 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 |---|---|---|---|
 | VID-1 | Lecture intégrée | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#VID-1`. |
 | VID-2 | Nombre max de vidéos par plan | ✅ | **FAIT (19/07)** — max_videos 1/3/5 par plan (avant : 50 en dur, et fonctionnalité réservée au Studio). `GET /atelier-videos/quota` pour le compteur. Vérifié en prod. |
-| VID-3 | Règles de modification par plan | ⬜ | Le contrôleur n'expose **pas de route de modification** (seulement créer/supprimer) → le « compteur de corrections mensuelles » est impossible en l'état. À créer : modification + compteur (Gratuit : remplacement auto ; Atelier : 1/mois ; Studio : 2/mois). |
-| VID-4 | Import direct de fichier vidéo | ⬜ | Aujourd'hui **URL uniquement** (aucune vérification que c'est bien YouTube). Stockage + traitement à prévoir. |
-| VID-5 | Validation obligatoire avant publication | ⬜ | **Aucune modération** : publication immédiate. À créer : statut « en attente », notification admin, délai 24 h, refus → **quota restitué**. |
+| VID-3 | Règles de modification par plan | ✅ | **FAIT (20/07)** — route de modification créée (elle n'existait pas) + corrections plafonnées par plan (0/1/2), journalisées car une suppression efface la ligne. Offre Gratuite : la nouvelle vidéo REMPLACE l'ancienne, sinon l'utilisateur serait bloqué à vie. |
+| VID-4 | Import direct de fichier vidéo | ✅ | **FAIT (20/07)** — import de fichier (MP4/MOV/WebM, 100 Mo) en plus du lien YouTube. |
+| VID-5 | Validation obligatoire avant publication | ✅ | **FAIT (20/07)** — soumission → en attente → validée/refusée sous 24 h, notifications, file admin avec compte à rebours. Refus = quota restitué. ⚠️ Corrigé au passage : la vitrine n'était **pas filtrée** — une vidéo en attente ou refusée s'affichait publiquement. |
 | SUP-1 | Encart d'information dans les tickets | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#SUP-1`. |
 
 ---
