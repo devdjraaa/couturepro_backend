@@ -145,7 +145,9 @@ class VitrineController extends Controller
             'merites'        => $badges,             // P174-176
             'badge_pro'      => (bool) ($atelier->abonnement?->getConfigEffective()['badge_designer_pro'] ?? false), // PL-8
             'videos'         => (($atelier->abonnement?->getConfigEffective()['videos_presentation'] ?? false)) // PL-7
-                ? \App\Models\AtelierVideo::where('atelier_id', $atelier->id)->orderBy('position')->get(['titre', 'url'])
+                // VID-5 : seules les vidéos VALIDÉES sont visibles publiquement
+                // (sans ce filtre, une vidéo en attente ou refusée s'afficherait).
+                ? \App\Models\AtelierVideo::where('atelier_id', $atelier->id)->publiees()->orderBy('position')->get(['titre', 'url', 'source'])
                 : [],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
             'avis'        => $atelier->avis()->where('statut', 'valide')->latest()->get(['id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),

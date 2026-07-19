@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\NiveauConfigController;
 use App\Http\Controllers\Admin\OffreSpecialeController;
 use App\Http\Controllers\Admin\PaiementController;
+use App\Http\Controllers\Admin\AtelierVideoController as AdminAtelierVideoController;
 use App\Http\Controllers\Admin\RealisationController as AdminRealisationController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
@@ -71,6 +72,14 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
     Route::get('vitrine/evenements', [VitrineController::class, 'getEvenements']);
     Route::put('vitrine/evenements', [VitrineController::class, 'setEvenements']);
+
+    // VID-5 : modération des vidéos de présentation (validation sous 24 h)
+    Route::middleware('admin.permission:realisations.moderate')->group(function () {
+        Route::get('atelier-videos/compteurs',                [AdminAtelierVideoController::class, 'compteurs']);
+        Route::get('atelier-videos',                          [AdminAtelierVideoController::class, 'index']);
+        Route::post('atelier-videos/{atelier_video}/approuver', [AdminAtelierVideoController::class, 'approuver']);
+        Route::post('atelier-videos/{atelier_video}/refuser',   [AdminAtelierVideoController::class, 'refuser']);
+    });
 
     // Point 101 : modération des réalisations (file d'attente, approbation+filigrane, refus)
     Route::middleware('admin.permission:realisations.moderate')->group(function () {

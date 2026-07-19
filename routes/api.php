@@ -398,6 +398,8 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::get('atelier-videos/quota',             [AtelierVideoController::class, 'quota']);
     Route::get('atelier-videos',                   [AtelierVideoController::class, 'index']);
     Route::post('atelier-videos',                  [AtelierVideoController::class, 'store']);
+    // VID-3 : correction d'une vidéo (plafonnée par mois selon le plan)
+    Route::put('atelier-videos/{atelier_video}',    [AtelierVideoController::class, 'update']);
     Route::delete('atelier-videos/{atelier_video}', [AtelierVideoController::class, 'destroy']);
 
     // Galerie photos VIP
