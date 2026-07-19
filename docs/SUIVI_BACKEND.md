@@ -47,13 +47,13 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
 | S08C-29a | Publication automatique des avis | ✅ | **FAIT (19/07)** — publication immédiate à la soumission. La migration a publié l'avis resté en attente (vérifié en prod : 5 valides, 0 en attente). |
-| S08C-29b | Retirer la modération par le créateur | ✅ | **FAIT (19/07)** — la validation par le créateur est retirée ; la route répond 410 le temps que le front retire l'écran ↔ `SUIVI_FRONTEND.md#S08C-29`. À supprimer ensuite. |
+| S08C-29b | Modération : créateur → admin | ✅ | **FAIT (19/07)** — la validation par le créateur est retirée ; la route répond 410 le temps que le front retire l'écran ↔ `SUIVI_FRONTEND.md#S08C-29`. À supprimer ensuite. |
 | S08C-29c | Sécuriser le signalement d'un avis | ✅ | **FAIT (19/07)** — le signalement n'affecte plus le statut : il incrémente un compteur + horodate. Limitation de débit ajoutée (10/h) ainsi que sur le dépôt d'avis (5/h). |
-| S08C-29d | Autoriser plusieurs avis par utilisateur | 🟡 | Aucune contrainte d'unicité sur le chemin public (l'auteur est un simple champ texte). Sur le chemin espace client, l'unicité est **par commande** (applicative, pas d'index en base). À clarifier avec la direction : la limite voulue est-elle « 1 avis par commande » ? |
-| S08C-29e | Lier les avis aux collections | ⬜ | `Avis` n'a pas de `collection_id`. Migration + relation à créer **si** la direction confirme vouloir des avis par collection (voir écart n°2). |
+| S08C-29d | Autoriser plusieurs avis par utilisateur | ✅ | **Tranché (20/07, décision 2b)** — pas de contrainte d'unicité : chacun peut déposer plusieurs avis, la régulation se fait par la **modération admin a posteriori** + la limitation de débit (5/h). L'unicité par commande reste sur le chemin espace client. |
+| S08C-29e | Lier les avis aux collections | ✅ | **FAIT (20/07, décision 1b)** — `collection_id` FACULTATIF sur les avis : un avis vise une collection précise ou le créateur. Les avis existants restent valides ; supprimer une collection ne les détruit pas. La collection doit appartenir au créateur visé (sinon dépôt refusé). |
 | S08C-30 | Moyens de paiement → FedaPay uniquement | ✅ | **FAIT (20/07)** — liste unique éditable en admin, FedaPay seul en V1, `GET /moyens-paiement` comme source du front, et le serveur VALIDE enfin le mode reçu. ⚠️ Les anciennes valeurs restent tolérées le temps que le front bascule, sinon la création de factures casserait en production. ↔ `SUIVI_FRONTEND.md#S08C-30` |
 | S08C-31 | Documentation du système de fidélité | ✅ | **Livré** : `docs/SYSTEME_FIDELITE.md` (événements réels, montants par plan, plafonds, conversion, 6 anomalies). |
-| S08C-31b | Corriger les anomalies de fidélité | ⬜ | Suite du livrable : les 3 règles annoncées mais inexistantes, le crédit qui ne passe que par la synchro offline, la permission `points.convert` non appliquée, la conversion à 31 jours fixes. **Arbitrage direction requis.** |
+| S08C-31b | Corriger les anomalies de fidélité | 🟡 | **Partiellement fait (20/07, décision 4a)** — les 3 règles annoncées mais inexistantes sont retirées de l'interface et remplacées par les règles réelles ↔ `SUIVI_FRONTEND.md`. La permission `points.convert` est désormais appliquée. **Restent à arbitrer** : faut-il créditer les points hors synchro offline (aujourd'hui les utilisateurs 100 % web n'en gagnent jamais) et la conversion à 31 jours fixes quel que soit le seuil. |
 
 ---
 
@@ -106,7 +106,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ABO-6 | Règles anti-abus | ✅ | **FAIT (19/07)** — auto-abonnement bloqué ; unicité (atelier, client) en base. |
 | ABO-7 | Liste + désabonnement depuis l'espace client | ✅ | **FAIT (19/07)** — `GET /vitrine/client/abonnements` (mes créateurs suivis) + désabonnement via le toggle. |
 | ABO-8 | Traçabilité | ✅ | **FAIT (19/07)** — désabonnement conservé (`actif` + `desabonne_at`) ; le compteur public ne compte que les abonnements actifs. |
-| ABO-9 | ⚠️ Migration des abonnements anonymes | ⬜ | **Décision direction requise** : on rattache les anciennes clés visiteur à un compte, ou on repart de zéro ? |
+| ABO-9 | ⚠️ Migration des abonnements anonymes | ✅ | **FAIT (20/07, décision 3a)** — remise à plat : les abonnements anonymes sont supprimés (1 ligne, **sauvegardée** dans `~/backup-abonnes-anonymes-*.json` sur le VPS avant suppression). Les compteurs repartent de zéro sur une base fiable. |
 
 ---
 
