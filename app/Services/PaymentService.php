@@ -184,6 +184,100 @@ class PaymentService
     }
 
     /**
+     * ANN-5/6 — Boost d'une annonce : mise en avant payante (1 / 3 / 7 jours).
+     *
+     * Le Boost peut démarrer plus tard que la publication, à condition que l'annonce
+     * soit encore diffusée à cette date. Prix config-driven (VitrineSetting), réglé
+     * par le même tunnel de paiement que l'abonnement et la sponsorisation.
+     */
+    public function initiateBoostAnnonce(
+        \App\Models\Annonce $annonce,
+        int $jours,
+        string $dateDebut,
+        string $provider = 'fedapay',
+        ?string $returnUrl = null
+    ): Paiement {
+        $config = VitrineSetting::boostAnnonce();
+        abort_unless((bool) ($config['actif'] ?? false), 422, "Le Boost n'est pas disponible actuellement.");
+
+        $offre = collect($config['offres'] ?? [])->firstWhere('jours', $jours);
+        abort_unless($offre, 422, 'Durée de Boost invalide.');
+
+        abort_if($annonce->statut === 'terminee', 422, 'Cette annonce est terminée : elle ne peut plus être boostée.');
+        abort_if($annonce->boost_actif, 422, 'Cette annonce est déjà boostée.');
+
+        // Le Boost doit démarrer pendant la période de diffusion de l'annonce.
+        abort_if(
+            $dateDebut < \App\Models\Annonce::aujourdhui()->toDateString() || $dateDebut > $annonce->date_fin->toDateString(),
+            422,
+            "Le Boost doit démarrer pendant la période de diffusion de l'annonce."
+        );
+
+        $atelier = Atelier::findOrFail($annonce->atelier_id);
+
+        $paiement = Paiement::create([
+            'atelier_id'   => $atelier->id,
+            'type'         => 'boost_annonce',
+            'meta'         => ['annonce_id' => $annonce->id, 'jours' => $jours, 'date_debut' => $dateDebut],
+            'niveau_cle'   => $atelier->abonnement?->niveau_cle ?? NiveauConfig::query()->value('cle'),
+            'duree_jours'  => $jours,
+            'montant'      => (int) $offre['prix'],
+            'devise'       => 'XOF',
+            'provider'     => $provider,
+            'statut'       => 'pending',
+            'initiated_at' => now(),
+            'expires_at'   => now()->addHours(2),
+            'ip_address'   => request()->ip(),
+        ]);
+
+        $providerInstance = $this->resolveProvider($provider);
+        $proprietaire     = $atelier->proprietaire;
+
+        $result = $providerInstance->initiate($paiement, [
+            'email'      => $proprietaire->email,
+            'nom'        => $proprietaire->nom,
+            'prenom'     => $proprietaire->prenom,
+            'return_url' => $returnUrl,
+        ]);
+
+        $paiement->update([
+            'checkout_url'            => $result->checkoutUrl,
+            'provider_transaction_id' => $result->providerTransactionId,
+            'provider_metadata'       => $result->providerMetadata,
+        ]);
+
+        return $paiement->fresh();
+    }
+
+    /** ANN-6 — Active le Boost une fois le paiement confirmé. */
+    private function activerBoostAnnonce(Paiement $paiement): void
+    {
+        DB::transaction(function () use ($paiement) {
+            $annonce = \App\Models\Annonce::find($paiement->meta['annonce_id'] ?? null);
+
+            if ($annonce) {
+                $jours = (int) ($paiement->meta['jours'] ?? $paiement->duree_jours);
+                $debut = \Carbon\CarbonImmutable::parse(
+                    $paiement->meta['date_debut'] ?? \App\Models\Annonce::aujourdhui()->toDateString(),
+                    \App\Models\Annonce::FUSEAU
+                );
+
+                $annonce->update([
+                    'boost_actif'       => true,
+                    'boost_debut'       => $debut->toDateString(),
+                    'boost_duree_jours' => $jours,
+                    // Durée inclusive, comme la durée de diffusion de l'annonce.
+                    'boost_fin'         => $debut->addDays($jours - 1)->toDateString(),
+                    'boost_prix_xof'    => (int) $paiement->montant,
+                    'boost_paye_at'     => now(),
+                ]);
+            }
+
+            $paiement->update(['statut' => 'completed', 'completed_at' => now()]);
+        });
+    }
+
+    /**
      * P161-163 : achat d'un patron par un visiteur. Réutilise le même provider FedaPay.
      * L'atelier vendeur porte le paiement (atelier_id) ; l'acheteur (anonyme) fournit ses
      * coordonnées, transmises au provider pour le reçu.
@@ -270,6 +364,11 @@ class PaymentService
 
         if ($paiement->type === 'patron') {
             $this->activerPatron($paiement);
+            return;
+        }
+
+        if ($paiement->type === 'boost_annonce') {
+            $this->activerBoostAnnonce($paiement);
             return;
         }
 

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Annonce;
 use App\Models\VitrineSetting;
+use App\Services\PaymentService;
 use App\Traits\ResolvesAtelier;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 /**
  * ANN-1..9 — Module « Annonces » côté professionnel (Espace Designer).
@@ -151,6 +153,45 @@ class AnnonceController extends Controller
         $annonce->update(['image_path' => null, 'image_url' => null]);
 
         return response()->json(['annonce' => $annonce->fresh()]);
+    }
+
+    /**
+     * POST /annonces/{annonce}/boost — lance le paiement du Boost (ANN-5/6).
+     *
+     * Les durées et prix proviennent de la configuration (jamais du client) : le
+     * front affiche le tarif, mais c'est le serveur qui fait foi. Le Boost démarre
+     * automatiquement à la date programmée, une fois le paiement confirmé.
+     */
+    public function boost(Request $request, Annonce $annonce, PaymentService $paiements): JsonResponse
+    {
+        if ($resp = $this->refuserSiPasProprietaire($request, $annonce)) {
+            return $resp;
+        }
+
+        $durees = collect(VitrineSetting::boostAnnonce()['offres'] ?? [])->pluck('jours')->all();
+
+        $data = $request->validate([
+            'jours'      => ['required', 'integer', Rule::in($durees)],
+            'date_debut' => ['required', 'date_format:Y-m-d'],
+            'return_url' => ['nullable', 'string', 'max:500'],
+        ], [
+            'jours.in' => 'Durée de Boost invalide (' . implode(', ', $durees) . ' jours).',
+        ]);
+
+        $paiement = $paiements->initiateBoostAnnonce(
+            $annonce,
+            (int) $data['jours'],
+            $data['date_debut'],
+            'fedapay',
+            $data['return_url'] ?? null
+        );
+
+        return response()->json([
+            'paiement_id'  => $paiement->id,
+            'montant'      => (int) $paiement->montant,
+            'devise'       => $paiement->devise,
+            'checkout_url' => $paiement->checkout_url,
+        ], 201);
     }
 
     /** DELETE /annonces/{annonce} */

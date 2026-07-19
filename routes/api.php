@@ -412,6 +412,7 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('annonces',                     [AnnonceController::class, 'store']);
     Route::put('annonces/{annonce}',            [AnnonceController::class, 'update']);
     Route::post('annonces/{annonce}/image',     [AnnonceController::class, 'image']);
+    Route::post('annonces/{annonce}/boost',     [AnnonceController::class, 'boost'])->middleware('throttle:10,60');
     Route::delete('annonces/{annonce}/image',   [AnnonceController::class, 'retirerImage']);
     Route::delete('annonces/{annonce}',         [AnnonceController::class, 'destroy']);
 
