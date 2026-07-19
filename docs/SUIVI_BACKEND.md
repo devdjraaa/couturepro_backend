@@ -24,6 +24,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | 4 | ~~**La route de signalement d'un avis est publique, sans authentification ni limitation**~~ ✅ **CORRIGÉ le 19/07** — le signalement ne dépublie plus rien (compteur + horodatage), limitation de débit ajoutée sur le signalement et sur le dépôt d'avis. | Faille fermée, vérifiée en production. |
 | 5 | **L'interface annonce 3 règles de fidélité qui n'existent pas** (parrainage 50 pts, 1 000 XOF = 1 pt, mois actif = 5 pts). Vérifié : zéro occurrence de parrainage dans le backend. | Promesse non tenue visible par les utilisateurs. Voir `SYSTEME_FIDELITE.md`. |
 | 6 | **Le socle du workflow photos existe déjà.** Le module « Mes Réalisations » (livré le 18/07) a déjà les statuts, la modération admin, le filigrane à la publication et l'anti-abus. | **Étendre**, ne pas refaire (PHOTO-*). |
+| 8 | ⚠️ **Le référentiel de permissions d'équipe n'est appliqué NULLE PART côté serveur** (découvert le 20/07). Il est renvoyé au front, qui masque l'interface — mais un membre d'équipe peut appeler n'importe quelle route pro quel que soit son rôle. | Correctif ciblé posé sur la conversion de points (action sensible). Une couche d'autorisation complète touche ~40 routes et risque de bloquer des utilisateurs légitimes : **à décider et tester posément**, pas à chaud. |
 | 7 | **L'abonnement aux créateurs est 100 % anonyme** (clé visiteur en stockage local). Vider son cache = perdre ses abonnements. | ⚠️ **Décision** : que fait-on des abonnements anonymes existants lors de la bascule vers un compte ? |
 
 ---
@@ -50,7 +51,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | S08C-29c | Sécuriser le signalement d'un avis | ✅ | **FAIT (19/07)** — le signalement n'affecte plus le statut : il incrémente un compteur + horodate. Limitation de débit ajoutée (10/h) ainsi que sur le dépôt d'avis (5/h). |
 | S08C-29d | Autoriser plusieurs avis par utilisateur | 🟡 | Aucune contrainte d'unicité sur le chemin public (l'auteur est un simple champ texte). Sur le chemin espace client, l'unicité est **par commande** (applicative, pas d'index en base). À clarifier avec la direction : la limite voulue est-elle « 1 avis par commande » ? |
 | S08C-29e | Lier les avis aux collections | ⬜ | `Avis` n'a pas de `collection_id`. Migration + relation à créer **si** la direction confirme vouloir des avis par collection (voir écart n°2). |
-| S08C-30 | Moyens de paiement → FedaPay uniquement | 🟡 | Côté serveur, `mode_paiement` d'une facture accepte **n'importe quelle chaîne** (aucune énumération). Les commandes/caisse ont une énumération figée en base (`especes`, `mobile_money`, `virement`), incohérente avec la facturation. → Exposer **une liste unique et configurable** consommée par le front. ↔ `SUIVI_FRONTEND.md#S08C-30` |
+| S08C-30 | Moyens de paiement → FedaPay uniquement | ✅ | **FAIT (20/07)** — liste unique éditable en admin, FedaPay seul en V1, `GET /moyens-paiement` comme source du front, et le serveur VALIDE enfin le mode reçu. ⚠️ Les anciennes valeurs restent tolérées le temps que le front bascule, sinon la création de factures casserait en production. ↔ `SUIVI_FRONTEND.md#S08C-30` |
 | S08C-31 | Documentation du système de fidélité | ✅ | **Livré** : `docs/SYSTEME_FIDELITE.md` (événements réels, montants par plan, plafonds, conversion, 6 anomalies). |
 | S08C-31b | Corriger les anomalies de fidélité | ⬜ | Suite du livrable : les 3 règles annoncées mais inexistantes, le crédit qui ne passe que par la synchro offline, la permission `points.convert` non appliquée, la conversion à 31 jours fixes. **Arbitrage direction requis.** |
 
@@ -62,13 +63,13 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| PHOTO-1 | Contrôle qualité automatique | ⬜ | Analyse à l'envoi : netteté/flou, luminosité, résolution minimale, cadrage. Aucune analyse d'image aujourd'hui. Le retour visuel est frontend ↔ `SUIVI_FRONTEND.md#PHOTO-1`. |
-| PHOTO-2 | Workflow Artisan (publication immédiate) | 🟡 | Aujourd'hui **toute** réalisation passe en modération. À différencier : artisan = publication directe après contrôle auto + modération a posteriori (échantillonnage/signalement). |
-| PHOTO-3 | Workflow Designer (fenêtre admin 24 h) | 🟡 | La modération admin existe ; manquent la **fenêtre de 24 h**, le compte à rebours et l'action « retoucher légèrement puis valider ». |
+| PHOTO-1 | Contrôle qualité automatique | ✅ | **FAIT (20/07)** — analyse synchrone à l'envoi (résolution, luminosité, netteté, cadrage), retour en CODES traduits en icônes côté interface. Photo refusée = non conservée, reprise illimitée sans pénalité. ⚠️ **La netteté est en AVERTISSEMENT, pas en blocage** : mesuré, une photo nette réaliste score ~46 quand un damier flouté dépasse 3000 — un seuil absolu non calibré rejetterait des photos légitimes. Seuils éditables en admin (`controle_photo`) ; passer `nettete_bloquante` à vrai après calibrage sur de vraies photos. |
+| PHOTO-2 | Workflow Artisan (publication immédiate) | ✅ | **FAIT (20/07)** — artisan : publication immédiate après contrôle auto (filigrane appliqué au passage), contrôle humain a posteriori. Évite le goulot d'étranglement sur un volume élevé. |
+| PHOTO-3 | Workflow Designer (fenêtre admin 24 h) | ✅ | **FAIT (20/07)** — designer : validation humaine explicite, fenêtre de 24 h avec compte à rebours et repérage des dossiers en retard. |
 | PHOTO-4 | Quota designer (compteur de solde) | ✅ | **FAIT (20/07)** — quota par cycle (5/10/20), solde **déduit des faits** (pas de compteur stocké, donc pas de dérive) : décrément à l'envoi, réattribution automatique si refus ou suppression avant publication. Alerte à 80 %, blocage à 0 avec message + plan supérieur. |
 | PHOTO-5 | Cycle de renouvellement | ✅ | **FAIT (20/07)** — reset le 22 de chaque mois à 00h00 heure de Cotonou, date du prochain renouvellement exposée. Testé sur 7 dates (bascule à minuit pile, passage d'année). |
-| PHOTO-6 | Statuts de suivi | 🟡 | `Realisation` a déjà 4 statuts. À compléter : `contrôle auto en cours`, `validée auto`, `refusée auto`. |
-| PHOTO-7 | API de modération admin | 🟡 | File + compteurs existent. À ajouter : compte à rebours 24 h, retouche, et **archivage de l'original** même après retouche (traçabilité / droits d'auteur). ↔ `SUIVI_FRONTEND.md#PHOTO-7` |
+| PHOTO-6 | Statuts de suivi | ✅ | **FAIT (20/07)** — les statuts « contrôle auto en cours / validée auto » se sont révélés inutiles : l'analyse est SYNCHRONE (quelques dizaines de ms), il n'y a donc pas d'état intermédiaire à représenter. Le verdict est rendu dans la réponse à l'envoi. |
+| PHOTO-7 | API de modération admin | ✅ | **FAIT (20/07)** — compte à rebours 24 h, retouche légère avant validation, **original toujours archivé** (traçabilité / droits d'auteur) ; le filigrane s'applique à la version retouchée s'il y en a une. |
 
 ---
 
