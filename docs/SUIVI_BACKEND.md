@@ -78,15 +78,15 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| ANN-1 | Table `annonces` dédiée | ⬜ | Entité propre : titre, message, image, date de début, durée, statut, atelier. Aujourd'hui il n'y a **pas de table** — juste `annonce_message` + `annonce_at` sur `collections`. |
-| ANN-2 | Durée 1→10 jours + date de fin calculée | ⬜ | Le designer choisit un nombre de jours ; la date de fin est calculée côté serveur. Publication gratuite. |
-| ANN-3 | Limite d'une annonce par jour | ⬜ | Aucune limitation aujourd'hui (ni contrôle de date ni limitation de débit) : un designer peut publier en boucle. |
-| ANN-4 | Historique + statuts | ⬜ | Statuts : en cours / terminée / expirée / boostée. Impossible aujourd'hui : la mise à jour **détruit** l'annonce précédente. Route de liste à créer. |
-| ANN-5 | Boost — modèle et planification | ⬜ | Date de début (immédiate ou différée, tant que l'annonce est active) + durée 1 / 3 / 7 jours. |
+| ANN-1 | Table `annonces` dédiée | ✅ | **FAIT (19/07)** — table `annonces` dédiée + modèle. L'ancienne « annonce de collection » écrasait la précédente : l'historique est désormais possible. |
+| ANN-2 | Durée 1→10 jours + date de fin calculée | ✅ | **FAIT (19/07)** — durée 1→10 jours, date de fin calculée côté serveur (durée inclusive : 1 jour = le jour même), publication gratuite. |
+| ANN-3 | Limite d'une annonce par jour | ✅ | **FAIT (19/07)** — une annonce par jour et par atelier (jour calendaire, heure de Cotonou), avec le message d'information renvoyant vers le Boost. |
+| ANN-4 | Historique + statuts | ✅ | **FAIT (19/07)** — historique complet + statuts DÉDUITS des dates (programmee/en_cours/boostee/terminee), donc jamais désynchronisés. 8/8 cas testés. |
+| ANN-5 | Boost — modèle et planification | 🟡 | Colonnes de Boost en place (début, durée, fin, prix, paiement) ; reste l'API de planification. ↔ front peut déjà construire la modale avec les tarifs exposés. |
 | ANN-6 | Boost — paiement | ⬜ | 100 / 200 / 300 FCFA. Réutiliser le tunnel de paiement existant (FedaPay), ajouter un type « boost annonce ». |
 | ANN-7 | Diffusion 3× par jour pendant le boost | ⬜ | Logique de diffusion + exposition à la vitrine. |
-| ANN-8 | Flux public des annonces actives | ⬜ | Aucune route ne liste les annonces de **tous** les ateliers — indispensable pour la bande défilante. ↔ `SUIVI_FRONTEND.md#ANN-8` |
-| ANN-9 | Upload de la bannière | ⬜ | Stockage image + exposition. ↔ `SUIVI_FRONTEND.md#ANN-9` |
+| ANN-8 | Flux public des annonces actives | ✅ | **FAIT (19/07)** — `GET /vitrine/annonces` : annonces en cours, boostées d'abord. Vérifié en prod. ↔ `SUIVI_FRONTEND.md#ANN-8` |
+| ANN-9 | Upload de la bannière | ✅ | **FAIT (19/07)** — upload et retrait de la bannière (avec/sans image géré côté rendu). |
 | ANN-10 | Modération des annonces | ⬜ | Aucun statut de validation ni route admin aujourd'hui. À arbitrer : modère-t-on les annonces ? |
 
 ---
@@ -97,14 +97,14 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| ABO-1 | Exiger un compte pour s'abonner | ⬜ | Passer la route en authentifiée et rattacher l'abonnement au client (`gxt_client_id`). ↔ `SUIVI_FRONTEND.md#ABO-1` |
+| ABO-1 | Exiger un compte pour s'abonner | ✅ | **FAIT (19/07)** — abonnement rattaché au compte ; la route renvoie `401 auth_requise` sans compte, signal exploité par le front pour ouvrir l'inscription. Vérifié en prod. |
 | ABO-2 | Inscription à la volée | ✅ | Le socle existe : inscription par e-mail avec code (OTP) + Google, limitation de débit correcte. Rien à construire côté serveur. ↔ front pour l'enchaînement. |
 | ABO-3 | Session maintenue après inscription | ✅ | Jeton émis à la validation, session persistée. Vérifié. |
 | ABO-4 | Reprise de l'action initiale | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#ABO-4`. |
-| ABO-5 | Consentement notifications distinct | ⬜ | Aucune colonne de préférence. À ajouter, séparé de l'abonnement (exigence APDP / Code du numérique). |
-| ABO-6 | Règles anti-abus | ⬜ | À ajouter : interdiction de s'abonner à soi-même (absent), abonnement compté **seulement après validation de l'e-mail**, limitation de débit (absente). L'unicité par (atelier, visiteur) existe déjà. |
-| ABO-7 | Liste + désabonnement depuis l'espace client | ⬜ | Aucune route ne renvoie les abonnements d'un client. |
-| ABO-8 | Traçabilité | 🟡 | La table a déjà `atelier_id` + horodatage. Manquent le lien compte, le statut actif/inactif et l'exploitation statistique. |
+| ABO-5 | Consentement notifications distinct | ✅ | **FAIT (19/07)** — `notifications_optin` distinct de l'abonnement (exigence APDP). |
+| ABO-6 | Règles anti-abus | ✅ | **FAIT (19/07)** — auto-abonnement bloqué ; unicité (atelier, client) en base. |
+| ABO-7 | Liste + désabonnement depuis l'espace client | ✅ | **FAIT (19/07)** — `GET /vitrine/client/abonnements` (mes créateurs suivis) + désabonnement via le toggle. |
+| ABO-8 | Traçabilité | ✅ | **FAIT (19/07)** — désabonnement conservé (`actif` + `desabonne_at`) ; le compteur public ne compte que les abonnements actifs. |
 | ABO-9 | ⚠️ Migration des abonnements anonymes | ⬜ | **Décision direction requise** : on rattache les anciennes clés visiteur à un compte, ou on repart de zéro ? |
 
 ---
@@ -126,7 +126,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
 | VID-1 | Lecture intégrée | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#VID-1`. |
-| VID-2 | Nombre max de vidéos par plan | ⬜ | Aujourd'hui **50 en dur** dans le contrôleur, identique pour tous les plans. À remplacer par une clé de configuration : Gratuit **1**, Atelier **3**, Studio **5**. |
+| VID-2 | Nombre max de vidéos par plan | ✅ | **FAIT (19/07)** — max_videos 1/3/5 par plan (avant : 50 en dur, et fonctionnalité réservée au Studio). `GET /atelier-videos/quota` pour le compteur. Vérifié en prod. |
 | VID-3 | Règles de modification par plan | ⬜ | Le contrôleur n'expose **pas de route de modification** (seulement créer/supprimer) → le « compteur de corrections mensuelles » est impossible en l'état. À créer : modification + compteur (Gratuit : remplacement auto ; Atelier : 1/mois ; Studio : 2/mois). |
 | VID-4 | Import direct de fichier vidéo | ⬜ | Aujourd'hui **URL uniquement** (aucune vérification que c'est bien YouTube). Stockage + traitement à prévoir. |
 | VID-5 | Validation obligatoire avant publication | ⬜ | **Aucune modération** : publication immédiate. À créer : statut « en attente », notification admin, délai 24 h, refus → **quota restitué**. |
@@ -138,7 +138,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| REL-1 | Correctif cache nginx (`immutable`) | 🟡 | Correctif prêt, mais le fichier de workflow n'est pas poussable : **le jeton du dépôt n'a pas la portée `workflow`**. Contournement en place (version dans l'URL du favicon). **Action direction requise.** |
+| REL-1 | Correctif cache nginx (`immutable`) | ⚠️ | **CAUSE RACINE TROUVÉE** — ce n'est pas le jeton nginx : l'étape « Setup SSH » du workflow backend n'a ni délai d'attente ni tolérance, donc un `ssh-keyscan` lent fait échouer TOUT le déploiement (2 déploiements perdus le 19/07, rattrapés à la main). Correctif prêt (`ssh-keyscan -T 10 … || true`, déjà appliqué au front) mais **NON POUSSABLE : le jeton n'a pas la portée `workflow`**. → action direction. |
 | REL-2 | Pré-rendu SEO (pt 125) | ⬜ | Recommandation prête, **à valider avant de toucher la production**. La vitrine est une application monopage : un robot sans JavaScript reçoit une coquille vide. |
 | REL-3 | « Mes Réalisations » sur mobile | ⬜ | Cache hors-ligne (100 brouillons/attente) à ajouter côté application native. |
 | REL-4 | Flux « Éditer les mesures » (pts 68-69) | ⬜ | Charger les libellés de mesures du type de vêtement dans l'éditeur existant. Mesures **par client** (arbitrage acté). Nécessite un test sur appareil. |
