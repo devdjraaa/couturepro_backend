@@ -42,7 +42,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          # known_hosts best-effort : ne doit JAMAIS faire échouer le déploiement.
+          # Sans délai d'attente ni tolérance, un ssh-keyscan lent cassait toute la
+          # chaîne (2 déploiements perdus le 19/07). ssh et rsync utilisent de toute
+          # façon StrictHostKeyChecking=no. Même correctif que le workflow frontend.
+          ssh-keyscan -T 10 -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
 
       - name: Sync files to VPS
