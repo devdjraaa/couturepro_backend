@@ -1,5 +1,29 @@
 # Suivi FRONTEND — Gextimo (Aquilas)
 
+> ## ⚠️ Répartition revue le 20/07 — à lire avant de commencer
+>
+> Le partage n'est pas « backend / frontend » mais **logique métier / façade**.
+>
+> **Tu prends la FAÇADE** : apparence, mise en page, animation, retour visuel, cohérence graphique.
+> **Nous prenons tout écran qui applique une RÈGLE SERVEUR** : quota, tarif, durée, statut,
+> reprise d'action, paiement. Un écran qui doit connaître une règle du serveur pour être juste
+> n'est pas de la façade, même s'il s'écrit en React.
+>
+> **Ce qui te revient réellement** : `S02A-25` libellé de bouton · `S02A-26` positionnement ·
+> `PHOTO-1` retour visuel instantané à l'envoi d'une photo · `ANN-7` encart d'information ·
+> `ANN-8` habillage de la bande défilante (le CSS `.gx-marquee` existe déjà) · `SUP-1` encart
+> tickets · `REL-V1` finitions vitrine · l'apparence du lecteur vidéo (`VID-1`).
+>
+> **Ce qui nous revient et que tu peux ignorer** : tout le module Annonces (`ANN-1` à `ANN-6`,
+> `ANN-9`), l'écran admin de modération des avis (`AV2-F4`), les règles vidéo (`VID-3`, `VID-4`,
+> `VID-5`), la traçabilité photo (`PHOTO-7`), le cache hors-ligne (`REL-V3`) et le réalignement
+> des branches (`REL-V4`).
+>
+> **Statuts périmés corrigés** : `EC-2`, `EC-3`, `EC-4`, `ABO-4` sont **faits** (mécanisme de
+> reprise d'action en place) et `REL-V2` aussi (le pré-rendu SEO est en production depuis
+> le 20/07 — un robot reçoit bien le contenu). Ne pas les redévelopper.
+
+
 > **Périmètre : frontend uniquement** — vitrine publique, application pro (web + mobile), interfaces d'administration, design.
 > Le volet backend (API, base de données, services) est pris en charge séparément et suivi dans **`SUIVI_BACKEND.md`**.
 > Un item qui touche les deux couches porte le **même identifiant** des deux côtés, avec un renvoi `↔`. Quand tu vois `↔`, l'API correspondante est de mon côté : dis-moi quand tu en as besoin, je te donne le contrat.
@@ -18,7 +42,7 @@
 |---|---|---|
 | 1 | **L'architecture des abonnements est déjà centralisée et fonctionne.** Tu as les hooks `usePlanFeature(cle)` (booléens) et `usePlanLimit(cle, count)` (limites numériques, `null`/`-1` = illimité), plus le composant `FeatureGate`. | **Ne recode aucune limite en dur** : branche-toi sur ces hooks. Voir `src/hooks/usePlanFeature.js` et `src/components/abonnement/FeatureGate.jsx`. |
 | 2 | **Le CSS de bande défilante existe déjà** : `.gx-marquee` dans `src/index.css` (défilement continu, pause au survol, désactivé si l'utilisateur réduit les animations). Utilisé aujourd'hui par `src/pages/vitrine/PartenairesBanner.jsx`. | Réutilisable **tel quel** pour la bande d'annonces (ANN-8). |
-| 3 | **Aucun mécanisme de « reprise d'action après connexion » n'existe** dans le code (vérifié). | EC-3 est une vraie construction, pas un correctif. C'est le cœur du problème signalé par la direction. |
+| 3 | ~~Aucun mécanisme de reprise d'action après connexion~~ **FAUX — corrigé le 20/07.** `src/pages/vitrine/actionEnAttente.js` existe et couvre trois actions (commander, laisser un avis, suivre un créateur). | EC-2/EC-3/EC-4 sont **faits**. Ne pas les redévelopper. |
 | 4 | Certains correctifs doivent être portés **sur les deux branches** (`master` **et** `android`). | Signalé au cas par cas ci-dessous. |
 
 ---

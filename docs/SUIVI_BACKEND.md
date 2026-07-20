@@ -1,7 +1,12 @@
 # Suivi BACKEND — Gextimo
 
-> **Périmètre : backend uniquement** (API, base de données, migrations, services, modération côté serveur, infra).
-> Le volet frontend est suivi séparément dans **`SUIVI_FRONTEND.md`** (Aquilas).
+> **Périmètre : la LOGIQUE MÉTIER, quelle que soit la couche** (API, base, services, mais aussi
+> les écrans qui appliquent une règle serveur — quota, tarif, statut, reprise d'action, paiement).
+> **Aquilas ne prend que la FAÇADE** : apparence, mise en page, animation, retour visuel.
+> Critère : *si l'écran doit connaître une règle du serveur pour être juste, il est pour nous.*
+>
+> Correction du 20/07 : 8 items étaient marqués « 100 % frontend » et renvoyés à Aquilas alors
+> qu'ils portaient de la logique (reprise d'action, quotas, tarifs, statuts). Ils reviennent ici.
 > Un item qui touche les deux couches porte le **même identifiant** des deux côtés, avec un renvoi `↔`.
 >
 > **Méthode** : chaque statut est posé après **audit du code réel**, jamais par supposition. Les ✅ et 🟡 citent un fichier comme preuve.
@@ -33,8 +38,8 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| S02A-25 | Libellé du bouton d'édition | ℹ️ | **100 % frontend** ↔ `SUIVI_FRONTEND.md#S02A-25`. Rien à faire côté serveur. |
-| S02A-26 | Positionnement du bouton | ℹ️ | **100 % frontend** ↔ `SUIVI_FRONTEND.md#S02A-26`. |
+| S02A-25 | Libellé du bouton d'édition | ℹ️ | **Façade → Aquilas.** Aucune règle serveur en jeu. |
+| S02A-26 | Positionnement du bouton | ℹ️ | **Façade → Aquilas.** |
 | S02A-27 | Quota galerie piloté par l'abonnement | ✅ | **Déjà fait.** `GalerieController` lit `max_photos_vip_par_mois` via `getConfigEffective()`, expose `GET /galerie/quota` (`utilise`/`max`/`restant`/`illimite`), `-1` et `null` = illimité. |
 | S02A-27b | Nettoyer les messages d'upsell en dur | ✅ | **FAIT (19/07)** — plan proposé dérivé de la grille active + libellés issus du référentiel ; `planRequisPourLimite()` ajouté pour les quotas numériques. |
 | S02A-28 | Configuration centralisée des abonnements | ✅ | **Déjà fait.** `NiveauConfig` (table `niveaux_config`) → `Abonnement::getConfigEffective()` (snapshot + fusion + repli sur `free` si expiré) → `ChecksPlanFeature::planGate()` + `AtelierLimitsService`. 26 points d'appel. |
@@ -101,7 +106,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ABO-1 | Exiger un compte pour s'abonner | ✅ | **FAIT (19/07)** — abonnement rattaché au compte ; la route renvoie `401 auth_requise` sans compte, signal exploité par le front pour ouvrir l'inscription. Vérifié en prod. |
 | ABO-2 | Inscription à la volée | ✅ | Le socle existe : inscription par e-mail avec code (OTP) + Google, limitation de débit correcte. Rien à construire côté serveur. ↔ front pour l'enchaînement. |
 | ABO-3 | Session maintenue après inscription | ✅ | Jeton émis à la validation, session persistée. Vérifié. |
-| ABO-4 | Reprise de l'action initiale | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#ABO-4`. |
+| ABO-4 | Reprise de l'action initiale | ✅ | **DÉJÀ FAIT — statut périmé corrigé le 20/07.** Le module `src/pages/vitrine/actionEnAttente.js` existe : `memoriserAction` (posé depuis `CreateurProfilPage`) → `lireAction`/`consommerAction` (consommés dans `EspaceClientPage`). Trois actions couvertes : commander, laisser un avis, suivre un créateur. |
 | ABO-5 | Consentement notifications distinct | ✅ | **FAIT (19/07)** — `notifications_optin` distinct de l'abonnement (exigence APDP). |
 | ABO-6 | Règles anti-abus | ✅ | **FAIT (19/07)** — auto-abonnement bloqué ; unicité (atelier, client) en base. |
 | ABO-7 | Liste + désabonnement depuis l'espace client | ✅ | **FAIT (19/07)** — `GET /vitrine/client/abonnements` (mes créateurs suivis) + désabonnement via le toggle. |
@@ -115,9 +120,9 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
 | EC-1 | Session créée et persistante | ✅ | Jeton avec capacité dédiée, restauré au chargement, purge automatique si invalide. **Le backend n'est pas en cause** dans le blocage constaté. |
-| EC-2 | Ouverture automatique de l'espace client | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-2`. |
-| EC-3 | Reprise automatique de l'action | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-3`. |
-| EC-4 | Gestion des échecs | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-4`. |
+| EC-2 | Ouverture automatique de l'espace client | ✅ | **DÉJÀ FAIT — vérifié le 20/07** : `CreateurProfilPage.jsx:353` redirige vers `/espace-client` quand l'action demande un compte. |
+| EC-3 | Reprise automatique de l'action | ✅ | **DÉJÀ FAIT** — même mécanisme qu'ABO-4, l'action mémorisée est rejouée après connexion. |
+| EC-4 | Gestion des échecs | ✅ | **DÉJÀ FAIT** — chaque branche de reprise gère son échec (`reprise_echec`), l'action n'est consommée qu'en cas de succès. |
 | EC-5 | Couvrir toutes les actions nécessitant un compte | ✅ | Côté serveur, tout est en place : l'abonnement est rattaché au compte (ABO-1) et le parcours de reprise est couvert côté front ↔ `SUIVI_FRONTEND.md#EC-5`. Les favoris restent volontairement locaux (aucune table) — ils n'engagent rien et ne nécessitent pas de compte.
 
 ---
@@ -126,12 +131,12 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 | ID | Sujet | Statut | Détail / preuve |
 |---|---|---|---|
-| VID-1 | Lecture intégrée | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#VID-1`. |
+| VID-1 | Lecture intégrée | 🟡 | **Partagé.** L'analyse du lien (fournisseur, extraction de l'identifiant, refus d'une URL non reconnue) est de la logique → **nous**. L'apparence du lecteur → Aquilas. |
 | VID-2 | Nombre max de vidéos par plan | ✅ | **FAIT (19/07)** — max_videos 1/3/5 par plan (avant : 50 en dur, et fonctionnalité réservée au Studio). `GET /atelier-videos/quota` pour le compteur. Vérifié en prod. |
 | VID-3 | Règles de modification par plan | ✅ | **FAIT (20/07)** — route de modification créée (elle n'existait pas) + corrections plafonnées par plan (0/1/2), journalisées car une suppression efface la ligne. Offre Gratuite : la nouvelle vidéo REMPLACE l'ancienne, sinon l'utilisateur serait bloqué à vie. |
 | VID-4 | Import direct de fichier vidéo | ✅ | **FAIT (20/07)** — import de fichier (MP4/MOV/WebM, 100 Mo) en plus du lien YouTube. |
 | VID-5 | Validation obligatoire avant publication | ✅ | **FAIT (20/07)** — soumission → en attente → validée/refusée sous 24 h, notifications, file admin avec compte à rebours. Refus = quota restitué. ⚠️ Corrigé au passage : la vitrine n'était **pas filtrée** — une vidéo en attente ou refusée s'affichait publiquement. |
-| SUP-1 | Encart d'information dans les tickets | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#SUP-1`. |
+| SUP-1 | Encart d'information dans les tickets | ℹ️ | **Façade → Aquilas.** Texte fixe, aucune règle serveur. |
 
 ---
 
@@ -169,6 +174,33 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | REL-6 | Clés externes | ℹ️ | GA4 / Meta Pixel / Clarity + Search Console : **bloqué**, dépend de la direction. |
 | REL-8 | Deux APK : identité des saveurs | ✅ | **CLOS le 20/07 — les deux applications cohabitent, vérifié sur appareil.** Les deux saveurs portaient le **même `applicationId`** : installer la console interne REMPLAÇAIT l'app des pros. Quatre défauts empilés, tous corrigés : (1) le `sed` non ancré de `scripts/build-android.sh` réécrivait les **trois** `applicationId` du `build.gradle` → ancré sur `defaultConfig` ; (2) le script ne restaurait que `capacitor.config.json`, laissant `build.gradle` muté → sauvegarde + restauration ; (3) il recopiait aussi nom, icônes et couleur de fond dans `src/main/res`, **dossier partagé**, sans restauration — après un build admin, l'app des pros serait sortie avec l'icône rouge et le nom « Gextimo Admin ». La saveur admin a désormais ses **17 ressources propres** (comme gextimo), les étapes 4c/4d/4e du script sont supprimées, et `src/main/res` n'est plus touché : vérifié après DEUX builds successifs, le dépôt ressort intact ; (4) `google-services.json` ne déclarait qu'un paquet → **la direction a enregistré `com.couturepro.admin` dans Firebase**, l'identifiant distinct est rétabli. Vérifié dans les binaires : `com.couturepro.admin` / « Gextimo Admin » et `com.couturepro.app` / « Gextimo », installés côte à côte. |
 | REL-10 | OTA servie par application | ✅ | **Trouvé en testant REL-8 sur appareil le 20/07.** L'APK de la console admin, pourtant construit avec la bonne cible (vérifié **dans le binaire** : `APP_TARGET` vaut « admin »), affichait l'écran de connexion des **professionnels** — et vider le cache n'y changeait rien. Cause : `/api/app/updates` servait un bundle **unique**. La console, lancée avec `autoUpdate` + `directUpdate`, téléchargeait le bundle des pros et **se faisait remplacer par lui à chaque démarrage**. La configuration devient une table indexée par identifiant de paquet ; une application absente ne reçoit **aucune** OTA (cas sûr). Deux pièges couverts par un test : `config()` lit la notation à points comme des niveaux imbriqués alors qu'un identifiant de paquet en contient (table indexée à la main), et le plugin envoie `app_id` ou `appId` selon sa version (les deux acceptés). Vérifié en production : pros → bundle 1.0.90, admin → `{}`, application inconnue → `{}`. Publier une OTA admin = renseigner `ADMIN_OTA_VERSION` / `ADMIN_OTA_URL`. |
+
+---
+
+## Ce qui NOUS revient encore (logique métier) — établi le 20/07 après audit du code
+
+> Le socle serveur de ces chantiers est **déjà livré**. Ce qui manque, c'est l'écran qui applique
+> la règle : quota, tarif, statut, durée. Ce n'est pas de la façade, Aquilas n'a pas à le porter.
+
+| ID | Sujet | Statut | Ce qui existe déjà côté serveur / ce qui manque |
+|---|---|---|---|
+| ANN-F | **Module Annonces — écran créateur** | ⬜ | **Le backend est COMPLET** : `GET annonces/quota`, `GET/POST annonces`, `PUT annonces/{id}`, `POST annonces/{id}/image`, `POST annonces/{id}/boost`, plus la modération admin et la diffusion vitrine. **Manque l'écran** : formulaire, durée en jours (la date de fin est calculée par le serveur), blocage 1 annonce/jour, historique avec statuts, modale de boost et **tarif automatique 1j=100 / 3j=200 / 7j=300 F**. Tout cela applique des règles serveur → **pour nous**. Restent à Aquilas : l'encart d'information (ANN-7) et l'habillage de la bande défilante (ANN-8, le CSS `.gx-marquee` existe déjà). |
+| AV2-F4 | **Écran admin de modération des avis** | ⬜ | Backend prêt (`GET/PUT admin/vitrine/moderation-avis` : seuils, motifs graves, mots bannis). L'écran est absent : la direction ne peut donc pas régler la modération sans passer par un développeur. **Pour nous** (CRUD de réglages). |
+| VID-3 | Règles de modification des vidéos | ⬜ | Quotas par plan côté serveur ; l'écran doit refléter la règle (Gratuit : une seule vidéo, la nouvelle remplace l'ancienne ; corrections mensuelles comptées). **Pour nous.** |
+| VID-4 | Import direct d'un fichier vidéo | ⬜ | Deux entrées : lien ou fichier. Envoi, validation, stockage → **pour nous**. |
+| VID-5 | Statut « en attente de validation » | 🟡 | Partiel : le statut s'affiche côté créateur. Manque la boucle complète de modération. **Pour nous.** |
+| PHOTO-7 | Traçabilité de la photo d'origine | ⬜ | Garder l'accès à l'original après retouche, côté admin. Stockage + exposition → **pour nous.** |
+| REL-3 | Cache hors-ligne « Mes Réalisations » | ⬜ | 100 brouillons/en attente côté natif (WatermelonDB). **Pour nous.** Dépend de REL-V4. |
+| REL-V4 | **Réalignement des branches** | ⚠️ | `master` et `android` ont divergé de plusieurs centaines de commits. Bloque REL-3 et toute reprise sereine du natif. **Pour nous**, et c'est le préalable technique le plus lourd. |
+
+### Ce qui reste à Aquilas (façade pure)
+`S02A-25` libellé de bouton · `S02A-26` positionnement · `PHOTO-1` retour visuel instantané ·
+`ANN-7` encart d'information · `ANN-8` habillage de la bande défilante · `SUP-1` encart tickets ·
+`REL-V1` finitions vitrine · l'apparence du lecteur vidéo (`VID-1`).
+
+### Bloqué sur des tiers
+`REL-5` relecture par un juriste · `REL-6` clés GA4 / Meta / Clarity (direction) ·
+identité légale RCCM / IFU / APDP (immatriculation) · jeton Meta (CM) · mot de passe VASAT.
 | REL-9 | Règles absolues enfreintes : hardcoding & emoji | ✅ | **Balayage systématique du 20/07.** (1) **ZÉRO HARDCODING** : 24 libellés français écrits en clair dans le JSX, invisibles pour la version anglaise — détail de commande (prix total, déjà encaissé, reste à payer, frise entière), réglages (format facture, logo, pied de page, TVA), équipe, formulaires, quota, sidebar, écran d'erreur. **7 d'entre eux avaient DÉJÀ une clé de traduction ailleurs** : le code les redoublait en clair (défaut récurrent du projet — deux sources pour la même vérité). Clés réutilisées, pas dupliquées. (2) **PAS D'EMOJI** : 40 emoji retirés de l'interface, remplacés par des icônes lucide avec `aria-hidden` ; les notations reçoivent un `aria-label` « n/5 » qu'un lecteur d'écran peut annoncer (une suite ★☆ ne se lisait pas). (3) **THÈME** : 11 fonds de palette Tailwind claire (`bg-green-50`…) qui restaient des taches blanches en thème sombre, dont le composant partagé `Badge` — alignés sur les jetons sémantiques, qui sont bien redéfinis en sombre. Les paliers de fidélité gardent leurs teintes propres avec une variante `dark:`. Vérifié sur les 17 pages de l'app en production. **Porté sur android**, où l'on a découvert que le second constructeur de message WhatsApp (unifié sur master le 20/07) y vivait toujours : il figeait l'unité « cm », la locale `fr-FR` et un message d'erreur français. |
 
 ---
