@@ -121,6 +121,11 @@ Route::get('vitrine/pages/{cle}', [\App\Http\Controllers\Api\PageLegaleControlle
 Route::get('vitrine/coordonnees', fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
 Route::get('vitrine/types-document', fn () => response()->json(['types' => \App\Models\VitrineSetting::typesDocumentVerification()]));
 
+// Identité légale (RCCM, IFU, délibération APDP, dates d'entrée en vigueur) :
+// injectée dans les 11 pages juridiques. Publique par nature — ces mentions ont
+// vocation à être lues par n'importe quel visiteur.
+Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\VitrineSetting::identiteLegale()));
+
 // Lot 2 (20/07) : désinscription des actualités depuis le lien d'un e-mail.
 // URL SIGNÉE : elle doit fonctionner sans connexion (on ne demande pas à
 // quelqu'un de se connecter pour arrêter de recevoir des messages), tout en

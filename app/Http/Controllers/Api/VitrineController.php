@@ -411,6 +411,34 @@ class VitrineController extends Controller
         return response()->json(['reglages' => $s->valeur]);
     }
 
+    /**
+     * PUT /api/admin/vitrine/identite-legale — identité légale de la société.
+     *
+     * Alimente les 11 pages juridiques (RCCM et IFU dans les mentions légales,
+     * numéro de délibération APDP dans les deux pages de données personnelles,
+     * dates d'entrée en vigueur partout). Chaque champ accepte la chaîne vide :
+     * tant qu'un numéro n'est pas attribué, la ligne correspondante disparaît de
+     * la page plutôt que d'afficher un gabarit « à compléter ».
+     */
+    public function setIdentiteLegale(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'rccm'                => ['present', 'nullable', 'string', 'max:60'],
+            'ifu'                 => ['present', 'nullable', 'string', 'max:60'],
+            'apdp_deliberation'   => ['present', 'nullable', 'string', 'max:80'],
+            'date_entree_vigueur' => ['present', 'nullable', 'string', 'max:40'],
+            'date_maj'            => ['present', 'nullable', 'string', 'max:40'],
+        ]);
+
+        // On normalise en chaîne : le front distingue « vide » de « absent »
+        // pour décider s'il affiche la ligne — un null casserait ce test.
+        $data = array_map(fn ($v) => trim((string) $v), $data);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'identite_legale'], ['valeur' => $data]);
+
+        return response()->json(['identite' => $s->valeur]);
+    }
+
     /** GET /api/admin/vitrine/paliers-fidelite — paliers du programme (admin). */
     public function getPaliersFidelite(): JsonResponse
     {

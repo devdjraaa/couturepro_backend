@@ -75,6 +75,11 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
     Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
 
+    // Identité légale : RCCM, IFU, délibération APDP et dates d'entrée en
+    // vigueur des 11 pages juridiques. À saisir le jour de l'immatriculation,
+    // sans redéploiement.
+    Route::put('vitrine/identite-legale', [VitrineController::class, 'setIdentiteLegale']);
+
     // VASAT : pose/renouvellement du mot de passe d'accès (admin uniquement).
     Route::put('vitrine/vasat', function (\Illuminate\Http\Request $r) {
         $d = $r->validate([

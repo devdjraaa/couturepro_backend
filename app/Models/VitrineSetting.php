@@ -141,6 +141,34 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Identité légale de la société, injectée dans les 11 pages juridiques.
+     *
+     * Ces valeurs étaient écrites en clair dans les fichiers de traduction sous
+     * la forme « [NUMÉRO RCCM : à compléter après immatriculation] » — et donc
+     * PUBLIÉES telles quelles sur les CGU, les mentions légales et huit autres
+     * pages. Un crochet « à compléter » sur une page juridique est pire qu'une
+     * absence : il donne à lire que la société n'est pas immatriculée.
+     *
+     * Elles vivent désormais ici, vides par défaut : tant qu'une valeur n'est
+     * pas renseignée, la ligne qui la porte DISPARAÎT côté vitrine au lieu
+     * d'afficher un gabarit. Le jour de l'immatriculation, la direction saisit
+     * les numéros en admin — sans redéploiement et sans passer par un
+     * développeur.
+     */
+    public static function identiteLegale(): array
+    {
+        $cfg = static::where('cle', 'identite_legale')->value('valeur');
+
+        return array_merge([
+            'rccm'                => '',
+            'ifu'                 => '',
+            'apdp_deliberation'   => '',
+            'date_entree_vigueur' => '',
+            'date_maj'            => '',
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
      * Makila — horaires de présence de l'ÉQUIPE HUMAINE (direction, 20/07).
      * Le badge « hors ligne » ne concerne que la disponibilité d'un humain :
      * Makila, lui, répond 24h/24 sans interruption. Bascule automatique sur
