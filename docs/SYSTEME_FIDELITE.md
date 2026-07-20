@@ -155,3 +155,44 @@ Avant d'ajouter de nouvelles règles (parrainage, achats, avis…), il faudrait 
 - rendre la conversion proportionnelle, ou aligner le libellé (point 5).
 
 Ces corrections sont chiffrées et suivies dans `SUIVI_BACKEND.md` sous l'identifiant **S08C-31**.
+
+---
+
+## 10. ⚠️ CONSTAT CHIFFRÉ (production, 20/07/2026) — le programme est inatteignable
+
+Relevé sur la base réelle :
+
+| Mesure | Valeur |
+|---|---|
+| Points générés depuis le lancement, **tous ateliers confondus** | **375** |
+| Meilleur solde individuel | 375 (dont 365 d'une seule activation annuelle) |
+| Seuil de conversion **le plus bas** (plan Gratuit) | **10 000** |
+| Conversions réalisées | **0** |
+
+Au rythme actuel (1 à 3 points par client/commande, 31 ou 365 par activation), il faudrait
+de l'ordre de **27 renouvellements annuels** pour une seule conversion. C'est la raison pour
+laquelle les incohérences décrites plus haut n'avaient jamais été remarquées : la
+fonctionnalité n'a jamais été atteinte par personne.
+
+**Effet pervers mesurable** : un abonné Studio paie **10×** le seuil d'un abonné Gratuit
+(100 000 contre 10 000) pour le **même** bonus de 31 jours, alors qu'il ne gagne que **2×**
+plus vite. Le plan premium est donc **pénalisé** — l'inverse de l'incitation attendue.
+
+### Ce qui a été corrigé (défauts techniques, 20/07)
+- Crédit actif **aussi sur le chemin web** (il ne fonctionnait qu'en synchro hors ligne).
+- Permission `points.convert` **appliquée** (elle était déclarée mais jamais vérifiée).
+- Les 3 règles annoncées et inexistantes **retirées** de l'interface.
+- Description « Commande validée » → « Commande créée » (le crédit a lieu à la création).
+
+### Ce qui reste une DÉCISION COMMERCIALE (direction)
+Le calibrage n'est pas un choix technique. Trois scénarios possibles :
+
+1. **Baisser les seuils** d'un facteur ~20 (ex. 500 / 1 000 / 2 000) → une conversion
+   devient atteignable en ~1 an d'activité normale.
+2. **Augmenter les gains** (points par client/commande) en gardant les seuils.
+3. **Rendre la conversion proportionnelle** : au lieu de 31 jours fixes quel que soit le
+   seuil, accorder des jours au prorata des points convertis — ce qui supprime du même coup
+   la pénalité du plan Studio.
+
+Recommandation : **scénario 1 + 3**. Le 1 rend le programme réel, le 3 supprime l'inversion
+entre plans. Les valeurs exactes appartiennent à la direction.
