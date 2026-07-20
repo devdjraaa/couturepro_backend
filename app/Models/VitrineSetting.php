@@ -80,6 +80,33 @@ class VitrineSetting extends Model
     }
 
     /**
+     * REL-2 / Pt 125 — Titres et descriptions par page servis aux ROBOTS
+     * (pré-rendu SEO). Éditables en admin ; défauts alignés sur les pages
+     * réelles de la vitrine.
+     */
+    public static function seoPages(): array
+    {
+        $cfg = static::where('cle', 'seo_pages')->value('valeur');
+
+        return is_array($cfg) && $cfg ? $cfg : [
+            '/'                  => ['titre' => 'Gextimo — La marketplace des créateurs de mode africains', 'description' => 'Trouvez les meilleurs designers et tailleurs africains. Commandez des tenues sur mesure, suivez vos commandes en temps réel.'],
+            '/createurs'         => ['titre' => 'Créateurs et ateliers de mode africaine | Gextimo', 'description' => 'Parcourez les créateurs, stylistes et tailleurs référencés sur Gextimo : spécialités, villes, avis clients et créations.'],
+            '/artisans'          => ['titre' => 'Artisans de la mode | Gextimo', 'description' => 'Les artisans partenaires de Gextimo : couture, broderie, accessoires.'],
+            '/qui-sommes-nous'   => ['titre' => 'Qui sommes-nous | Gextimo', 'description' => 'Gextimo, par Novafriq : la plateforme qui connecte créateurs, artisans et clients de la mode africaine.'],
+            '/partenaires'       => ['titre' => 'Partenaires | Gextimo', 'description' => 'Ils accompagnent le développement de la mode africaine avec Gextimo.'],
+            '/premium'           => ['titre' => 'Offres et abonnements | Gextimo', 'description' => 'Choisissez la formule adaptée à votre atelier : publication en vitrine, outils de gestion, visibilité renforcée.'],
+            '/mise-en-avant'     => ['titre' => 'Mise en avant sponsorisée | Gextimo', 'description' => 'Renforcez la visibilité de votre atelier sur la vitrine Gextimo.'],
+            '/aide'              => ['titre' => 'Aide et support | Gextimo', 'description' => 'Questions fréquentes et assistance Gextimo.'],
+            '/espace-client'     => ['titre' => 'Espace client | Gextimo', 'description' => 'Suivez vos commandes, laissez des avis et gérez vos créateurs suivis.'],
+            '/mentions-legales'  => ['titre' => 'Mentions légales | Gextimo', 'description' => 'Mentions légales de la plateforme Gextimo, éditée par Novafriq.'],
+            '/confidentialite'   => ['titre' => 'Politique de confidentialité | Gextimo', 'description' => 'Comment Gextimo collecte, utilise et protège vos données personnelles.'],
+            '/cgu'               => ['titre' => 'Conditions générales d\'utilisation | Gextimo', 'description' => 'Les conditions d\'utilisation de la plateforme Gextimo.'],
+            '/cgv'               => ['titre' => 'Conditions générales de vente | Gextimo', 'description' => 'Les conditions de vente applicables sur Gextimo.'],
+            '/cookies'           => ['titre' => 'Politique cookies | Gextimo', 'description' => 'L\'usage des cookies et traceurs sur Gextimo, et vos choix.'],
+        ];
+    }
+
+    /**
      * VASAT — second produit du groupe (directive direction 20/07) : présent sur
      * le site mais invisible au public, derrière un mot de passe. Le hash est posé
      * à la PREMIÈRE saisie (même principe TOFU que le tracker de suivi), puis

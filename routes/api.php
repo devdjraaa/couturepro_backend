@@ -76,6 +76,10 @@ Route::prefix('vitrine')->group(function () {
     Route::post('patrons/{patron}/acheter',              [PatronPublicController::class, 'acheter']);
     Route::get('patrons/achats/{code}',                  [PatronPublicController::class, 'statut']);
     Route::get('patrons/achats/{code}/telecharger',      [PatronPublicController::class, 'telecharger']);
+    // REL-2 / Pt 125 : pré-rendu HTML pour TOUS les robots (nginx route les
+    // User-Agents de robots vers cette page ; les humains n'y passent jamais).
+    Route::get('seo/render', [\App\Http\Controllers\Api\SeoRenderController::class, 'render']);
+
     // Rendu OG côté serveur pour les robots sociaux (proxifié par nginx selon l'User-Agent).
     Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
     // S08C-29 : routes publiques d'avis — limitées en débit (aucune limitation
