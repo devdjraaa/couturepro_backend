@@ -119,6 +119,7 @@ Route::get('vitrine/pages/{cle}', [\App\Http\Controllers\Api\PageLegaleControlle
 // Coordonnées officielles (marque, site, téléphone) : source unique pour les
 // documents et partages sortants — le front ne doit rien figer en dur.
 Route::get('vitrine/coordonnees', fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
+Route::get('vitrine/types-document', fn () => response()->json(['types' => \App\Models\VitrineSetting::typesDocumentVerification()]));
 
 // Lot 2 (20/07) : désinscription des actualités depuis le lien d'un e-mail.
 // URL SIGNÉE : elle doit fonctionner sans connexion (on ne demande pas à

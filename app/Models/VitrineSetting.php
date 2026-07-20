@@ -107,6 +107,24 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Pt 10 (lot 2) — Types de pièces justificatives acceptées pour la
+     * vérification Designer. Éditable en admin : ajouter un type ne demande
+     * pas de redéploiement.
+     */
+    public static function typesDocumentVerification(): array
+    {
+        $cfg = static::where('cle', 'types_document_verification')->value('valeur');
+
+        return is_array($cfg) && $cfg ? $cfg : [
+            ['cle' => 'carte_identite',   'label' => "Carte d'identité / passeport"],
+            ['cle' => 'registre_commerce','label' => 'Registre de commerce (RCCM)'],
+            ['cle' => 'ifu',              'label' => 'Carte IFU'],
+            ['cle' => 'justif_domicile',  'label' => 'Justificatif de domicile'],
+            ['cle' => 'autre',            'label' => 'Autre document'],
+        ];
+    }
+
+    /**
      * Coordonnées officielles de la marque, utilisées dans les documents et
      * partages sortants (PDF de mesures, message WhatsApp). Éditables en admin :
      * un changement de numéro ne doit pas demander un redéploiement.

@@ -68,12 +68,43 @@ class ParametresController extends Controller
             'contact_public' => ['sometimes', 'boolean'],
             'specialite' => ['sometimes', 'nullable', 'string', 'max:120'],
             'bio'        => ['sometimes', 'nullable', 'string', 'max:1000'],
+            // Pt 9 (lot 2) : LIEN complet attendu, pas un pseudo — le profil public
+            // doit pouvoir en faire un lien cliquable. Un pseudo saisi seul est
+            // converti en URL plus bas plutôt que refusé : l'utilisateur n'a pas
+            // à connaître la règle pour que ça marche.
             'instagram'  => ['sometimes', 'nullable', 'string', 'max:255'],
             'facebook'   => ['sometimes', 'nullable', 'string', 'max:255'],
             'site_web'   => ['sometimes', 'nullable', 'string', 'max:255'],
             'latitude'   => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
             'longitude'  => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
         ]);
+
+        // Pt 9 (lot 2) : normaliser en URL complète. Le créateur peut saisir
+        // « @maison », « maison » ou l'URL entière : dans les trois cas le profil
+        // public doit produire un lien qui s'ouvre. Refuser la saisie aurait
+        // simplement empêché de renseigner le champ.
+        foreach ([
+            'instagram' => ['hotes' => ['instagram.com', 'www.instagram.com'], 'base' => 'https://instagram.com/'],
+            'facebook'  => ['hotes' => ['facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.com'], 'base' => 'https://facebook.com/'],
+        ] as $champ => $reseau) {
+            if (! array_key_exists($champ, $data) || ! $data[$champ]) {
+                continue;
+            }
+            $v = trim($data[$champ]);
+
+            if (preg_match('#^https?://#i', $v)) {
+                $data[$champ] = $v;
+                continue;
+            }
+
+            // Une saisie « instagram.com/maison » (sans protocole) est un domaine,
+            // pas un pseudo : la préfixer donnerait instagram.com/instagram.com/…
+            $sansProtocole = preg_replace('#^//#', '', $v);
+            $hote = strtolower(strtok($sansProtocole, '/'));
+            $data[$champ] = in_array($hote, $reseau['hotes'], true)
+                ? 'https://' . $sansProtocole
+                : $reseau['base'] . ltrim($v, '@/');
+        }
 
         $atelier = $this->getAtelier($request);
         $atelier->update($data);
@@ -364,6 +395,10 @@ class ParametresController extends Controller
         $request->validate([
             'document' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'lien'     => ['nullable', 'string', 'max:255'],
+            // Pt 10 : la modération doit savoir CE qu'elle regarde.
+            'type_document' => ['nullable', \Illuminate\Validation\Rule::in(
+                collect(\App\Models\VitrineSetting::typesDocumentVerification())->pluck('cle')->all()
+            )],
         ]);
 
         $atelier = $this->getAtelier($request);
@@ -377,6 +412,7 @@ class ParametresController extends Controller
                 Storage::disk('public')->delete($atelier->verification_doc_path);
             }
             $atelier->verification_doc_path = $request->file('document')->store('verifications/' . $atelier->id, 'public');
+            $atelier->verification_doc_type = $request->input('type_document');
         }
 
         if ($request->filled('lien')) {
