@@ -60,10 +60,15 @@ class VitrineSetting extends Model
      * Décision direction : pour la première version, **FedaPay uniquement**, même si
      * l'intégration n'est pas finalisée — la structure doit rester évolutive.
      *
-     * Cette liste devient la source unique : auparavant le front embarquait
-     * `['wave','om','especes','virement','autre']` EN DUR, avec une seconde liste
-     * incohérente (`especes`/`mobile_money`/`virement`) côté commandes et caisse.
-     * Éditable en admin, donc ajouter un moyen ne demande plus de redéploiement.
+     * Remplace la liste qui était EN DUR côté front (`wave`, `om`, `especes`,
+     * `virement`, `autre`) : ajouter un moyen ne demande plus de redéploiement.
+     *
+     * ⚠️ Périmètre : la FACTURATION uniquement. La caisse et les commandes ont
+     * leur propre liste (`especes` / `mobile_money` / `virement`) et NE doivent
+     * pas consommer celle-ci : elles enregistrent comment le client a réellement
+     * payé sur place. Les brancher sur « FedaPay uniquement » supprimerait
+     * l'encaissement en espèces, qui est le cas majoritaire des ateliers.
+     * Unifier les deux notions est une décision produit, pas un nettoyage.
      */
     public static function moyensPaiement(): array
     {

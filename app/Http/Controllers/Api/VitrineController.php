@@ -44,7 +44,11 @@ class VitrineController extends Controller
             ->with('abonnement')
             ->withCount([
                 'vetements' => fn ($q) => $q->where('is_archived', false)->where('publie_vitrine', true),
-                'abonnes',   // P171 👥
+                // ABO-8 : un désabonnement CONSERVE la ligne (traçabilité) — sans ce
+                // filtre, la galerie continuerait de compter les partis, alors que la
+                // fiche du créateur, elle, ne compte que les actifs. Deux chiffres
+                // différents pour le même créateur selon la page.
+                'abonnes' => fn ($q) => $q->where('actif', true), // P171 👥
                 'commandes', // P171 🛒
             ])
             ->orderBy('nom')
@@ -141,7 +145,12 @@ class VitrineController extends Controller
                 'tiktok'    => $atelier->tiktok,     // P177
             ],
             'inscrit_depuis' => $atelier->created_at ? $this->inscritDepuis($atelier->created_at) : null, // P172
-            'abonne'         => $visitorKey ? $atelier->abonnes()->where('visitor_key', $visitorKey)->exists() : false, // P173
+            // P173 / ABO-1 : l'abonnement est rattaché au COMPTE client, plus à la clé
+            // visiteur anonyme. Le lire encore par `visitor_key` renverrait toujours
+            // `false` : le bouton afficherait « Suivre » à quelqu'un déjà abonné.
+            'abonne'         => ($client = auth('sanctum')->user()) instanceof GxtClient
+                ? $atelier->abonnes()->where('gxt_client_id', $client->id)->where('actif', true)->exists()
+                : false,
             'merites'        => $badges,             // P174-176
             'badge_pro'      => (bool) ($atelier->abonnement?->getConfigEffective()['badge_designer_pro'] ?? false), // PL-8
             'videos'         => (($atelier->abonnement?->getConfigEffective()['videos_presentation'] ?? false)) // PL-7
@@ -736,7 +745,7 @@ HTML;
             'ville'        => $a->ville,
             'note'         => ($avgNote = $a->avis()->where('statut', 'valide')->avg('note')) ? round($avgNote, 1) : null,
             'avis'         => $a->avis()->where('statut', 'valide')->count(), // P171 ⭐
-            'abonnes'      => $a->abonnes_count   ?? $a->abonnes()->count(),   // P171 👥
+            'abonnes'      => $a->abonnes_count   ?? $a->abonnes()->actifs()->count(),   // P171 👥
             'commandes'    => $a->commandes_count ?? $a->commandes()->count(), // P171 🛒
             'verifie'      => (bool) $a->verifie,
             'experience'   => null,
