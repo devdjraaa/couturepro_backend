@@ -79,9 +79,18 @@ class VetementController extends Controller
             $imagePaths[] = $request->file('image')->store('vetements', 'public');
         }
 
+        // Pts 68-69 : libellés nettoyés — vides écartés, doublons retirés.
+        $libelles = collect($request->input('libelles_mesures', []))
+            ->map(fn ($l) => trim((string) $l))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
         $vetement = Vetement::create([
             'atelier_id'      => $atelier->id,
             'nom'             => $request->nom,
+            'libelles_mesures' => $libelles ?: null,
             'image_path'      => $imagePaths[0] ?? null,
             'images'          => $imagePaths ?: null,
             'is_systeme'      => false,
@@ -98,6 +107,17 @@ class VetementController extends Controller
         $this->authorize('update', $vetement);
 
         $data = ['nom' => $request->nom ?? $vetement->nom];
+
+        // Pts 68-69 : liste des mesures attendues, modifiable après coup.
+        if ($request->has('libelles_mesures')) {
+            $libelles = collect($request->input('libelles_mesures', []))
+                ->map(fn ($l) => trim((string) $l))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+            $data['libelles_mesures'] = $libelles ?: null;
+        }
 
         // Le même plafond s'applique à la modification : sinon on crée avec une
         // photo puis on « modifie » avec cinquante.

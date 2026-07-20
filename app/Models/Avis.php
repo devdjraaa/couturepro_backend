@@ -17,16 +17,24 @@ class Avis extends Model
     protected $table = 'avis';
 
     protected $fillable = [
-        'atelier_id', 'collection_id', 'auteur_nom', 'note', 'texte', 'photos', 'statut',
-        'gxt_client_id', 'commande_id', 'signalements_count', 'signale_at',
+        'atelier_id', 'vetement_id', 'collection_id', 'auteur_nom', 'note', 'texte',
+        'photos', 'photos_statut', 'statut',
+        'gxt_client_id', 'commande_id', 'achat_verifie',
+        'signalements_count', 'signale_at', 'revue_prioritaire',
     ];
 
     protected $casts = [
         'note'               => 'integer',
         'photos'             => 'array',
+        'achat_verifie'      => 'boolean',
+        'revue_prioritaire'  => 'boolean',
         'signalements_count' => 'integer',
         'signale_at'         => 'datetime',
     ];
+
+    public const PHOTOS_EN_ATTENTE = 'en_attente';
+    public const PHOTOS_VALIDEES   = 'validees';
+    public const PHOTOS_REFUSEES   = 'refusees';
 
     protected $appends = ['photos_urls'];
 
@@ -43,10 +51,31 @@ class Avis extends Model
         return $this->belongsTo(Atelier::class, 'atelier_id');
     }
 
-    /** S08C-29e — collection visée par l'avis (facultatif : sinon l'avis vise le créateur). */
+    /** Historique (piste abandonnée le 20/07) : quelques lignes portent encore une collection. */
     public function collection(): BelongsTo
     {
         return $this->belongsTo(Collection::class, 'collection_id');
+    }
+
+    /** Décision 1 (20/07) — l'avis vise un MODÈLE. Nul = avis historique niveau créateur. */
+    public function vetement(): BelongsTo
+    {
+        return $this->belongsTo(Vetement::class, 'vetement_id');
+    }
+
+    public function clientAuteur(): BelongsTo
+    {
+        return $this->belongsTo(GxtClient::class, 'gxt_client_id');
+    }
+
+    /**
+     * Photos montrables au PUBLIC : uniquement celles validées par l'admin
+     * (décision 11 — une photo indécente visible même quelques minutes cause un
+     * tort réel). L'accesseur `photos_urls` reste complet pour l'admin.
+     */
+    public function photosPubliques(): array
+    {
+        return $this->photos_statut === self::PHOTOS_VALIDEES ? $this->photos_urls : [];
     }
 
     /** Avis visibles publiquement. */

@@ -80,7 +80,9 @@ Route::prefix('vitrine')->group(function () {
     Route::get('og/createurs/{atelier}', [VitrineController::class, 'ogCreateur']);
     // S08C-29 : routes publiques d'avis — limitées en débit (aucune limitation
     // auparavant : dépôt d'avis et signalements pouvaient être envoyés en boucle).
-    Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store'])->middleware('throttle:5,60');
+    Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store'])->middleware('throttle:5,60'); // 410 — remplacé par le dépôt par modèle
+    // Avis v2 (décisions 20/07) : dépôt sur un MODÈLE, compte client obligatoire.
+    Route::post('creations/{vetement}/avis', [AvisController::class, 'storePourModele'])->middleware('throttle:5,60');
     Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);

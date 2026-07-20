@@ -75,6 +75,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
     Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
 
+    // Avis v2 : réglages de modération (seuil, motifs graves, mots bannis)
+    Route::get('vitrine/moderation-avis', [VitrineController::class, 'getModerationAvis']);
+    Route::put('vitrine/moderation-avis', [VitrineController::class, 'setModerationAvis']);
+
     // S08C-30 : moyens de paiement de la facturation (FedaPay en V1)
     Route::get('vitrine/moyens-paiement', [VitrineController::class, 'moyensPaiement']);
     Route::put('vitrine/moyens-paiement', [VitrineController::class, 'setMoyensPaiement']);
@@ -97,6 +101,8 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::get('avis',                    [AdminAvisController::class, 'index']);
         Route::post('avis/{avis}/masquer',    [AdminAvisController::class, 'masquer']);
         Route::post('avis/{avis}/retablir',   [AdminAvisController::class, 'retablir']);
+        // Décision 11 : validation des photos jointes AVANT publication.
+        Route::post('avis/{avis}/photos',     [AdminAvisController::class, 'modererPhotos']);
     });
 
     // VID-5 : modération des vidéos de présentation (validation sous 24 h)

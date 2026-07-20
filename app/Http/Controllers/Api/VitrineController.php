@@ -159,10 +159,22 @@ class VitrineController extends Controller
                 ? \App\Models\AtelierVideo::where('atelier_id', $atelier->id)->publiees()->orderBy('position')->get(['titre', 'url', 'source'])
                 : [],
             'collections' => $atelier->collections()->orderBy('nom')->get(['id', 'nom', 'annonce_message', 'annonce_at']), // PL-6
-            // S08C-29e : `collection_id` accompagne chaque avis pour permettre au
-            // front de les regrouper par collection (null = avis sur le créateur).
-            'avis'        => $atelier->avis()->where('statut', 'valide')->latest()
-                ->get(['id', 'collection_id', 'auteur_nom', 'note', 'texte', 'photos', 'created_at']),
+            // Avis v2 (20/07) : chaque avis porte le MODÈLE visé (`vetement_id`,
+            // nul = avis historique niveau créateur). Les photos ne sortent que
+            // VALIDÉES (décision 11) — l'ancien code exposait les photos brutes.
+            'avis'        => $atelier->avis()->where('statut', 'valide')->with('vetement:id,nom')->latest()
+                ->get()
+                ->map(fn ($av) => [
+                    'id'            => $av->id,
+                    'vetement_id'   => $av->vetement_id,
+                    'vetement_nom'  => $av->vetement?->nom,
+                    'auteur_nom'    => $av->auteur_nom,
+                    'note'          => $av->note,
+                    'texte'         => $av->texte,
+                    'photos_urls'   => $av->photosPubliques(),
+                    'achat_verifie' => $av->achat_verifie,   // décision 9 : badge futur
+                    'created_at'    => $av->created_at,
+                ]),
             'creations'   => $creations,
             // Point 101 : réalisations publiées (photos filigranées, modérées).
             'realisations' => \App\Models\Realisation::where('atelier_id', $atelier->id)
@@ -334,6 +346,33 @@ class VitrineController extends Controller
         $s = VitrineSetting::updateOrCreate(['cle' => 'moyens_paiement'], ['valeur' => $data['moyens']]);
 
         return response()->json(['moyens' => $s->valeur]);
+    }
+
+    /** GET /api/admin/vitrine/moderation-avis — réglages de modération des avis. */
+    public function getModerationAvis(): JsonResponse
+    {
+        return response()->json(['reglages' => VitrineSetting::moderationAvis()]);
+    }
+
+    /**
+     * PUT /api/admin/vitrine/moderation-avis — seuils, motifs graves et mots
+     * bannis, éditables sans redéploiement (décisions 7, 8 et 12 du 20/07 —
+     * la liste de mots « s'enrichit progressivement avec l'usage réel »).
+     */
+    public function setModerationAvis(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'max_avis_par_jour'  => ['required', 'integer', 'min:1', 'max:100'],
+            'seuil_signalements' => ['required', 'integer', 'min:1', 'max:100'],
+            'motifs_graves'      => ['required', 'array', 'max:10'],
+            'motifs_graves.*'    => ['string', 'max:30'],
+            'mots_bannis'        => ['present', 'array', 'max:500'],
+            'mots_bannis.*'      => ['string', 'max:60'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'moderation_avis'], ['valeur' => $data]);
+
+        return response()->json(['reglages' => $s->valeur]);
     }
 
     /** GET /api/admin/vitrine/paliers-fidelite — paliers du programme (admin). */

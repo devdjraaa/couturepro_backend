@@ -80,6 +80,24 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Avis v2 (décisions direction 20/07) — réglages de modération, éditables en
+     * admin. `mots_bannis` démarre VIDE : la direction précise que la liste
+     * « s'enrichit progressivement avec l'usage réel » — elle se remplit depuis
+     * l'admin, pas depuis le code.
+     */
+    public static function moderationAvis(): array
+    {
+        $cfg = static::where('cle', 'moderation_avis')->value('valeur');
+
+        return array_merge([
+            'max_avis_par_jour'  => 5,     // décision 8 : anti-spam par compte
+            'seuil_signalements' => 3,     // décision 7 : mise en file standard
+            'motifs_graves'      => ['contenu_illegal', 'insulte', 'discrimination'],
+            'mots_bannis'        => [],
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
      * ANN-6 — Tarifs du Boost d'annonce (mise en avant payante), config-driven
      * et éditables depuis l'admin. La publication d'une annonce reste gratuite ;
      * seul le Boost est payant. `diffusions_par_jour` = nombre de passages
