@@ -24,8 +24,8 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | 4 | ~~**La route de signalement d'un avis est publique, sans authentification ni limitation**~~ ✅ **CORRIGÉ le 19/07** — le signalement ne dépublie plus rien (compteur + horodatage), limitation de débit ajoutée sur le signalement et sur le dépôt d'avis. | Faille fermée, vérifiée en production. |
 | 5 | **L'interface annonce 3 règles de fidélité qui n'existent pas** (parrainage 50 pts, 1 000 XOF = 1 pt, mois actif = 5 pts). Vérifié : zéro occurrence de parrainage dans le backend. | Promesse non tenue visible par les utilisateurs. Voir `SYSTEME_FIDELITE.md`. |
 | 6 | **Le socle du workflow photos existe déjà.** Le module « Mes Réalisations » (livré le 18/07) a déjà les statuts, la modération admin, le filigrane à la publication et l'anti-abus. | **Étendre**, ne pas refaire (PHOTO-*). |
-| 8 | ⚠️ **Le référentiel de permissions d'équipe n'est appliqué NULLE PART côté serveur** (découvert le 20/07). Il est renvoyé au front, qui masque l'interface — mais un membre d'équipe peut appeler n'importe quelle route pro quel que soit son rôle. | Correctif ciblé posé sur la conversion de points (action sensible). Une couche d'autorisation complète touche ~40 routes et risque de bloquer des utilisateurs légitimes : **à décider et tester posément**, pas à chaud. |
-| 7 | **L'abonnement aux créateurs est 100 % anonyme** (clé visiteur en stockage local). Vider son cache = perdre ses abonnements. | ⚠️ **Décision** : que fait-on des abonnements anonymes existants lors de la bascule vers un compte ? |
+| 8 | ~~**Le référentiel de permissions d'équipe n'est appliqué nulle part côté serveur**~~ ✅ **CORRIGÉ le 20/07** — middleware `equipe.permission` sur **54 routes** (clients, mesures, commandes, paiements, vêtements, factures, notifications). Le propriétaire n'est jamais concerné. | Les défauts du rôle « assistant » ont dû être **élargis avant activation** : tels quels ils privaient les 4 assistants en production de la saisie des mesures et de l'avancement des commandes. Restent refusés : suppression clients/commandes, facturation, conversion de points. |
+| 7 | ~~**L'abonnement aux créateurs est 100 % anonyme**~~ ✅ **RÉSOLU le 20/07** — l'abonnement est rattaché au compte client (ABO-1). | **Décision close par les faits** : il n'existait **aucun** abonnement anonyme en base (0 ligne en production). Il n'y avait donc rien à migrer. |
 
 ---
 
@@ -118,7 +118,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | EC-2 | Ouverture automatique de l'espace client | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-2`. |
 | EC-3 | Reprise automatique de l'action | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-3`. |
 | EC-4 | Gestion des échecs | ℹ️ | **Frontend** ↔ `SUIVI_FRONTEND.md#EC-4`. |
-| EC-5 | Couvrir toutes les actions nécessitant un compte | 🟡 | Côté serveur : les favoris n'existent pas en base (purement locaux), l'abonnement est anonyme → tant que ABO-1 n'est pas fait, « reprendre l'action » n'a pas de sens pour ces deux cas. |
+| EC-5 | Couvrir toutes les actions nécessitant un compte | ✅ | Côté serveur, tout est en place : l'abonnement est rattaché au compte (ABO-1) et le parcours de reprise est couvert côté front ↔ `SUIVI_FRONTEND.md#EC-5`. Les favoris restent volontairement locaux (aucune table) — ils n'engagent rien et ne nécessitent pas de compte.
 
 ---
 
