@@ -83,6 +83,8 @@ Route::prefix('vitrine')->group(function () {
     Route::post('createurs/{atelier}/avis',  [AvisController::class, 'store'])->middleware('throttle:5,60'); // 410 — remplacé par le dépôt par modèle
     // Avis v2 (décisions 20/07) : dépôt sur un MODÈLE, compte client obligatoire.
     Route::post('creations/{vetement}/avis', [AvisController::class, 'storePourModele'])->middleware('throttle:5,60');
+    // VASAT (produit masqué) : accès par mot de passe, anti force brute.
+    Route::post('vasat/acces', [VitrineController::class, 'accesVasat'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);

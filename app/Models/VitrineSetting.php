@@ -80,6 +80,19 @@ class VitrineSetting extends Model
     }
 
     /**
+     * VASAT — second produit du groupe (directive direction 20/07) : présent sur
+     * le site mais invisible au public, derrière un mot de passe. Le hash est posé
+     * à la PREMIÈRE saisie (même principe TOFU que le tracker de suivi), puis
+     * modifiable via l'admin.
+     */
+    public static function vasat(): array
+    {
+        $cfg = static::where('cle', 'vasat')->value('valeur');
+
+        return array_merge(['actif' => true, 'mdp_hash' => null], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
      * Avis v2 (décisions direction 20/07) — réglages de modération, éditables en
      * admin. `mots_bannis` démarre VIDE : la direction précise que la liste
      * « s'enrichit progressivement avec l'usage réel » — elle se remplit depuis

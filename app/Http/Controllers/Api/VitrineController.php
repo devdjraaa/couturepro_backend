@@ -348,6 +348,37 @@ class VitrineController extends Controller
         return response()->json(['moyens' => $s->valeur]);
     }
 
+    /**
+     * POST /api/vitrine/vasat/acces — accès à l'espace VASAT (produit masqué).
+     *
+     * Directive direction (20/07) : VASAT est intégré au site mais protégé par
+     * mot de passe, pour développer en arrière-plan sans exposition publique.
+     * Premier mot de passe saisi = mot de passe de référence (TOFU) ; ensuite
+     * exigé à chaque accès. Limité en débit contre la force brute.
+     */
+    public function accesVasat(Request $request): JsonResponse
+    {
+        $data = $request->validate(['mdp' => ['required', 'string', 'min:6', 'max:100']]);
+
+        $cfg = VitrineSetting::vasat();
+        if (! ($cfg['actif'] ?? true)) {
+            return response()->json(['message' => 'Espace indisponible.'], 404);
+        }
+
+        if (empty($cfg['mdp_hash'])) {
+            $cfg['mdp_hash'] = \Illuminate\Support\Facades\Hash::make($data['mdp']);
+            VitrineSetting::updateOrCreate(['cle' => 'vasat'], ['valeur' => $cfg]);
+
+            return response()->json(['ok' => true, 'initialise' => true]);
+        }
+
+        if (! \Illuminate\Support\Facades\Hash::check($data['mdp'], $cfg['mdp_hash'])) {
+            return response()->json(['message' => 'Mot de passe incorrect.'], 403);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
     /** GET /api/admin/vitrine/moderation-avis — réglages de modération des avis. */
     public function getModerationAvis(): JsonResponse
     {
