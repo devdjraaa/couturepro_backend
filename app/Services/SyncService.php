@@ -184,41 +184,13 @@ class SyncService
         }
     }
 
+    /**
+     * Délègue au service de fidélité : la règle est désormais PARTAGÉE avec les
+     * endpoints web, qui ne créditaient rien auparavant.
+     */
     private function maybeAwardPoints(Atelier $atelier, string $table, string $recordId): void
     {
-        if (!in_array($table, ['clients', 'commandes'])) {
-            return;
-        }
-
-        // Idempotence : ne pas créditer deux fois le même record
-        if (PointsHistorique::where('atelier_id', $atelier->id)->where('reference_id', $recordId)->exists()) {
-            return;
-        }
-
-        $config = $atelier->abonnement?->getConfigEffective() ?? [];
-
-        [$pts, $type, $desc] = $table === 'clients'
-            ? [(int) ($config['pts_par_client'] ?? 0),   'client_cree',      'Client créé']
-            : [(int) ($config['pts_par_commande'] ?? 0), 'commande_validee', 'Commande validée'];
-
-        if ($pts <= 0) {
-            return;
-        }
-
-        $solde = PointsFidelite::firstOrCreate(
-            ['atelier_id' => $atelier->id],
-            ['solde_pts'  => 0]
-        );
-        $solde->increment('solde_pts', $pts);
-
-        PointsHistorique::create([
-            'atelier_id'   => $atelier->id,
-            'type'         => $type,
-            'points'       => $pts,
-            'description'  => $desc,
-            'reference_id' => $recordId,
-            'created_at'   => now(),
-        ]);
+        app(PointsFideliteService::class)->crediterCreation($atelier, $table, $recordId);
     }
 
     private function createActionNotification(Atelier $atelier, string $table, $record): void

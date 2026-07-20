@@ -45,6 +45,44 @@ class PointsFideliteService
             ->exists();
     }
 
+    /**
+     * Crédite les points d'une création de client ou de commande.
+     *
+     * ⚠️ Cette règle vivait UNIQUEMENT dans le service de synchronisation hors ligne :
+     * un utilisateur travaillant sur le web ne gagnait donc JAMAIS de points sur ses
+     * clients et commandes — un pan entier du programme de fidélité était inopérant.
+     * La règle est remontée ici pour que les deux chemins (web et synchro) l'utilisent.
+     *
+     * Idempotent par `reference_id` : un même enregistrement ne peut être crédité
+     * qu'une fois, y compris si le web crée puis la synchro repousse le même objet.
+     *
+     * @param  string  $entite  'clients' ou 'commandes'
+     */
+    public function crediterCreation(Atelier $atelier, string $entite, string $recordId): void
+    {
+        if (! in_array($entite, ['clients', 'commandes'], true)) {
+            return;
+        }
+
+        if ($this->alreadyCredited($atelier->id, $recordId)) {
+            return;
+        }
+
+        $config = $atelier->abonnement?->getConfigEffective() ?? [];
+
+        [$pts, $type, $desc] = $entite === 'clients'
+            ? [(int) ($config['pts_par_client'] ?? 0),   'client_cree',      'Client créé']
+            // Le type historique reste `commande_validee` (données déjà en base),
+            // mais la description dit la vérité : le crédit a lieu à la CRÉATION.
+            : [(int) ($config['pts_par_commande'] ?? 0), 'commande_validee', 'Commande créée'];
+
+        if ($pts <= 0) {
+            return;
+        }
+
+        $this->creditPoints($atelier->id, $type, $pts, $desc, $recordId);
+    }
+
     public function convertirEnBonus(Atelier $atelier): Abonnement
     {
         $abonnement = $atelier->abonnement;

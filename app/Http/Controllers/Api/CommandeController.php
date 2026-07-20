@@ -102,6 +102,11 @@ class CommandeController extends Controller
 
         $this->limitsService->incrementCommandes($atelier);
 
+        // Fidélité : ce crédit n'existait QUE sur le chemin de synchronisation hors
+        // ligne — un utilisateur travaillant sur le web ne gagnait donc jamais de
+        // points sur ses commandes. Idempotent : la synchro ne recréditera pas.
+        app(\App\Services\PointsFideliteService::class)->crediterCreation($atelier, 'commandes', $commande->id);
+
         $clientNom = $commande->client?->prenom
             ? "{$commande->client->prenom} {$commande->client->nom}"
             : ($commande->client?->nom ?? 'Client');

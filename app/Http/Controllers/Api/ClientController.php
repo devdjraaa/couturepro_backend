@@ -105,6 +105,11 @@ class ClientController extends Controller
 
         $this->limitsService->incrementClients($atelier);
 
+        // Fidélité : ce crédit n'existait QUE sur le chemin de synchronisation hors
+        // ligne — un utilisateur travaillant sur le web ne gagnait donc jamais de
+        // points sur ses clients. Idempotent : la synchro ne recréditera pas.
+        app(\App\Services\PointsFideliteService::class)->crediterCreation($atelier, 'clients', $client->id);
+
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
             'titre'      => 'Nouveau client ajouté',
