@@ -230,6 +230,39 @@ class VitrineSetting extends Model
     }
 
     /**
+     * CLI-3 — Compte à rebours de lancement (22 août).
+     *
+     * Deux composants d'un même réglage : une BANDE discrète qui s'affiche à
+     * partir de J-30 et se masque d'elle-même une fois l'échéance passée, et un
+     * CHRONO plein écran le jour J.
+     *
+     * Tout est éditable en admin — date, heure, textes, couleurs, seuil de
+     * déclenchement — parce que ce compte à rebours ne servira pas qu'au 22
+     * août : la direction voudra le rejouer pour d'autres annonces. Une date
+     * écrite en dur aurait obligé à redéployer à chaque fois.
+     *
+     * `actif` à false par défaut : rien ne s'affiche tant que la direction n'a
+     * pas décidé, plutôt qu'un compte à rebours surgissant chez les utilisateurs
+     * au premier déploiement.
+     */
+    public static function compteARebours(): array
+    {
+        $cfg = static::where('cle', 'compte_a_rebours')->value('valeur');
+
+        return array_merge([
+            'actif'           => false,
+            'date_cible'      => '2026-08-22 08:00',   // heure de Cotonou
+            'jours_avant'     => 30,                   // seuil d'apparition de la bande
+            'titre'           => 'Gextimo arrive',
+            'texte_bande'     => 'Plus que {{jours}} jours avant le lancement.',
+            'texte_jour_j'    => "C'est aujourd'hui !",
+            'couleur'         => '#D00B0B',
+            'lien'            => null,                 // facultatif : « en savoir plus »
+            'chrono_jour_j'   => true,                 // plein écran le jour J
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
      * ANN-6 — Tarifs du Boost d'annonce (mise en avant payante), config-driven
      * et éditables depuis l'admin. La publication d'une annonce reste gratuite ;
      * seul le Boost est payant. `diffusions_par_jour` = nombre de passages

@@ -454,6 +454,33 @@ class VitrineController extends Controller
         return response()->json(['identite' => $s->valeur]);
     }
 
+    /**
+     * PUT /api/admin/vitrine/compte-a-rebours — CLI-3.
+     *
+     * Volontairement générique : la direction voudra rejouer ce compte à rebours
+     * pour d'autres annonces que le lancement du 22 août. Date, textes, couleur
+     * et seuil d'apparition sont donc tous éditables — une date en dur aurait
+     * imposé un redéploiement à chaque réutilisation.
+     */
+    public function setCompteARebours(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'actif'         => ['required', 'boolean'],
+            'date_cible'    => ['required', 'date_format:Y-m-d H:i'],
+            'jours_avant'   => ['required', 'integer', 'min:1', 'max:365'],
+            'titre'         => ['required', 'string', 'max:80'],
+            'texte_bande'   => ['required', 'string', 'max:160'],
+            'texte_jour_j'  => ['required', 'string', 'max:160'],
+            'couleur'       => ['required', 'string', 'max:9'],
+            'lien'          => ['present', 'nullable', 'string', 'max:300'],
+            'chrono_jour_j' => ['required', 'boolean'],
+        ]);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'compte_a_rebours'], ['valeur' => $data]);
+
+        return response()->json(['compte_a_rebours' => $s->valeur]);
+    }
+
     /** GET /api/admin/vitrine/paliers-fidelite — paliers du programme (admin). */
     public function getPaliersFidelite(): JsonResponse
     {

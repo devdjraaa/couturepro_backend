@@ -126,6 +126,10 @@ Route::get('vitrine/types-document', fn () => response()->json(['types' => \App\
 // vocation à être lues par n'importe quel visiteur.
 Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\VitrineSetting::identiteLegale()));
 
+// CLI-3 : compte à rebours de lancement. Public — il s'affiche avant même
+// qu'un visiteur ait un compte.
+Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
+
 // Lot 2 (20/07) : désinscription des actualités depuis le lien d'un e-mail.
 // URL SIGNÉE : elle doit fonctionner sans connexion (on ne demande pas à
 // quelqu'un de se connecter pour arrêter de recevoir des messages), tout en

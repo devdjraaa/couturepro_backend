@@ -134,6 +134,46 @@ class RealisationController extends Controller
         return response()->json(['realisation' => $realisation->fresh()]);
     }
 
+    /**
+     * GET /admin/realisations/{realisation}/fichier?path=… — sert une photo au
+     * modérateur, originale ou retouchée.
+     *
+     * Deux raisons, pas une :
+     *
+     * 1. La retouche se fait sur un canvas, qui exige que l'image soit servie
+     *    avec des en-têtes CORS. `/storage` n'en envoie aucun (vérifié en
+     *    production) : l'image chargée en `crossOrigin` échouerait, et sans
+     *    `crossOrigin` le canvas serait souillé et le rendu refusé par le
+     *    navigateur. En passant par l'API — déjà autorisée pour le front — le
+     *    fichier arrive en blob, donc en même origine une fois converti.
+     * 2. Une réalisation en attente n'est PAS publiée. La servir depuis un
+     *    chemin public la rendait lisible par quiconque devinait l'URL, avant
+     *    toute modération. Ici il faut être admin.
+     *
+     * Le chemin demandé est confronté aux images de CETTE réalisation : sans
+     * cette vérification, le paramètre permettrait de lire n'importe quel
+     * fichier du disque.
+     */
+    public function fichier(Request $request, Realisation $realisation): mixed
+    {
+        $demande = (string) $request->query('path');
+
+        $autorises = collect($realisation->images ?? [])
+            ->flatMap(fn ($img) => [$img['path'] ?? null, $img['retouche_path'] ?? null])
+            ->filter()
+            ->all();
+
+        if (! in_array($demande, $autorises, true)) {
+            return response()->json(['message' => 'Fichier introuvable pour cette réalisation.'], 404);
+        }
+
+        if (! Storage::disk('public')->exists($demande)) {
+            return response()->json(['message' => 'Fichier absent du stockage.'], 404);
+        }
+
+        return Storage::disk('public')->response($demande);
+    }
+
     /** POST /admin/realisations/{realisation}/refuser — refuse avec motif. */
     public function refuser(Request $request, Realisation $realisation): JsonResponse
     {

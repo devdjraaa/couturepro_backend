@@ -207,9 +207,13 @@ class RealisationController extends Controller
         $restantes = [];
         foreach ($realisation->images ?? [] as $img) {
             if (($img['path'] ?? null) === $data['path']) {
-                Storage::disk('public')->delete($img['path']);
-                if (! empty($img['watermark_path'])) {
-                    Storage::disk('public')->delete($img['watermark_path']);
+                // Les TROIS fichiers dérivés d'une photo : l'original, la
+                // retouche du modérateur et la version filigranée. En oublier
+                // un laisse un fichier orphelin que plus rien ne référence.
+                foreach (['path', 'retouche_path', 'watermark_path'] as $cle) {
+                    if (! empty($img[$cle])) {
+                        Storage::disk('public')->delete($img[$cle]);
+                    }
                 }
                 continue;
             }
@@ -311,7 +315,10 @@ class RealisationController extends Controller
     private function filigraner(array $images): array
     {
         return array_map(function (array $img) {
-            $wm = ! empty($img['path']) ? $this->watermark->appliquer($img['path']) : null;
+            // Même règle que la modération : si le modérateur a retouché, c'est
+            // la retouche qu'on filigrane. Sinon la correction serait perdue.
+            $source = $img['retouche_path'] ?? $img['path'] ?? null;
+            $wm = $source ? $this->watermark->appliquer($source) : null;
 
             return $wm
                 ? array_merge($img, ['watermark_path' => $wm['path'], 'watermark_url' => $wm['url']])
@@ -327,11 +334,10 @@ class RealisationController extends Controller
         }
 
         foreach ($realisation->images ?? [] as $img) {
-            if (! empty($img['path'])) {
-                Storage::disk('public')->delete($img['path']);
-            }
-            if (! empty($img['watermark_path'])) {
-                Storage::disk('public')->delete($img['watermark_path']);
+            foreach (['path', 'retouche_path', 'watermark_path'] as $cle) {
+                if (! empty($img[$cle])) {
+                    Storage::disk('public')->delete($img[$cle]);
+                }
             }
         }
         $realisation->delete();

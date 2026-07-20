@@ -82,6 +82,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\VitrineSetting::identiteLegale()));
     Route::put('vitrine/identite-legale', [VitrineController::class, 'setIdentiteLegale']);
 
+    // CLI-3 : compte à rebours de lancement, entièrement paramétrable.
+    Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
+    Route::put('vitrine/compte-a-rebours', [VitrineController::class, 'setCompteARebours']);
+
     // VASAT : pose/renouvellement du mot de passe d'accès (admin uniquement).
     Route::put('vitrine/vasat', function (\Illuminate\Http\Request $r) {
         $d = $r->validate([
@@ -161,6 +165,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::post('realisations/{realisation}/approuver', [AdminRealisationController::class, 'approuver']);
         Route::post('realisations/{realisation}/retoucher', [AdminRealisationController::class, 'retoucher']);
         Route::post('realisations/{realisation}/refuser',   [AdminRealisationController::class, 'refuser']);
+        // PHOTO-3/7 : photo servie au modérateur (canvas de retouche + accès à
+        // l'original après retouche). Authentifiée : le contenu n'est pas publié.
+        Route::get('realisations/{realisation}/fichier',    [AdminRealisationController::class, 'fichier']);
     });
 
     // Ateliers
