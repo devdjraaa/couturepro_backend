@@ -124,6 +124,8 @@ Route::prefix('vitrine/chatbot')->group(function () {
     Route::post('message',    [ChatbotController::class, 'message'])->middleware('throttle:20,1');
     Route::post('feedback',   [ChatbotController::class, 'feedback'])->middleware('throttle:30,1');
     Route::get('historique',  [ChatbotController::class, 'historique'])->middleware('throttle:30,1');
+    // Badge « équipe hors ligne » (20/07) — Makila reste actif 24h/24.
+    Route::get('statut',      [ChatbotController::class, 'statut'])->middleware('throttle:60,1');
 });
 
 // ─── Espace client vitrine (P202) : auth sans mot de passe (Google / OTP e-mail) ───

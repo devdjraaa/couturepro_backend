@@ -52,6 +52,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command(CheckPendingPayments::class)->everyFifteenMinutes();
         $schedule->command(ProcessBonusExpiry::class)->hourly();
         $schedule->command(NotifyAbonnementExpiry::class)->dailyAt('08:00');
+        // MVP réseaux sociaux (20/07) : relevé quotidien des stats de la Page
+        // Facebook (lecture seule). Inoffensif tant que le jeton n'est pas fourni.
+        $schedule->command(\App\Console\Commands\CollecterStatsReseaux::class)->dailyAt('06:30');
         // PL-10 : sauvegarde cloud par atelier (la commande applique la cadence par plan).
         $schedule->command(BackupAteliersCloud::class)->dailyAt('02:30');
         // P53-55 : downgrades programmés / expirations arrivés à échéance.

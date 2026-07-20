@@ -18,6 +18,21 @@ class ChatbotController extends Controller
     public function __construct(private ChatbotService $bot) {}
 
     /** POST /vitrine/chatbot/message — question → réponse (+ mémorisation). */
+    /**
+     * GET /vitrine/chatbot/statut — présence de l'ÉQUIPE HUMAINE (20/07).
+     * Ne concerne QUE la disponibilité d'un humain : Makila répond 24h/24.
+     * Le front affiche le badge « hors ligne » entre 18h et 8h (Cotonou).
+     */
+    public function statut(): JsonResponse
+    {
+        $h = \App\Models\VitrineSetting::equipeHoraires();
+
+        return response()->json([
+            'equipe_en_ligne' => \App\Models\VitrineSetting::equipeEnLigne(),
+            'reprise_heure'   => (int) $h['debut'],   // pour composer le message côté front
+        ]);
+    }
+
     public function message(Request $request): JsonResponse
     {
         $data = $request->validate([

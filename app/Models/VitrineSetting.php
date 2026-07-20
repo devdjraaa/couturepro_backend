@@ -107,6 +107,36 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Makila — horaires de présence de l'ÉQUIPE HUMAINE (direction, 20/07).
+     * Le badge « hors ligne » ne concerne que la disponibilité d'un humain :
+     * Makila, lui, répond 24h/24 sans interruption. Bascule automatique sur
+     * l'heure de Cotonou, réglable en admin.
+     */
+    public static function equipeHoraires(): array
+    {
+        $cfg = static::where('cle', 'equipe_horaires')->value('valeur');
+
+        return array_merge([
+            'actif'  => true,
+            'debut'  => 8,    // heure locale de reprise
+            'fin'    => 18,   // heure locale de fin
+            'fuseau' => 'Africa/Porto-Novo',
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /** L'équipe humaine est-elle en ligne en ce moment ? */
+    public static function equipeEnLigne(): bool
+    {
+        $h = static::equipeHoraires();
+        if (! ($h['actif'] ?? true)) {
+            return true;   // indicateur désactivé = ne jamais afficher « hors ligne »
+        }
+        $heure = (int) now($h['fuseau'])->format('G');
+
+        return $heure >= (int) $h['debut'] && $heure < (int) $h['fin'];
+    }
+
+    /**
      * VASAT — second produit du groupe (directive direction 20/07) : présent sur
      * le site mais invisible au public, derrière un mot de passe. Le hash est posé
      * à la PREMIÈRE saisie (même principe TOFU que le tracker de suivi), puis

@@ -75,6 +75,13 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
     Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
 
+    // MVP réseaux sociaux (20/07) : stats des pages officielles, lecture seule.
+    Route::get('reseaux/statut',        [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'statut']);
+    Route::put('reseaux/facebook',      [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'configurerFacebook']);
+    Route::post('reseaux/collecter',    [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'collecter']);
+    Route::get('reseaux/rapport',       [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'rapport']);
+    Route::patch('reseaux/posts/{id}',  [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'etiqueter']);
+
     // Avis v2 : réglages de modération (seuil, motifs graves, mots bannis)
     Route::get('vitrine/moderation-avis', [VitrineController::class, 'getModerationAvis']);
     Route::put('vitrine/moderation-avis', [VitrineController::class, 'setModerationAvis']);

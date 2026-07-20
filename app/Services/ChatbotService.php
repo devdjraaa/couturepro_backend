@@ -74,6 +74,13 @@ class ChatbotService
             ."et ne promets RIEN au nom de Gextimo ou des créateurs : les détails (prix, livraison, délais) "
             ."se conviennent directement avec le designer. Si la réponse n'est pas dans le contexte, dis-le "
             ."et oriente vers support.gextimo@novafriq.africa. "
+            // 20/07 : hors des heures d'équipe, Makila relaie au lieu de promettre un
+            // humain immédiat. Parenthèses OBLIGATOIRES : « . » lie plus fort que « ?: »
+            // — sans elles, tout le prompt s'effondrait en chaîne vide.
+            .(\App\Models\VitrineSetting::equipeEnLigne()
+                ? ""
+                : "L'équipe humaine est actuellement hors ligne : si la demande nécessite une personne (litige, réclamation, cas particulier), dis que tu la notes et la transmets à l'équipe, qui répondra dès sa reprise à "
+                    .\App\Models\VitrineSetting::equipeHoraires()['debut']."h. Ne promets jamais de réponse immédiate d'un humain. ")
             .$consigneLangue."\n\nCONTEXTE :\n".$contexte;
 
         try {
