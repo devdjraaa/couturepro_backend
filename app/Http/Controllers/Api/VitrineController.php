@@ -685,6 +685,32 @@ HTML;
      * GET /api/vitrine/client/abonnements — mes créateurs suivis (ABO-7).
      * Route authentifiée : permet de consulter et de se désabonner depuis l'espace client.
      */
+    /**
+     * ABO-5 — PATCH /api/vitrine/client/abonnements/{abonnement}
+     *
+     * Le consentement aux notifications est DISTINCT de l'abonnement : suivre un
+     * créateur ne vaut pas accord pour être notifié. Il ne se réglait jusqu'ici
+     * qu'au moment de s'abonner, et ne pouvait plus être changé ensuite — sauf à
+     * se désabonner puis se réabonner.
+     */
+    public function majNotificationsAbonnement(Request $request, AtelierAbonne $abonnement): JsonResponse
+    {
+        // Un client ne règle que SES propres abonnements.
+        if ($abonnement->gxt_client_id !== $request->user()->id) {
+            return response()->json(['message' => 'Abonnement introuvable.'], 404);
+        }
+
+        $data = $request->validate([
+            'notifications_optin' => ['required', 'boolean'],
+        ]);
+
+        $abonnement->update(['notifications_optin' => $data['notifications_optin']]);
+
+        return response()->json([
+            'notifications_optin' => $abonnement->notifications_optin,
+        ]);
+    }
+
     public function mesAbonnements(Request $request): JsonResponse
     {
         $client = $request->user();

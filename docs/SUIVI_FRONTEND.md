@@ -33,7 +33,7 @@
 | S02A-26 | Positionnement du bouton | ✅ | ✅ **Fait.** Un seul bouton d'action, en pied de panneau collant (`sticky bottom-0`, `safe-area-inset-bottom`) dans `VetementForm.jsx`.
 | S02A-26b | Doublon d'action « Nouveau » | ✅ | ✅ **Fait.** Le bouton flottant n'est rendu que si `mesModeles.length > 0` : quand la liste est vide, seul l'état vide porte l'invitation.
 | S02A-28 | Limites en dur à brancher sur le plan | ✅ | ✅ **Fait.** Limites issues du plan : `max_photos_vetement` (via `usePlanLimit`) et `max_photos_realisation` (via `/realisations/quota`), avec l'ancienne valeur en repli. ⚠️ Découvert au passage : **le serveur n'imposait aucune limite** sur les photos de modèle — le front s'arrêtait à 5, l'API en acceptait autant qu'on voulait. Plafond appliqué côté serveur à la création et à la modification. `VetementForm` portait aussi 6 libellés français en dur, passés par `t()`.
-| S02A-28b | Écran admin des plans désynchronisé | 🟡 | `src/pages/admin/PlansPage.jsx` connaît ~19 clés alors que le serveur en expose ~37 : **15 clés récentes** tombent dans « Autres clés » (champ libre), donc éditables à l'aveugle. À resynchroniser (je te fournis la liste). |
+| S02A-28b | Écran admin des plans désynchronisé | ✅ | ✅ **Fait.** L'écran ne porte plus de liste de clés en dur : les réglages avancés sont rendus depuis `GET /admin/fonctionnalites` (libellé, description, type, unité). Une clé ajoutée par une future migration apparaît automatiquement, avec le bon type de champ. Les clés orphelines (présentes en config, absentes du référentiel) restent visibles et supprimables plutôt que masquées.
 
 ---
 
@@ -84,9 +84,9 @@
 | ABO-1 | Vérifier la session au clic | ✅ | ✅ **Fait.** ⚠️ C'était devenu une **régression** : le serveur exigeait déjà un compte (401) mais le front envoyait une clé anonyme et `postJson` aplatissait toute erreur sur `null` — chaque clic « Suivre » échouait en silence. `postDetaille` rend le statut, l'affichage optimiste est annulé sur refus, et un 401 déclenche la connexion.
 | ABO-2 | Inscription simplifiée à la volée | ⬜ | Le module s'ouvre **tout seul** (l'utilisateur ne doit pas le chercher). Seule information obligatoire : **l'adresse e-mail**. ⚠️ Si l'utilisateur ferme ou abandonne avant validation : **aucun compte incomplet, aucun abonnement enregistré**. ℹ️ Le socle existe déjà côté serveur (code e-mail + Google). |
 | ABO-4 | Reprendre l'abonnement automatiquement | ✅ | ✅ **Fait.** L'abonnement visé est rejoué automatiquement après connexion, puis l'utilisateur est ramené au profil du créateur.
-| ABO-5 | Case de consentement notifications | ⬜ | S'abonner et accepter les notifications sont **deux consentements séparés** : case dédiée, indépendante de l'abonnement. Exigence APDP / Code du numérique béninois. |
-| ABO-6 | Messages des règles métier | ⬜ | « Vous êtes déjà abonné à ce créateur » si doublon. Un créateur ne peut pas s'abonner à lui-même. |
-| ABO-7 | Espace client : mes abonnements | ⬜ | Liste des créateurs suivis + **désabonnement** à tout moment. |
+| ABO-5 | Case de consentement notifications | ✅ | ✅ **Fait.** Le consentement aux notifications est distinct de l'abonnement et modifiable **à tout moment** depuis l'espace client — il ne pouvait auparavant se régler qu'à la souscription, sans retour arrière possible (nouvel endpoint `PATCH /vitrine/client/abonnements/{id}`).
+| ABO-6 | Messages des règles métier | ✅ | ✅ **Fait.** Le message renvoyé par le serveur (auto-abonnement, déjà abonné) est affiché à l'utilisateur au lieu d'être avalé.
+| ABO-7 | Espace client : mes abonnements | ✅ | ✅ **Fait.** Section « Mes créateurs suivis » dans l'espace client : liste, lien vers le profil, désabonnement et bascule des notifications. Les abonnements n'étaient visibles **nulle part** — on suivait sans jamais pouvoir consulter ni se désabonner autrement qu'en retournant sur le profil.
 
 ---
 

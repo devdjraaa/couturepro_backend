@@ -130,6 +130,9 @@ Route::prefix('vitrine/client')->group(function () {
         Route::post('consentement', [ClientAuthController::class, 'consentement']);
         // ABO-7 : mes créateurs suivis (consultation + désabonnement via le toggle).
         Route::get('abonnements',   [VitrineController::class, 'mesAbonnements']);
+        // ABO-5 : le consentement aux notifications se règle indépendamment de
+        // l'abonnement (il ne pouvait plus changer une fois l'abonnement créé).
+        Route::patch('abonnements/{abonnement}', [VitrineController::class, 'majNotificationsAbonnement']);
         Route::post('logout',       [ClientAuthController::class, 'logout']);
 
         // Phase 2 : commandes « direct » (atterrissent dans l'outil du designer) + avis + réclamations.
