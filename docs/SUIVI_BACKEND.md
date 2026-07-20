@@ -193,7 +193,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | VID-3 | Règles de modification des vidéos | ✅ | Quotas par plan côté serveur ; l'écran doit refléter la règle (Gratuit : une seule vidéo, la nouvelle remplace l'ancienne ; corrections mensuelles comptées). **Pour nous.** |
 | VID-4 | Import direct d'un fichier vidéo | ✅ | Deux entrées : lien ou fichier. Envoi, validation, stockage → **pour nous**. |
 | VID-5 | Statut « en attente de validation » | ✅ | Partiel : le statut s'affiche côté créateur. Manque la boucle complète de modération. **Pour nous.** |
-| PHOTO-7 | Traçabilité de la photo d'origine | ⬜ | Garder l'accès à l'original après retouche, côté admin. Stockage + exposition → **pour nous.** |
+| PHOTO-7 | Traçabilité de la photo d'origine | ✅ | **DÉJÀ FAIT — statut périmé, vérifié le 20/07.** `WatermarkService` produit une COPIE : l'original reste sous `path`/`url`, la version filigranée sous `watermark_path`/`watermark_url`. L'écran de modération admin affiche bien l'original (`AdminRealisationsPage`), et la vitrine publique sert `watermark_url` avec repli sur l'original **seulement si le filigrane a échoué** — choix assumé et documenté : publier sans protection plutôt que bloquer la publication. |
 | REL-3 | Cache hors-ligne « Mes Réalisations » | ⬜ | 100 brouillons/en attente côté natif (WatermelonDB). **Pour nous.** Dépend de REL-V4. |
 | REL-V4 | **Réalignement des branches** | ⚠️ | `master` et `android` ont divergé de plusieurs centaines de commits. Bloque REL-3 et toute reprise sereine du natif. **Pour nous**, et c'est le préalable technique le plus lourd. |
 
