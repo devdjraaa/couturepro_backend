@@ -281,6 +281,21 @@ class VitrineController extends Controller
         return response()->json($actif ?: ['actif' => false]);
     }
 
+    /**
+     * GET /api/admin/vitrine/splash-themes — TOUTES les périodes (admin).
+     *
+     * La route publique `GET /vitrine/splash-theme` ne renvoie que la période
+     * ACTIVE du jour : elle sert l'application, pas l'administration. Sans cette
+     * lecture, l'écran d'admin ne pouvait pas afficher les périodes existantes —
+     * on ne pouvait qu'écraser la liste à l'aveugle.
+     */
+    public function getSplashThemes(): JsonResponse
+    {
+        return response()->json([
+            'themes' => VitrineSetting::where('cle', 'splash_themes')->value('valeur') ?: [],
+        ]);
+    }
+
     /** PUT /api/admin/vitrine/splash-themes — liste des périodes thématiques (admin). */
     public function setSplashThemes(Request $request): JsonResponse
     {

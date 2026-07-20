@@ -69,6 +69,7 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::put('vitrine/sponsorisation', [VitrineController::class, 'setSponsorisation']);
 
     // Brief 16/07 (pt 6) : périodes d'habillage saisonnier (splash local, config-driven)
+    Route::get('vitrine/splash-themes', [VitrineController::class, 'getSplashThemes']);
     Route::put('vitrine/splash-themes', [VitrineController::class, 'setSplashThemes']);
 
     // Fidélité : paliers recalibrables sans redéploiement (étaient codés en dur)
@@ -78,6 +79,7 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Identité légale : RCCM, IFU, délibération APDP et dates d'entrée en
     // vigueur des 11 pages juridiques. À saisir le jour de l'immatriculation,
     // sans redéploiement.
+    Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\VitrineSetting::identiteLegale()));
     Route::put('vitrine/identite-legale', [VitrineController::class, 'setIdentiteLegale']);
 
     // VASAT : pose/renouvellement du mot de passe d'accès (admin uniquement).
