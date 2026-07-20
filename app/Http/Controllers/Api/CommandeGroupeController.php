@@ -47,7 +47,10 @@ class CommandeGroupeController extends Controller
             'client_id'     => ['required', 'uuid', 'exists:clients,id'],
             'note'          => ['nullable', 'string', 'max:1000'],
             'sous_commandes' => ['required', 'array', 'min:2'],
-            'sous_commandes.*.vetement_id'           => ['required', 'uuid', 'exists:vetements,id'],
+            // Pt 7 (20/07) : le type de vêtement est FACULTATIF — exiger sa
+            // présence bloquait toute création dès qu'un article n'était pas
+            // rattaché au catalogue (le front envoyait null, 422 silencieux).
+            'sous_commandes.*.vetement_id'           => ['nullable', 'uuid', 'exists:vetements,id'],
             'sous_commandes.*.quantite'              => ['nullable', 'integer', 'min:1'],
             'sous_commandes.*.prix'                  => ['required', 'numeric', 'min:0'],
             'sous_commandes.*.acompte'               => ['nullable', 'numeric', 'min:0'],
@@ -82,7 +85,7 @@ class CommandeGroupeController extends Controller
         }
 
         // Chaque vêtement doit appartenir à un de mes ateliers (ou au catalogue global).
-        $vetementIds = collect($data['sous_commandes'])->pluck('vetement_id')->unique();
+        $vetementIds = collect($data['sous_commandes'])->pluck('vetement_id')->filter()->unique();
         $vetementsOk = Vetement::whereIn('id', $vetementIds)
             ->where(fn ($q) => $q->whereIn('atelier_id', $atelierIds)->orWhereNull('atelier_id'))
             ->count();
@@ -114,7 +117,7 @@ class CommandeGroupeController extends Controller
                     'atelier_id'            => $atelier->id,
                     'client_id'             => $client->id,
                     'commande_groupe_id'    => $groupe->id,
-                    'vetement_id'           => $sc['vetement_id'],
+                    'vetement_id'           => $sc['vetement_id'] ?? null,
                     'created_by'            => $user->id,
                     'created_by_role'       => $role,
                     'quantite'              => $sc['quantite'] ?? 1,
