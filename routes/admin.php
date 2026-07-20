@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\NiveauConfigController;
 use App\Http\Controllers\Admin\OffreSpecialeController;
 use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\AtelierVideoController as AdminAtelierVideoController;
+use App\Http\Controllers\Admin\AnnonceController as AdminAnnonceController;
 use App\Http\Controllers\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Admin\RealisationController as AdminRealisationController;
 use App\Http\Controllers\Admin\TicketController;
@@ -77,6 +78,14 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
     Route::get('vitrine/evenements', [VitrineController::class, 'getEvenements']);
     Route::put('vitrine/evenements', [VitrineController::class, 'setEvenements']);
+
+    // ANN-10 : modération des annonces a posteriori (publication libre)
+    Route::middleware('admin.permission:realisations.moderate')->group(function () {
+        Route::get('annonces/compteurs',        [AdminAnnonceController::class, 'compteurs']);
+        Route::get('annonces',                  [AdminAnnonceController::class, 'index']);
+        Route::post('annonces/{annonce}/masquer',  [AdminAnnonceController::class, 'masquer']);
+        Route::post('annonces/{annonce}/retablir', [AdminAnnonceController::class, 'retablir']);
+    });
 
     // S08C-29 : modération des avis A POSTERIORI (les signalements alimentent la file)
     Route::middleware('admin.permission:realisations.moderate')->group(function () {

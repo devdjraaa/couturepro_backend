@@ -38,6 +38,7 @@ class Annonce extends Model
         'date_debut', 'duree_jours', 'date_fin',
         'boost_actif', 'boost_debut', 'boost_duree_jours', 'boost_fin',
         'boost_prix_xof', 'boost_paye_at',
+        'signalements_count', 'signale_at', 'masquee_at', 'motif_masquage',
     ];
 
     protected $casts = [
@@ -50,6 +51,9 @@ class Annonce extends Model
         'boost_duree_jours' => 'integer',
         'boost_prix_xof'    => 'integer',
         'boost_paye_at'     => 'datetime',
+        'signalements_count' => 'integer',
+        'signale_at'        => 'datetime',
+        'masquee_at'        => 'datetime',
     ];
 
     protected $appends = ['statut', 'boost_en_cours'];
@@ -88,6 +92,11 @@ class Annonce extends Model
     protected function statut(): Attribute
     {
         return Attribute::make(get: function () {
+            // ANN-10 : une annonce masquée par l'administration l'emporte sur tout.
+            if ($this->masquee_at) {
+                return 'masquee';
+            }
+
             $jour = self::aujourdhui()->toDateString();
 
             if ($jour < $this->date_debut->toDateString()) {
@@ -106,7 +115,8 @@ class Annonce extends Model
     {
         $jour = self::aujourdhui()->toDateString();
 
-        return $q->whereDate('date_debut', '<=', $jour)->whereDate('date_fin', '>=', $jour);
+        return $q->whereNull('masquee_at')   // ANN-10 : jamais de diffusion si masquée
+            ->whereDate('date_debut', '<=', $jour)->whereDate('date_fin', '>=', $jour);
     }
 
     /** Boostées d'abord, puis les plus récentes (ordre de la bande défilante). */

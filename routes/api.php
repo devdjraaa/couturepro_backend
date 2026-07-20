@@ -93,6 +93,7 @@ Route::prefix('vitrine')->group(function () {
     Route::get('evenements',                     [VitrineController::class, 'evenements']);
     // ANN-8 : annonces en cours de diffusion (bande défilante), boostées d'abord.
     Route::get('annonces',                       [VitrineController::class, 'annonces']);
+    Route::post('annonces/{annonce}/signaler',   [VitrineController::class, 'signalerAnnonce'])->middleware('throttle:10,60');
     Route::get('sponsorisation',                 [VitrineController::class, 'sponsorisation']);
     Route::get('plans',                          [VitrineController::class, 'plans']);
     // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)

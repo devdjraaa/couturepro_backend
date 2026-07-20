@@ -220,6 +220,21 @@ class VitrineController extends Controller
         ]);
     }
 
+    /**
+     * POST /api/vitrine/annonces/{annonce}/signaler — signalement public (ANN-10).
+     * Ne retire RIEN : incrémente un compteur qui fait remonter l'annonce dans la
+     * file de modération. L'arbitrage revient à l'administration.
+     */
+    public function signalerAnnonce(\App\Models\Annonce $annonce): JsonResponse
+    {
+        if (! $annonce->masquee_at) {
+            $annonce->increment('signalements_count');
+            $annonce->update(['signale_at' => now()]);
+        }
+
+        return response()->json(['message' => 'Signalement enregistré. Merci, notre équipe va vérifier.']);
+    }
+
     /** GET /api/vitrine/banniere — bannière publicitaire (publique). */
     public function banniere(): JsonResponse
     {
