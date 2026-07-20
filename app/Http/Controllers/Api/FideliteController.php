@@ -40,12 +40,9 @@ class FideliteController extends Controller
                 ->where('points', '>', 0)
                 ->sum('points');
 
-            $seuils = [
-                ['cle' => 'bronze',  'nom' => 'Bronze',  'seuil' => 0],
-                ['cle' => 'argent',  'nom' => 'Argent',  'seuil' => 5000],
-                ['cle' => 'or',      'nom' => 'Or',      'seuil' => 20000],
-                ['cle' => 'platine', 'nom' => 'Platine', 'seuil' => 50000],
-            ];
+            // Paliers éditables en admin (étaient codés en dur : impossible de
+            // recalibrer le programme sans redéploiement).
+            $seuils = \App\Models\VitrineSetting::paliersFidelite();
 
             $actuel = $seuils[0];
             $prochain = null;
@@ -104,14 +101,14 @@ class FideliteController extends Controller
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
             'titre'      => 'Points convertis',
-            'contenu'    => '31 jours de bonus ont été ajoutés à votre abonnement.',
+            'contenu'    => $abonnement->bonus_jours_restants . ' jours de bonus ont été ajoutés à votre abonnement.',
             'type'       => 'points_convertis',
             'lien'       => '/fidelite',
             'is_read'    => false,
         ]);
 
         return response()->json([
-            'message'             => 'Conversion réussie. Bonus de 31 jours activé.',
+            'message'             => 'Conversion réussie. Bonus de ' . $abonnement->bonus_jours_restants . ' jours activé.',
             'bonus_actif'         => true,
             'bonus_jours_restants'=> $abonnement->bonus_jours_restants,
             'bonus_timestamp_debut' => $abonnement->bonus_timestamp_debut,

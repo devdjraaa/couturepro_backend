@@ -71,6 +71,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Brief 16/07 (pt 6) : périodes d'habillage saisonnier (splash local, config-driven)
     Route::put('vitrine/splash-themes', [VitrineController::class, 'setSplashThemes']);
 
+    // Fidélité : paliers recalibrables sans redéploiement (étaient codés en dur)
+    Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
+    Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
+
     // S08C-30 : moyens de paiement de la facturation (FedaPay en V1)
     Route::get('vitrine/moyens-paiement', [VitrineController::class, 'moyensPaiement']);
     Route::put('vitrine/moyens-paiement', [VitrineController::class, 'setMoyensPaiement']);

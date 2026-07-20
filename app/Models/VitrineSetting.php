@@ -35,6 +35,26 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Paliers du programme de fidélité (Bronze / Argent / Or / Platine).
+     *
+     * Étaient CODÉS EN DUR dans le contrôleur : impossible de recalibrer sans
+     * redéploiement. Or le constat du 20/07 montre que le programme est
+     * inatteignable en l'état (375 points générés au total pour un premier palier
+     * à 5 000) — la direction doit pouvoir ajuster elle-même.
+     */
+    public static function paliersFidelite(): array
+    {
+        $cfg = static::where('cle', 'paliers_fidelite')->value('valeur');
+
+        return $cfg ?: [
+            ['cle' => 'bronze',  'nom' => 'Bronze',  'seuil' => 0],
+            ['cle' => 'argent',  'nom' => 'Argent',  'seuil' => 5000],
+            ['cle' => 'or',      'nom' => 'Or',      'seuil' => 20000],
+            ['cle' => 'platine', 'nom' => 'Platine', 'seuil' => 50000],
+        ];
+    }
+
+    /**
      * S08C-30 — Moyens de paiement proposés en facturation (devis/factures).
      *
      * Décision direction : pour la première version, **FedaPay uniquement**, même si

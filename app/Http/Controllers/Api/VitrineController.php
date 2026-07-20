@@ -327,6 +327,34 @@ class VitrineController extends Controller
         return response()->json(['moyens' => $s->valeur]);
     }
 
+    /** GET /api/admin/vitrine/paliers-fidelite — paliers du programme (admin). */
+    public function getPaliersFidelite(): JsonResponse
+    {
+        return response()->json(['paliers' => VitrineSetting::paliersFidelite()]);
+    }
+
+    /**
+     * PUT /api/admin/vitrine/paliers-fidelite — recalibrage des paliers (admin).
+     * Permet d'ajuster le programme sans redéploiement (les seuils étaient en dur).
+     */
+    public function setPaliersFidelite(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'paliers'          => ['required', 'array', 'min:1', 'max:10'],
+            'paliers.*.cle'    => ['required', 'string', 'max:30'],
+            'paliers.*.nom'    => ['required', 'string', 'max:40'],
+            'paliers.*.seuil'  => ['required', 'integer', 'min:0'],
+        ]);
+
+        // Ordre croissant garanti : la logique de progression parcourt la liste en
+        // séquence, un ordre incohérent fausserait le palier courant.
+        $paliers = collect($data['paliers'])->sortBy('seuil')->values()->all();
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'paliers_fidelite'], ['valeur' => $paliers]);
+
+        return response()->json(['paliers' => $s->valeur]);
+    }
+
     /** GET /api/admin/vitrine/evenements — catalogue brut (admin). */
     public function getEvenements(EvenementCelebrationService $moteur): JsonResponse
     {

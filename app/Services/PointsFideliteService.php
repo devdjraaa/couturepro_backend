@@ -93,6 +93,10 @@ class PointsFideliteService
 
         $config  = $abonnement->getConfigEffective();
         $seuil   = (int) ($config['seuil_conversion_pts'] ?? 0);
+        // Durée du bonus obtenu : pilotée par le plan (était figée à 31 jours pour
+        // TOUS les plans, alors que le seuil varie de 10 000 à 100 000 points — le
+        // plan Studio payait donc 10x plus cher le même bonus).
+        $jours   = (int) ($config['bonus_jours_conversion'] ?? 31);
 
         $solde = PointsFidelite::where('atelier_id', $atelier->id)->first();
         $pts   = $solde?->solde_pts ?? 0;
@@ -109,7 +113,7 @@ class PointsFideliteService
             throw new \DomainException('Un bonus est déjà actif. Attendez sa fin avant de convertir.');
         }
 
-        DB::transaction(function () use ($atelier, $abonnement, $solde, $seuil) {
+        DB::transaction(function () use ($atelier, $abonnement, $solde, $seuil, $jours) {
             // Déduire les points
             $solde->decrement('solde_pts', $seuil);
 
@@ -117,14 +121,14 @@ class PointsFideliteService
                 'atelier_id'  => $atelier->id,
                 'type'        => 'conversion',
                 'points'      => -$seuil,
-                'description' => 'Conversion points → bonus 31 jours',
+                'description' => "Conversion points → bonus {$jours} jours",
                 'created_at'  => now(),
             ]);
 
             // Activer le bonus
             $abonnement->update([
                 'bonus_actif'           => true,
-                'bonus_jours_restants'  => 31,
+                'bonus_jours_restants'  => $jours,
                 'bonus_niveau_cle'      => $abonnement->niveau_cle,
                 'bonus_timestamp_debut' => now(),
             ]);
