@@ -132,6 +132,9 @@ Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\Vitr
 // qu'un visiteur ait un compte.
 Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
 
+// CLI-1 : catégories de la bibliothèque photos, éditables sans déploiement.
+Route::get('vitrine/categories-galerie', fn () => response()->json(['categories' => \App\Models\VitrineSetting::categoriesGalerie()]));
+
 // CLI-1 : référentiel des devises (symbole, décimales). Public : les montants
 // s'affichent aussi sur la vitrine, avant toute connexion. Le front n'a ainsi
 // aucune correspondance devise → symbole en dur à maintenir.

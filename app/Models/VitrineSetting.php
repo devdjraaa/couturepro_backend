@@ -353,6 +353,31 @@ class VitrineSetting extends Model
     }
 
     /**
+     * CLI-1 — Catégories de la bibliothèque photos (P152).
+     *
+     * Le serveur acceptait déjà n'importe quelle valeur, mais la liste proposée
+     * était figée dans l'écran : ajouter « Broderie » ou « Défilé » demandait un
+     * déploiement. Elle vient désormais d'ici.
+     *
+     * `cle` est ce qui est stocké : la renommer orphelinerait les photos déjà
+     * classées. Seul `label` se change librement — et il n'est utilisé que si
+     * la traduction correspondante n'existe pas, pour que les catégories
+     * d'origine restent traduites dans les deux langues.
+     */
+    public static function categoriesGalerie(): array
+    {
+        $cfg = static::where('cle', 'categories_galerie')->value('valeur');
+
+        return is_array($cfg) && $cfg ? $cfg : [
+            ['cle' => 'modele',      'label' => 'Modèle'],
+            ['cle' => 'tissu',       'label' => 'Tissu'],
+            ['cle' => 'occasion',    'label' => 'Occasion'],
+            ['cle' => 'inspiration', 'label' => 'Inspiration'],
+            ['cle' => 'client',      'label' => 'Client'],
+        ];
+    }
+
+    /**
      * CLI-2 — Catégories de « Gextimo Infos ».
      *
      * Éditables en admin : la direction ajoutera des catégories au fil des
