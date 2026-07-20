@@ -75,6 +75,21 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
     Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
 
+    // VASAT : pose/renouvellement du mot de passe d'accès (admin uniquement).
+    Route::put('vitrine/vasat', function (\Illuminate\Http\Request $r) {
+        $d = $r->validate([
+            'mdp'   => ['required', 'string', 'min:8', 'max:100'],
+            'actif' => ['nullable', 'boolean'],
+        ]);
+
+        $cfg = \App\Models\VitrineSetting::vasat();
+        $cfg['mdp_hash'] = \Illuminate\Support\Facades\Hash::make($d['mdp']);
+        $cfg['actif']    = $r->boolean('actif', true);
+        \App\Models\VitrineSetting::updateOrCreate(['cle' => 'vasat'], ['valeur' => $cfg]);
+
+        return response()->json(['ok' => true]);
+    });
+
     // Coordonnées officielles (PDF, WhatsApp) — éditables sans redéploiement.
     Route::put('vitrine/coordonnees', function (\Illuminate\Http\Request $r) {
         $d = $r->validate([

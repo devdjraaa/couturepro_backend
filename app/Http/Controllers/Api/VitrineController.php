@@ -365,11 +365,16 @@ class VitrineController extends Controller
             return response()->json(['message' => 'Espace indisponible.'], 404);
         }
 
+        // ⚠️ Le mot de passe ne s'auto-définit PLUS à la première saisie.
+        // Ce principe (« premier arrivé ») convient au tracker, qui n'a aucun
+        // lien public. VASAT, lui, est référencé au pied du site : n'importe
+        // quel visiteur aurait pu s'en emparer en tapant six caractères.
+        // Il se pose uniquement depuis l'administration.
         if (empty($cfg['mdp_hash'])) {
-            $cfg['mdp_hash'] = \Illuminate\Support\Facades\Hash::make($data['mdp']);
-            VitrineSetting::updateOrCreate(['cle' => 'vasat'], ['valeur' => $cfg]);
-
-            return response()->json(['ok' => true, 'initialise' => true]);
+            return response()->json([
+                'message' => 'Espace indisponible.',
+                'code'    => 'non_configure',
+            ], 404);
         }
 
         if (! \Illuminate\Support\Facades\Hash::check($data['mdp'], $cfg['mdp_hash'])) {
