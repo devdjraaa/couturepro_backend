@@ -103,4 +103,21 @@ class JournalMajTest extends TestCase
 
         $this->getJson('/api/app/journal-maj')->assertJsonPath('entrees.0.version', '1.0.97');
     }
+
+    public function test_a_date_egale_le_tri_suit_la_version(): void
+    {
+        // Cas réel : quatre publications le même jour. Saisies dans le désordre.
+        VitrineSetting::create(['cle' => 'journal_maj', 'valeur' => [
+            $this->entree('1.0.94', '2026-07-20'),
+            $this->entree('1.0.97', '2026-07-20'),
+            $this->entree('1.0.9',  '2026-07-20'),
+            $this->entree('1.0.96', '2026-07-20'),
+        ]]);
+
+        $versions = array_column(VitrineSetting::journalMaj(), 'version');
+
+        // `version_compare` et non un tri de chaînes : « 1.0.9 » est ANTÉRIEURE
+        // à « 1.0.96 », alors qu'en comparaison de texte elle passerait après.
+        $this->assertSame(['1.0.97', '1.0.96', '1.0.94', '1.0.9'], $versions);
+    }
 }

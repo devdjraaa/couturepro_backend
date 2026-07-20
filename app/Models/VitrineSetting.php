@@ -250,7 +250,18 @@ class VitrineSetting extends Model
         $cfg = static::where('cle', 'journal_maj')->value('valeur');
         $entrees = is_array($cfg) ? $cfg : [];
 
-        usort($entrees, fn ($a, $b) => strcmp($b['date'] ?? '', $a['date'] ?? ''));
+        // Tri par date, puis par VERSION à date égale. Le second critère n'est
+        // pas théorique : quatre publications dans la même journée est le rythme
+        // observé. Sans lui, l'ordre d'affichage ne tiendrait qu'à l'ordre de
+        // saisie en admin, et la pastille « du nouveau » — qui regarde la
+        // première entrée — pourrait pointer une version plus ancienne.
+        usort($entrees, function ($a, $b) {
+            $parDate = strcmp($b['date'] ?? '', $a['date'] ?? '');
+
+            return $parDate !== 0
+                ? $parDate
+                : version_compare($b['version'] ?? '', $a['version'] ?? '');
+        });
 
         return $entrees;
     }
