@@ -12,6 +12,29 @@ class NiveauConfigController extends Controller
 {
     use LogsAdminAction;
 
+    /**
+     * S02A-28b — Référentiel des fonctionnalités configurables.
+     *
+     * L'écran admin des plans portait sa PROPRE liste de clés connues, en dur.
+     * Chaque nouvelle clé ajoutée par une migration se retrouvait donc reléguée
+     * dans « Autres clés », affichée en brut (`max_photos_vetement`) sans libellé
+     * ni type — et la liste dérivait un peu plus à chaque livraison.
+     *
+     * La table `fonctionnalites` porte déjà label, description, type et unité :
+     * elle devient la source unique. Une clé enregistrée par une migration
+     * apparaît désormais avec son vrai libellé, sans toucher au front.
+     */
+    public function fonctionnalites(): JsonResponse
+    {
+        $refs = \Illuminate\Support\Facades\DB::table('fonctionnalites')
+            ->where('is_actif', true)
+            ->orderBy('ordre_affichage')
+            ->orderBy('cle')
+            ->get(['cle', 'label', 'description', 'type', 'unite', 'categorie', 'ordre_affichage']);
+
+        return response()->json(['fonctionnalites' => $refs]);
+    }
+
     public function index(): JsonResponse
     {
         $plans = NiveauConfig::with('updatedBy')

@@ -137,6 +137,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // Plans
     Route::middleware('admin.permission:plans.view')->group(function () {
+        // S02A-28b : référentiel des clés configurables (libellés, types, unités).
+        // L'écran des plans s'en sert au lieu de sa liste en dur.
+        Route::get('fonctionnalites', [NiveauConfigController::class, 'fonctionnalites']);
         Route::get('plans',        [NiveauConfigController::class, 'index']);
         Route::get('plans/{plan}', [NiveauConfigController::class, 'show']);
     });
