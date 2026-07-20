@@ -24,10 +24,18 @@ class PermissionEquipe extends Model
     // Permissions CDC §4.3 — utilisées quand aucune ligne n'existe en DB
     // Assistant : CREATE + READ + ARCHIVE uniquement (pas d'UPDATE ni DELETE)
     public const DEFAULTS = [
+        // ⚠️ Élargis le 20/07, au moment de rendre ces permissions EFFECTIVES.
+        // Elles n'avaient jamais été vérifiées côté serveur : elles servaient
+        // seulement à masquer des boutons. Les appliquer telles quelles aurait
+        // privé les assistants de la saisie des mesures, de l'avancement des
+        // commandes et de la modification d'une fiche client — c'est-à-dire de
+        // l'essentiel de leur poste.
+        // Restent refusés par défaut : tout ce qui SUPPRIME ou qui ENGAGE
+        // financièrement l'atelier. Le patron peut resserrer atelier par atelier.
         'assistant' => [
-            'clients.view', 'clients.create', 'clients.archive',
-            'commandes.view', 'commandes.create', 'commandes.archive',
-            'mesures.view', 'mesures.archive',
+            'clients.view', 'clients.create', 'clients.archive', 'clients.edit',
+            'commandes.view', 'commandes.create', 'commandes.archive', 'commandes.edit',
+            'mesures.view', 'mesures.archive', 'mesures.edit',
             'vetements.manage',
             'paiements.view', 'paiements.create',
             'notifications.view',

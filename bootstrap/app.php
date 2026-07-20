@@ -35,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth'       => \App\Http\Middleware\AdminAuth::class,
             'admin.permission' => \App\Http\Middleware\CheckAdminPermission::class,
+            // Permissions d'équipe : le référentiel n'était appliqué que côté front
+            // (masquage des boutons), jamais côté serveur.
+            'equipe.permission' => \App\Http\Middleware\CheckEquipePermission::class,
             'recaptcha'        => \App\Http\Middleware\VerifyRecaptcha::class,
             'account'          => \App\Http\Middleware\EnsureAccountType::class, // P202 : isole client vitrine / pro
         ]);

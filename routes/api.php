@@ -207,58 +207,58 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('ateliers/{atelierIdParam}/deverrouiller', [AtelierProprietaireController::class, 'deverrouiller']);
 
     // Clients
-    Route::get('clients',                    [ClientController::class, 'index']);
-    Route::post('clients',                   [ClientController::class, 'store']);
-    Route::post('clients/import',            [ClientController::class, 'importBatch']);
-    Route::get('clients/{client}',           [ClientController::class, 'show']);
-    Route::put('clients/{client}',           [ClientController::class, 'update']);
-    Route::delete('clients/{client}',        [ClientController::class, 'destroy']);
-    Route::post('clients/{client}/archiver',     [ClientController::class, 'archiver']);
-    Route::post('clients/{client}/desarchiver',  [ClientController::class, 'desarchiver']);
-    Route::post('clients/{client}/toggle-vip',   [ClientController::class, 'toggleVip']);
+    Route::get('clients',                    [ClientController::class, 'index'])->middleware('equipe.permission:clients.view');
+    Route::post('clients',                   [ClientController::class, 'store'])->middleware('equipe.permission:clients.create');
+    Route::post('clients/import',            [ClientController::class, 'importBatch'])->middleware('equipe.permission:clients.create');
+    Route::get('clients/{client}',           [ClientController::class, 'show'])->middleware('equipe.permission:clients.view');
+    Route::put('clients/{client}',           [ClientController::class, 'update'])->middleware('equipe.permission:clients.edit');
+    Route::delete('clients/{client}',        [ClientController::class, 'destroy'])->middleware('equipe.permission:clients.delete');
+    Route::post('clients/{client}/archiver',     [ClientController::class, 'archiver'])->middleware('equipe.permission:clients.archive');
+    Route::post('clients/{client}/desarchiver',  [ClientController::class, 'desarchiver'])->middleware('equipe.permission:clients.archive');
+    Route::post('clients/{client}/toggle-vip',   [ClientController::class, 'toggleVip'])->middleware('equipe.permission:clients.edit');
 
     // Mesures
-    Route::get('mesures/export-groupe',                  [MesureController::class, 'exportGroupe']); // PL-2
-    Route::get('clients/{clientId}/mesures',             [MesureController::class, 'index']);
-    Route::get('clients/{clientId}/mesures/historique',  [MesureController::class, 'historique']); // P74
+    Route::get('mesures/export-groupe',                  [MesureController::class, 'exportGroupe'])->middleware('equipe.permission:mesures.view'); // PL-2
+    Route::get('clients/{clientId}/mesures',             [MesureController::class, 'index'])->middleware('equipe.permission:mesures.view');
+    Route::get('clients/{clientId}/mesures/historique',  [MesureController::class, 'historique'])->middleware('equipe.permission:mesures.view'); // P74
 
-    Route::get('clients/{clientId}/mesures/export-csv',  [MesureController::class, 'exportCsv']);
-    Route::get('clients/{clientId}/mesures/whatsapp',    [MesureController::class, 'exportWhatsApp']);
-    Route::post('mesures',                               [MesureController::class, 'store']);
-    Route::put('mesures/{mesure}',                       [MesureController::class, 'update']);
-    Route::post('mesures/{mesure}/archiver',             [MesureController::class, 'archiver']);
-    Route::post('mesures/{mesure}/desarchiver',          [MesureController::class, 'desarchiver']);
-    Route::delete('mesures/{mesure}',                    [MesureController::class, 'destroy']);
+    Route::get('clients/{clientId}/mesures/export-csv',  [MesureController::class, 'exportCsv'])->middleware('equipe.permission:mesures.view');
+    Route::get('clients/{clientId}/mesures/whatsapp',    [MesureController::class, 'exportWhatsApp'])->middleware('equipe.permission:mesures.view');
+    Route::post('mesures',                               [MesureController::class, 'store'])->middleware('equipe.permission:mesures.edit');
+    Route::put('mesures/{mesure}',                       [MesureController::class, 'update'])->middleware('equipe.permission:mesures.edit');
+    Route::post('mesures/{mesure}/archiver',             [MesureController::class, 'archiver'])->middleware('equipe.permission:mesures.archive');
+    Route::post('mesures/{mesure}/desarchiver',          [MesureController::class, 'desarchiver'])->middleware('equipe.permission:mesures.archive');
+    Route::delete('mesures/{mesure}',                    [MesureController::class, 'destroy'])->middleware('equipe.permission:mesures.archive');
 
     // Clients — recherche globale cross-ateliers
-    Route::get('clients/search-global', [ClientController::class, 'searchGlobal']);
+    Route::get('clients/search-global', [ClientController::class, 'searchGlobal'])->middleware('equipe.permission:clients.view');
 
     // Commandes
-    Route::get('commandes',                               [CommandeController::class, 'index']);
-    Route::post('commandes',                              [CommandeController::class, 'store']);
-    Route::get('commandes/{commande}',                    [CommandeController::class, 'show']);
-    Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update']);
-    Route::post('commandes/{commande}/archiver',          [CommandeController::class, 'archiver']);
-    Route::post('commandes/{commande}/desarchiver',       [CommandeController::class, 'desarchiver']);
-    Route::post('commandes/{commande}/etape',             [CommandeController::class, 'setEtape']);
-    Route::delete('commandes/{commande}',                 [CommandeController::class, 'destroy']);
+    Route::get('commandes',                               [CommandeController::class, 'index'])->middleware('equipe.permission:commandes.view');
+    Route::post('commandes',                              [CommandeController::class, 'store'])->middleware('equipe.permission:commandes.create');
+    Route::get('commandes/{commande}',                    [CommandeController::class, 'show'])->middleware('equipe.permission:commandes.view');
+    Route::match(['PUT', 'POST'], 'commandes/{commande}', [CommandeController::class, 'update'])->middleware('equipe.permission:commandes.edit');
+    Route::post('commandes/{commande}/archiver',          [CommandeController::class, 'archiver'])->middleware('equipe.permission:commandes.archive');
+    Route::post('commandes/{commande}/desarchiver',       [CommandeController::class, 'desarchiver'])->middleware('equipe.permission:commandes.archive');
+    Route::post('commandes/{commande}/etape',             [CommandeController::class, 'setEtape'])->middleware('equipe.permission:commandes.edit');
+    Route::delete('commandes/{commande}',                 [CommandeController::class, 'destroy'])->middleware('equipe.permission:commandes.delete');
 
     // Commande items (multi-vêtements par commande)
-    Route::get('commandes/{commande}/items',                    [CommandeItemController::class, 'index']);
-    Route::post('commandes/{commande}/items',                   [CommandeItemController::class, 'store']);
-    Route::put('commandes/{commande}/items/{item}',             [CommandeItemController::class, 'update']);
-    Route::delete('commandes/{commande}/items/{item}',          [CommandeItemController::class, 'destroy']);
+    Route::get('commandes/{commande}/items',                    [CommandeItemController::class, 'index'])->middleware('equipe.permission:commandes.view');
+    Route::post('commandes/{commande}/items',                   [CommandeItemController::class, 'store'])->middleware('equipe.permission:commandes.edit');
+    Route::put('commandes/{commande}/items/{item}',             [CommandeItemController::class, 'update'])->middleware('equipe.permission:commandes.edit');
+    Route::delete('commandes/{commande}/items/{item}',          [CommandeItemController::class, 'destroy'])->middleware('equipe.permission:commandes.edit');
 
     // Commande échéances (multi-dates de livraison)
-    Route::get('commandes/{commande}/echeances',                [CommandeEcheanceController::class, 'index']);
-    Route::post('commandes/{commande}/echeances',               [CommandeEcheanceController::class, 'store']);
-    Route::put('commandes/{commande}/echeances/{echeance}',     [CommandeEcheanceController::class, 'update']);
-    Route::delete('commandes/{commande}/echeances/{echeance}',  [CommandeEcheanceController::class, 'destroy']);
+    Route::get('commandes/{commande}/echeances',                [CommandeEcheanceController::class, 'index'])->middleware('equipe.permission:commandes.view');
+    Route::post('commandes/{commande}/echeances',               [CommandeEcheanceController::class, 'store'])->middleware('equipe.permission:commandes.edit');
+    Route::put('commandes/{commande}/echeances/{echeance}',     [CommandeEcheanceController::class, 'update'])->middleware('equipe.permission:commandes.edit');
+    Route::delete('commandes/{commande}/echeances/{echeance}',  [CommandeEcheanceController::class, 'destroy'])->middleware('equipe.permission:commandes.edit');
 
     // Commandes groupées (un client commande plusieurs types de vêtements en une fois)
-    Route::get('commande-groupes',          [CommandeGroupeController::class, 'index']);
-    Route::post('commande-groupes',         [CommandeGroupeController::class, 'store']);
-    Route::get('commande-groupes/{groupe}', [CommandeGroupeController::class, 'show']);
+    Route::get('commande-groupes',          [CommandeGroupeController::class, 'index'])->middleware('equipe.permission:commandes.view');
+    Route::post('commande-groupes',         [CommandeGroupeController::class, 'store'])->middleware('equipe.permission:commandes.create');
+    Route::get('commande-groupes/{groupe}', [CommandeGroupeController::class, 'show'])->middleware('equipe.permission:commandes.view');
 
     // Archives (liste pour le patron)
     Route::get('archives', [ArchiveController::class, 'index']);
@@ -268,16 +268,16 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::get('caisse/clients', [CaisseController::class, 'clients']);
     Route::get('caisse/rapport-mensuel', [CaisseController::class, 'rapportMensuel']); // PL-3
     // Paiements de commande
-    Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index']);
-    Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store']);
+    Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index'])->middleware('equipe.permission:paiements.view');
+    Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store'])->middleware('equipe.permission:paiements.create');
 
     // Vêtements
     Route::get('vetements',               [VetementController::class, 'index']);
-    Route::post('vetements',              [VetementController::class, 'store']);
-    Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update']);
-    Route::post('vetements/{vetement}/publication', [VetementController::class, 'togglePublication']);
-    Route::post('vetements/{vetement}/collection',  [VetementController::class, 'setCollection']);
-    Route::delete('vetements/{vetement}', [VetementController::class, 'destroy']);
+    Route::post('vetements',              [VetementController::class, 'store'])->middleware('equipe.permission:vetements.manage');
+    Route::match(['PUT', 'POST'], 'vetements/{vetement}', [VetementController::class, 'update'])->middleware('equipe.permission:vetements.manage');
+    Route::post('vetements/{vetement}/publication', [VetementController::class, 'togglePublication'])->middleware('equipe.permission:vetements.manage');
+    Route::post('vetements/{vetement}/collection',  [VetementController::class, 'setCollection'])->middleware('equipe.permission:vetements.manage');
+    Route::delete('vetements/{vetement}', [VetementController::class, 'destroy'])->middleware('equipe.permission:vetements.manage');
 
     // P161-163 : patrons payants (côté créateur) — CRUD + upload fichier privé.
     Route::get('patrons',              [PatronController::class, 'index']);
@@ -335,9 +335,9 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
         ->middleware('throttle:5,1');
 
     // Notifications
-    Route::get('notifications',                   [NotificationController::class, 'index']);
-    Route::post('notifications/mark-as-read',     [NotificationController::class, 'markAsRead']);
-    Route::post('notifications/delete',           [NotificationController::class, 'destroy']);
+    Route::get('notifications',                   [NotificationController::class, 'index'])->middleware('equipe.permission:notifications.view');
+    Route::post('notifications/mark-as-read',     [NotificationController::class, 'markAsRead'])->middleware('equipe.permission:notifications.view');
+    Route::post('notifications/delete',           [NotificationController::class, 'destroy'])->middleware('equipe.permission:notifications.view');
     Route::post('notifications/fcm-token',        [NotificationController::class, 'registerFcmToken']);
     Route::delete('notifications/fcm-token',      [NotificationController::class, 'removeFcmToken']);
 
@@ -372,13 +372,13 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
 
     // Facturation designer (devis / factures / reçus)
     Route::get('factures',                    [FactureController::class, 'index']);
-    Route::post('factures',                   [FactureController::class, 'store']);
+    Route::post('factures',                   [FactureController::class, 'store'])->middleware('equipe.permission:factures.generate');
     Route::get('factures/{facture}',          [FactureController::class, 'show']);
-    Route::patch('factures/{facture}/statut', [FactureController::class, 'updateStatut']);
-    Route::post('factures/{facture}/dgi',     [FactureController::class, 'uploadDgi']);
+    Route::patch('factures/{facture}/statut', [FactureController::class, 'updateStatut'])->middleware('equipe.permission:factures.generate');
+    Route::post('factures/{facture}/dgi',     [FactureController::class, 'uploadDgi'])->middleware('equipe.permission:factures.generate');
     Route::get('factures/{facture}/dgi',      [FactureController::class, 'downloadDgi']);
-    Route::post('factures/{facture}/normaliser', [FactureController::class, 'normaliser']);
-    Route::delete('factures/{facture}',       [FactureController::class, 'destroy']);
+    Route::post('factures/{facture}/normaliser', [FactureController::class, 'normaliser'])->middleware('equipe.permission:factures.generate');
+    Route::delete('factures/{facture}',       [FactureController::class, 'destroy'])->middleware('equipe.permission:factures.generate');
 
     // WhatsApp
     Route::get('whatsapp/rappel-client/{clientId}',            [WhatsAppController::class, 'rappelClient']);
