@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\GalerieController;
 use App\Http\Controllers\Api\RealisationController;
 use App\Http\Controllers\Api\ListeAttenteController;
 use App\Http\Controllers\Api\MesureController;
+use App\Http\Controllers\Api\InfosController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaiementController;
 use App\Http\Controllers\Api\ParametresController;
@@ -372,6 +373,14 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
 
     // Notifications
     Route::get('notifications',                   [NotificationController::class, 'index'])->middleware('equipe.permission:notifications.view');
+
+    // CLI-2 — « Gextimo Infos » : onglet distinct des notifications. Une
+    // notification concerne VOTRE atelier et appelle une action ; une info est
+    // un message éditorial de Gextimo. Les mélanger noie les alertes.
+    Route::get('infos',                 [InfosController::class, 'index']);
+    Route::get('infos/compteur',        [InfosController::class, 'compteur']);
+    Route::post('infos/tout-lu',        [InfosController::class, 'toutMarquerLu']);
+    Route::post('infos/{info}/lue',     [InfosController::class, 'marquerLue']);
     Route::post('notifications/mark-as-read',     [NotificationController::class, 'markAsRead'])->middleware('equipe.permission:notifications.view');
     Route::post('notifications/delete',           [NotificationController::class, 'destroy'])->middleware('equipe.permission:notifications.view');
     Route::post('notifications/fcm-token',        [NotificationController::class, 'registerFcmToken']);

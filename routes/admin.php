@@ -260,6 +260,16 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     // Notifications
     Route::middleware('admin.permission:notifications.broadcast')->post('notifications', [NotificationController::class, 'store']);
 
+    // CLI-2 — « Gextimo Infos » : diffusion ciblée, sous la même permission que
+    // la diffusion générale (c'est le même geste éditorial).
+    Route::middleware('admin.permission:notifications.broadcast')->group(function () {
+        Route::get('infos',            [\App\Http\Controllers\Admin\InfosController::class, 'index']);
+        Route::post('infos/portee',    [\App\Http\Controllers\Admin\InfosController::class, 'portee']);
+        Route::post('infos',           [\App\Http\Controllers\Admin\InfosController::class, 'store']);
+        Route::put('infos/{info}',     [\App\Http\Controllers\Admin\InfosController::class, 'update']);
+        Route::delete('infos/{info}',  [\App\Http\Controllers\Admin\InfosController::class, 'destroy']);
+    });
+
     // P204 : partenaires + candidatures
     Route::middleware('admin.permission:partenaires.manage')->group(function () {
         Route::get('partenaires',                       [AdminPartenaireController::class, 'index']);

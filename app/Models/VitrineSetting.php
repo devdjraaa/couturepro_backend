@@ -230,6 +230,33 @@ class VitrineSetting extends Model
     }
 
     /**
+     * CLI-2 — Catégories de « Gextimo Infos ».
+     *
+     * Éditables en admin : la direction ajoutera des catégories au fil des
+     * campagnes (recrutement, partenariat…) et ne doit pas dépendre d'un
+     * déploiement pour cela. La couleur et l'icône voyagent avec la catégorie
+     * pour que l'écran n'ait aucune correspondance codée en dur.
+     *
+     * `cle` est ce qui est stocké en base : la renommer casserait les messages
+     * déjà diffusés — seul `label` se change librement.
+     */
+    public static function categoriesInfos(): array
+    {
+        $cfg = static::where('cle', 'categories_infos')->value('valeur');
+
+        return is_array($cfg) && $cfg ? $cfg : [
+            ['cle' => 'annonce',   'label' => 'Annonce',    'couleur' => '#D00B0B', 'icone' => 'megaphone'],
+            ['cle' => 'nouveaute', 'label' => 'Nouveauté',  'couleur' => '#0F766E', 'icone' => 'sparkles'],
+            ['cle' => 'astuce',    'label' => 'Astuce',     'couleur' => '#B45309', 'icone' => 'lightbulb'],
+            ['cle' => 'promo',     'label' => 'Promotion',  'couleur' => '#7C3AED', 'icone' => 'percent'],
+            ['cle' => 'alerte',    'label' => 'Alerte',     'couleur' => '#DC2626', 'icone' => 'alert-triangle'],
+            ['cle' => 'evenement', 'label' => 'Événement',  'couleur' => '#2563EB', 'icone' => 'calendar'],
+            ['cle' => 'formation', 'label' => 'Formation',  'couleur' => '#059669', 'icone' => 'graduation-cap'],
+            ['cle' => 'securite',  'label' => 'Sécurité',   'couleur' => '#EA580C', 'icone' => 'shield-alert'],
+        ];
+    }
+
+    /**
      * CLI-3 — Compte à rebours de lancement (22 août).
      *
      * Deux composants d'un même réglage : une BANDE discrète qui s'affiche à
