@@ -89,7 +89,7 @@ class VeilleSeo extends Command
             try {
                 Mail::raw($rapport, function ($m) use ($dest, $alertes) {
                     $m->to($dest)->subject(
-                        ($alertes ? '⚠ ' : '✓ ').'Veille SEO NovAfriq — '.now()->format('d/m/Y')
+                        ($alertes ? '⚠ ' : '✓ ').'Veille SEO Novafriq — '.now()->format('d/m/Y')
                     );
                 });
             } catch (\Throwable $e) {
