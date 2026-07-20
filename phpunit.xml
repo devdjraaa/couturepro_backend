@@ -23,8 +23,17 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- PostgreSQL, comme la PRODUCTION. Ce n'est pas un détail : les tests
+             tournaient sous SQLite (où les migrations ne passent même pas), et
+             tester sous un autre moteur que celui qui tourne laisse filer des
+             défauts propres au moteur — le tinyInteger plafonné à 127 et la
+             syntaxe `ALTER COLUMN … DROP NOT NULL` en sont deux exemples, tous
+             deux invisibles côté PostgreSQL.
+
+             Base DÉDIÉE `couturepro_test`, jamais `couturepro` : RefreshDatabase
+             repart d'une base vide et effacerait la base de travail. -->
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_DATABASE" value="couturepro_test"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

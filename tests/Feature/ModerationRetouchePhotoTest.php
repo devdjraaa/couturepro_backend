@@ -3,10 +3,16 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\Admin\RealisationController;
+use App\Models\Admin;
+use App\Models\Atelier;
+use App\Models\Proprietaire;
 use App\Models\Realisation;
 use App\Services\WatermarkService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -20,6 +26,8 @@ use Tests\TestCase;
  */
 class ModerationRetouchePhotoTest extends TestCase
 {
+    use RefreshDatabase;
+
     private function controleur(): RealisationController
     {
         return new RealisationController(app(WatermarkService::class));
@@ -100,5 +108,100 @@ class ModerationRetouchePhotoTest extends TestCase
         $reponse = $this->controleur()->fichier($this->requete('realisations/a/disparue.jpg'), $realisation);
 
         $this->assertSame(404, $reponse->getStatusCode());
+    }
+
+    // ── Parcours complet, avec base ──────────────────────────────────────
+
+    private function realisationEnregistree(): Realisation
+    {
+        $proprietaire = Proprietaire::create([
+            'telephone' => '+2299' . random_int(1000000, 9999999),
+            'email' => Str::uuid() . '@test.local',
+            'nom' => 'Test', 'prenom' => 'Moderation',
+            'question_secrete' => 'q', 'reponse_secrete' => 'r',
+            'password' => bcrypt('motdepasse'),
+        ]);
+
+        $atelier = Atelier::create([
+            'proprietaire_id' => $proprietaire->id,
+            'nom' => 'Atelier de test',
+        ]);
+
+        $chemin = UploadedFile::fake()->image('photo.jpg', 800, 600)
+            ->store('realisations/' . $atelier->id, 'public');
+
+        return Realisation::create([
+            'atelier_id' => $atelier->id,
+            'titre'      => 'Test modération',
+            'statut'     => Realisation::STATUT_EN_ATTENTE,
+            'soumis_at'  => now(),
+            'images'     => [['path' => $chemin, 'url' => 'http://exemple/' . $chemin]],
+        ]);
+    }
+
+    private function admin(): Admin
+    {
+        // `super_admin` : les routes de modération sont derrière
+        // `admin.permission:realisations.moderate`, et le rôle `admin` par
+        // défaut ne la porte pas.
+        return Admin::create([
+            'nom' => 'Admin', 'prenom' => 'Test',
+            'email' => Str::uuid() . '@test.local',
+            'password' => bcrypt('motdepasse'),
+            'role' => 'super_admin',
+            'is_active' => true,   // AdminAuth refuse un compte inactif
+        ]);
+    }
+
+    public function test_la_retouche_ne_detruit_jamais_l_original(): void
+    {
+        Storage::fake('public');
+        $realisation = $this->realisationEnregistree();
+        $original = $realisation->images[0]['path'];
+
+        $this->actingAs($this->admin(), 'admin')
+            ->post("/api/admin/realisations/{$realisation->id}/retoucher", [
+                'path'  => $original,
+                'photo' => UploadedFile::fake()->image('retouche.jpg', 400, 300),
+            ])
+            ->assertOk();
+
+        $image = $realisation->fresh()->images[0];
+
+        $this->assertNotEmpty($image['retouche_path'] ?? null, 'la retouche doit être enregistrée');
+        $this->assertNotSame($original, $image['retouche_path']);
+        // L'exigence de la direction : droits d'auteur et traçabilité.
+        $this->assertTrue(Storage::disk('public')->exists($original), "l'original doit survivre à la retouche");
+    }
+
+    public function test_une_realisation_deja_publiee_n_est_plus_retouchable(): void
+    {
+        Storage::fake('public');
+        $realisation = $this->realisationEnregistree();
+        $realisation->update(['statut' => Realisation::STATUT_PUBLIEE]);
+
+        $this->actingAs($this->admin(), 'admin')
+            ->postJson("/api/admin/realisations/{$realisation->id}/retoucher", [
+                'path'  => $realisation->images[0]['path'],
+                'photo' => UploadedFile::fake()->image('retouche.jpg'),
+            ])
+            ->assertStatus(422);
+    }
+
+    public function test_la_file_expose_l_echeance_de_24h(): void
+    {
+        Storage::fake('public');
+        $this->realisationEnregistree();
+
+        $reponse = $this->actingAs($this->admin(), 'admin')
+            ->getJson('/api/admin/realisations?statut=en_attente')
+            ->assertOk();
+
+        // L'écran s'appuie sur ces deux champs pour le décompte : l'horloge du
+        // poste du modérateur ne doit pas faire autorité sur l'échéance.
+        $premier = $reponse->json('data.0');
+        $this->assertArrayHasKey('limite_moderation', $premier);
+        $this->assertArrayHasKey('en_retard', $premier);
+        $this->assertFalse($premier['en_retard'], 'une réalisation soumise à l\'instant n\'est pas en retard');
     }
 }
