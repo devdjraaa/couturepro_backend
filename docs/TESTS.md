@@ -33,16 +33,33 @@ sudo -u postgres psql -c "CREATE ROLE couturepro_user LOGIN PASSWORD '<mot-de-pa
 sudo -u postgres createdb -O couturepro_user couturepro_test
 ```
 
-Puis renseigner `.env.testing` (non versionné, modèle ci-dessous) :
+Puis créer `.env.testing` (non versionné) **en partant d'une copie de `.env`** :
+
+```bash
+cp .env .env.testing
+```
+
+et n'y remplacer que ceci :
 
 ```
+APP_ENV=testing
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=couturepro_test
 DB_USERNAME=couturepro_user
 DB_PASSWORD=<mot-de-passe>
+MAIL_MAILER=array        # aucun e-mail ne doit sortir pendant les tests
+QUEUE_CONNECTION=sync
+CACHE_STORE=array
+SESSION_DRIVER=array
 ```
+
+> ⚠️ **Partir d'une copie, pas d'un fichier réduit.** Laravel **remplace** `.env`
+> par `.env.testing`, il ne le complète pas. Un fichier ne contenant que les
+> réglages de base laisse l'application sans `APP_KEY`, et tout test touchant au
+> chiffrement, aux sessions ou aux cookies échoue sur `MissingAppKeyException` —
+> une erreur qui ne dit rien de la vraie cause.
 
 > ⚠️ La base doit être `couturepro_test`, **jamais** `couturepro`. `RefreshDatabase`
 > repart d'une base vide : pointer la suite sur la base de travail l'effacerait.

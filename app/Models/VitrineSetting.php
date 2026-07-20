@@ -230,6 +230,32 @@ class VitrineSetting extends Model
     }
 
     /**
+     * CLI-1 — Journal des mises à jour (« Quoi de neuf »).
+     *
+     * Il n'existait qu'une **ligne de texte** dans une variable d'environnement
+     * (`APP_UPDATE_NOTE`), affichée par la fenêtre de mise à jour puis perdue :
+     * aucun historique, et rien de consultable après coup. Un professionnel qui
+     * fermait la fenêtre ne pouvait plus jamais savoir ce qui avait changé.
+     *
+     * Éditable en admin, parce que les publications sont AUTOMATIQUES au push :
+     * exiger un déploiement pour décrire une version reviendrait à ne jamais la
+     * décrire.
+     *
+     * Chaque entrée : `version`, `date`, `titre`, `type`, `lignes[]`. La liste
+     * est rendue de la plus récente à la plus ancienne, tri fait ici pour que
+     * l'ordre de saisie en admin n'ait aucune importance.
+     */
+    public static function journalMaj(): array
+    {
+        $cfg = static::where('cle', 'journal_maj')->value('valeur');
+        $entrees = is_array($cfg) ? $cfg : [];
+
+        usort($entrees, fn ($a, $b) => strcmp($b['date'] ?? '', $a['date'] ?? ''));
+
+        return $entrees;
+    }
+
+    /**
      * CLI-2 — Catégories de « Gextimo Infos ».
      *
      * Éditables en admin : la direction ajoutera des catégories au fil des

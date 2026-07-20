@@ -86,6 +86,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
     Route::put('vitrine/compte-a-rebours', [VitrineController::class, 'setCompteARebours']);
 
+    // CLI-1 : journal des mises à jour, éditable sans déploiement.
+    Route::get('vitrine/journal-maj', fn () => response()->json(['entrees' => \App\Models\VitrineSetting::journalMaj()]));
+    Route::put('vitrine/journal-maj', [VitrineController::class, 'setJournalMaj']);
+
     // VASAT : pose/renouvellement du mot de passe d'accès (admin uniquement).
     Route::put('vitrine/vasat', function (\Illuminate\Http\Request $r) {
         $d = $r->validate([

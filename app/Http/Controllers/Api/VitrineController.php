@@ -455,6 +455,30 @@ class VitrineController extends Controller
     }
 
     /**
+     * PUT /api/admin/vitrine/journal-maj — CLI-1, « Quoi de neuf ».
+     *
+     * Éditable en admin parce que les publications sont automatiques au push :
+     * exiger un déploiement pour décrire une version reviendrait à ne jamais la
+     * décrire.
+     */
+    public function setJournalMaj(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'entrees'             => ['present', 'array', 'max:100'],
+            'entrees.*.version'   => ['required', 'string', 'max:20'],
+            'entrees.*.date'      => ['required', 'date_format:Y-m-d'],
+            'entrees.*.titre'     => ['required', 'string', 'max:120'],
+            'entrees.*.type'      => ['required', 'in:nouveaute,amelioration,correction'],
+            'entrees.*.lignes'    => ['present', 'array', 'max:30'],
+            'entrees.*.lignes.*'  => ['string', 'max:300'],
+        ]);
+
+        VitrineSetting::updateOrCreate(['cle' => 'journal_maj'], ['valeur' => $data['entrees']]);
+
+        return response()->json(['entrees' => VitrineSetting::journalMaj()]);
+    }
+
+    /**
      * PUT /api/admin/vitrine/compte-a-rebours — CLI-3.
      *
      * Volontairement générique : la direction voudra rejouer ce compte à rebours

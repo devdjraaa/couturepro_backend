@@ -131,6 +131,11 @@ Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\Vitr
 // qu'un visiteur ait un compte.
 Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
 
+// CLI-1 : journal des mises à jour (« Quoi de neuf »). Public : la liste des
+// nouveautés n'a rien de confidentiel, et l'écran doit rester lisible même
+// quand la session a expiré.
+Route::get('app/journal-maj', fn () => response()->json(['entrees' => \App\Models\VitrineSetting::journalMaj()]));
+
 // Lot 2 (20/07) : désinscription des actualités depuis le lien d'un e-mail.
 // URL SIGNÉE : elle doit fonctionner sans connexion (on ne demande pas à
 // quelqu'un de se connecter pour arrêter de recevoir des messages), tout en
