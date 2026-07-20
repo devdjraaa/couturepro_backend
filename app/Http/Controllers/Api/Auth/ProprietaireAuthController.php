@@ -82,6 +82,19 @@ class ProprietaireAuthController extends Controller
             'essai_expire_at' => now()->addDays(14),
         ]);
 
+        // CLI-1 — devise déduite du pays, lui-même deviné à partir de l'indicatif
+        // du numéro. Jusqu'ici la colonne existait avec « XOF » en dur : un
+        // atelier ghanéen ou nigérian démarrait en franc CFA sans que rien ne
+        // le signale. C'est un INDICE, pas une certitude — d'où un réglage
+        // modifiable ensuite dans les paramètres de l'atelier.
+        $devise = app(\App\Services\DeviseService::class)
+            ->deviseDepuisTelephone($proprietaire->telephone);
+
+        \App\Models\ParametresAtelier::updateOrCreate(
+            ['atelier_id' => $atelier->id],
+            ['devise' => $devise],
+        );
+
         // Essai « accès complet » : le niveau dépend du type de compte (designer → Studio).
         $cleEssai    = NiveauConfig::cleEssaiPour($atelier->type);
         $niveauEssai = NiveauConfig::where('cle', $cleEssai)->first();

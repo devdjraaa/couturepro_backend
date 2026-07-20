@@ -132,6 +132,11 @@ Route::get('vitrine/identite-legale', fn () => response()->json(\App\Models\Vitr
 // qu'un visiteur ait un compte.
 Route::get('vitrine/compte-a-rebours', fn () => response()->json(\App\Models\VitrineSetting::compteARebours()));
 
+// CLI-1 : référentiel des devises (symbole, décimales). Public : les montants
+// s'affichent aussi sur la vitrine, avant toute connexion. Le front n'a ainsi
+// aucune correspondance devise → symbole en dur à maintenir.
+Route::get('vitrine/devises', fn () => response()->json(app(\App\Services\DeviseService::class)->referentiel()));
+
 // CLI-1 : journal des mises à jour (« Quoi de neuf »). Public : la liste des
 // nouveautés n'a rien de confidentiel, et l'écran doit rester lisible même
 // quand la session a expiré.

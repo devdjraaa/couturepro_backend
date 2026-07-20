@@ -15,6 +15,13 @@ use Illuminate\Http\Request;
 
 class CommandePaiementController extends Controller
 {
+    /**
+     * CLI-1 — les montants de ces messages écrivaient « FCFA » en clair : la
+     * mauvaise monnaie pour tout atelier hors zone franc, dans un message qui
+     * part directement à son client.
+     */
+    public function __construct(private \App\Services\DeviseService $devises) {}
+
     use ResolvesAtelier;
     public function index(Request $request, Commande $commande): JsonResponse
     {
@@ -53,12 +60,13 @@ class CommandePaiementController extends Controller
         // Met à jour le total des avances
         $commande->increment('acompte', $data['montant']);
         $commande->refresh();
+        $devise = $this->devises->deviseAtelier($atelier);
 
         // Notification interne « paiement reçu » → push FCM temps réel au propriétaire.
         NotificationSysteme::create([
             'atelier_id' => $atelier->id,
             'titre'      => 'Paiement reçu',
-            'contenu'    => number_format((float) $data['montant'], 0, '.', ' ') . ' FCFA'
+            'contenu'    => $this->devises->montant((float) $data['montant'], $devise)
                             . ($commande->client_nom ? " — {$commande->client_nom}" : ''),
             'type'       => 'paiement',
             'lien'       => '/commandes/' . $commande->id,
@@ -82,13 +90,13 @@ class CommandePaiementController extends Controller
                         default        => 'Espèces',
                     };
                     $msg = "Bonjour {$client->prenom},\n\n"
-                         . "✅ Paiement reçu : *" . number_format((float) $data['montant'], 0, '.', ' ') . " FCFA*\n"
+                         . "✅ Paiement reçu : *" . $this->devises->montant((float) $data['montant'], $devise) . "*\n"
                          . "Mode : {$modeLabel}\n\n"
                          . "📋 Commande : #" . strtoupper(substr($commande->id, 0, 8)) . "\n"
-                         . "💰 Total : " . number_format((float) $commande->prix, 0, '.', ' ') . " FCFA\n"
-                         . "✅ Versé : " . number_format((float) $commande->acompte, 0, '.', ' ') . " FCFA\n";
+                         . "💰 Total : " . $this->devises->montant((float) $commande->prix, $devise) . "\n"
+                         . "✅ Versé : " . $this->devises->montant((float) $commande->acompte, $devise) . "\n";
                     if ($reste > 0) {
-                        $msg .= "⏳ Reste : " . number_format($reste, 0, '.', ' ') . " FCFA\n";
+                        $msg .= "⏳ Reste : " . $this->devises->montant($reste, $devise) . "\n";
                     } else {
                         $msg .= "🎉 Commande entièrement réglée !\n";
                     }

@@ -230,6 +230,92 @@ class VitrineSetting extends Model
     }
 
     /**
+     * CLI-1 — Devise par pays.
+     *
+     * La colonne `devise` existait déjà sur les paramètres d'atelier, avec
+     * `XOF` en dur par défaut, et **aucun pays n'était jamais détecté** : un
+     * atelier ghanéen ou nigérian se voyait attribuer le franc CFA à
+     * l'inscription. Pire, dix-neuf écrans écrivaient « FCFA » en clair sans
+     * passer par le réglage — le changer n'aurait donc rien changé à l'écran.
+     *
+     * La correspondance vit ICI et non côté écran : la devise détermine des
+     * montants de facture et de paiement, pas une simple étiquette.
+     *
+     * `decimales` compte : le franc CFA ne se divise pas, le cedi et le naira
+     * si. Formater un montant ghanéen sans décimale fausse la facture.
+     *
+     * Un pays absent de cette table retombe sur `defaut` — jamais d'erreur, et
+     * la table s'enrichit depuis l'admin sans redéploiement.
+     */
+    public static function devisesParPays(): array
+    {
+        $cfg = static::where('cle', 'devises_par_pays')->value('valeur');
+
+        return array_merge([
+            'defaut' => ['devise' => 'XOF', 'symbole' => 'FCFA', 'decimales' => 0],
+            'pays'   => [
+                // Zone franc CFA (UEMOA + CEMAC) — le cas très majoritaire.
+                'BJ' => 'XOF', 'BF' => 'XOF', 'CI' => 'XOF', 'GW' => 'XOF',
+                'ML' => 'XOF', 'NE' => 'XOF', 'SN' => 'XOF', 'TG' => 'XOF',
+                'CM' => 'XAF', 'CF' => 'XAF', 'TD' => 'XAF', 'CG' => 'XAF',
+                'GA' => 'XAF', 'GQ' => 'XAF',
+                // Hors zone franc
+                'GH' => 'GHS', 'NG' => 'NGN', 'GN' => 'GNF', 'GM' => 'GMD',
+                'LR' => 'LRD', 'SL' => 'SLE', 'CV' => 'CVE', 'MR' => 'MRU',
+                'CD' => 'CDF', 'ST' => 'STN',
+                'MA' => 'MAD', 'DZ' => 'DZD', 'TN' => 'TND', 'EG' => 'EGP',
+                'FR' => 'EUR', 'BE' => 'EUR', 'US' => 'USD', 'CA' => 'CAD', 'GB' => 'GBP',
+            ],
+            'formats' => [
+                'XOF' => ['symbole' => 'FCFA', 'decimales' => 0],
+                'XAF' => ['symbole' => 'FCFA', 'decimales' => 0],
+                'GHS' => ['symbole' => 'GH₵',  'decimales' => 2],
+                'NGN' => ['symbole' => '₦',    'decimales' => 2],
+                'GNF' => ['symbole' => 'FG',   'decimales' => 0],
+                'GMD' => ['symbole' => 'D',    'decimales' => 2],
+                'LRD' => ['symbole' => 'L$',   'decimales' => 2],
+                'SLE' => ['symbole' => 'Le',   'decimales' => 2],
+                'CVE' => ['symbole' => '$',    'decimales' => 0],
+                'MRU' => ['symbole' => 'UM',   'decimales' => 2],
+                'CDF' => ['symbole' => 'FC',   'decimales' => 0],
+                'STN' => ['symbole' => 'Db',   'decimales' => 2],
+                'MAD' => ['symbole' => 'DH',   'decimales' => 2],
+                'DZD' => ['symbole' => 'DA',   'decimales' => 2],
+                'TND' => ['symbole' => 'DT',   'decimales' => 3],
+                'EGP' => ['symbole' => 'E£',   'decimales' => 2],
+                'EUR' => ['symbole' => '€',    'decimales' => 2],
+                'USD' => ['symbole' => '$',    'decimales' => 2],
+                'CAD' => ['symbole' => 'C$',   'decimales' => 2],
+                'GBP' => ['symbole' => '£',    'decimales' => 2],
+            ],
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
+     * Indicatifs téléphoniques → code pays, pour deviner le pays d'un atelier
+     * à partir du seul numéro saisi à l'inscription.
+     *
+     * Les indicatifs les PLUS LONGS sont testés en premier : « +1 » (Amérique
+     * du Nord) préfixe « +1868 » et bien d'autres ; comparer dans l'ordre
+     * naturel attribuerait ces pays aux États-Unis.
+     */
+    public static function indicatifsPays(): array
+    {
+        $cfg = static::where('cle', 'indicatifs_pays')->value('valeur');
+
+        return is_array($cfg) && $cfg ? $cfg : [
+            '+229' => 'BJ', '+226' => 'BF', '+238' => 'CV', '+220' => 'GM',
+            '+233' => 'GH', '+224' => 'GN', '+245' => 'GW', '+225' => 'CI',
+            '+231' => 'LR', '+223' => 'ML', '+222' => 'MR', '+227' => 'NE',
+            '+234' => 'NG', '+232' => 'SL', '+221' => 'SN', '+228' => 'TG',
+            '+237' => 'CM', '+236' => 'CF', '+235' => 'TD', '+242' => 'CG',
+            '+243' => 'CD', '+241' => 'GA', '+240' => 'GQ', '+239' => 'ST',
+            '+212' => 'MA', '+213' => 'DZ', '+216' => 'TN', '+20' => 'EG',
+            '+33' => 'FR', '+32' => 'BE', '+44' => 'GB', '+1' => 'US',
+        ];
+    }
+
+    /**
      * CLI-1 — Journal des mises à jour (« Quoi de neuf »).
      *
      * Il n'existait qu'une **ligne de texte** dans une variable d'environnement

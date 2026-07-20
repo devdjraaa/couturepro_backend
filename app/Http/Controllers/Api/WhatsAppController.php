@@ -14,10 +14,18 @@ use Illuminate\Http\Request;
 
 class WhatsAppController extends Controller
 {
+    /**
+     * CLI-1 — les messages envoyés aux clients écrivaient « FCFA » en clair.
+     * C'était donc la mauvaise monnaie pour tout atelier hors zone franc, dans
+     * un message qui part directement à SON client.
+     */
+    public function __construct(private \App\Services\DeviseService $devises) {}
+
     use ResolvesAtelier;
     public function rappelClient(Request $request, string $clientId): JsonResponse
     {
         $atelier = $this->getAtelier($request);
+        $devise  = $this->devises->deviseAtelier($atelier);
 
         $client = Client::where('id', $clientId)
             ->where('atelier_id', $atelier->id)
@@ -48,6 +56,7 @@ class WhatsAppController extends Controller
     public function confirmationCommande(Request $request, string $commandeId): JsonResponse
     {
         $atelier = $this->getAtelier($request);
+        $devise  = $this->devises->deviseAtelier($atelier);
 
         $commande = Commande::where('id', $commandeId)
             ->where('atelier_id', $atelier->id)
@@ -65,10 +74,10 @@ class WhatsAppController extends Controller
 
         $message = "Bonjour {$client->prenom}, votre commande ({$commande->vetement_nom}) a bien été enregistrée chez {$atelier->nom}.";
         if ($commande->acompte > 0) {
-            $message .= ' Acompte reçu : ' . number_format($commande->acompte, 0, ',', ' ') . ' FCFA.';
+            $message .= ' Acompte reçu : ' . $this->devises->montant($commande->acompte, $devise) . '.';
         }
         if ($restant > 0) {
-            $message .= ' Reste à payer : ' . number_format($restant, 0, ',', ' ') . ' FCFA.';
+            $message .= ' Reste à payer : ' . $this->devises->montant($restant, $devise) . '.';
         }
         $message .= ' Merci de votre confiance !';
 
@@ -80,6 +89,7 @@ class WhatsAppController extends Controller
     public function commandePrete(Request $request, string $commandeId): JsonResponse
     {
         $atelier = $this->getAtelier($request);
+        $devise  = $this->devises->deviseAtelier($atelier);
 
         $commande = Commande::where('id', $commandeId)
             ->where('atelier_id', $atelier->id)
@@ -97,7 +107,7 @@ class WhatsAppController extends Controller
 
         $message = "Bonjour {$client->prenom}, votre commande ({$commande->vetement_nom}) est prête chez {$atelier->nom} !";
         if ($restant > 0) {
-            $message .= ' Reste à payer : ' . number_format($restant, 0, ',', ' ') . ' FCFA.';
+            $message .= ' Reste à payer : ' . $this->devises->montant($restant, $devise) . '.';
         } else {
             $message .= ' Tout a été réglé, venez récupérer votre commande.';
         }
@@ -111,6 +121,7 @@ class WhatsAppController extends Controller
     public function preuvePaiement(Request $request, string $commandeId): JsonResponse
     {
         $atelier  = $this->getAtelier($request);
+        $devise   = $this->devises->deviseAtelier($atelier);
         $commande = Commande::where('id', $commandeId)
             ->where('atelier_id', $atelier->id)
             ->with(['client', 'vetement', 'items', 'commandePaiements'])
@@ -134,7 +145,7 @@ class WhatsAppController extends Controller
         if ($commande->items->isNotEmpty()) {
             foreach ($commande->items as $item) {
                 $nom    = $item->vetement_nom ?? $item->vetement?->nom ?? 'Article';
-                $ligne  = "  • {$nom} × {$item->quantite} = " . number_format($item->quantite * $item->prix_unitaire, 0, ',', ' ') . ' FCFA';
+                $ligne  = "  • {$nom} × {$item->quantite} = " . $this->devises->montant($item->quantite * $item->prix_unitaire, $devise);
                 $ligneItems .= "\n" . $ligne;
             }
         } else {
@@ -150,12 +161,12 @@ class WhatsAppController extends Controller
             "📦 Commande :{$ligneItems}",
             '',
             '💰 Récapitulatif :',
-            '  Total commande : ' . number_format($prix, 0, ',', ' ') . ' FCFA',
-            '  Total encaissé : ' . number_format($acompte, 0, ',', ' ') . ' FCFA',
+            '  Total commande : ' . $this->devises->montant($prix, $devise),
+            '  Total encaissé : ' . $this->devises->montant($acompte, $devise),
         ];
 
         if ($restant > 0) {
-            $lignes[] = '  ⚠️ Reste à payer : ' . number_format($restant, 0, ',', ' ') . ' FCFA';
+            $lignes[] = '  ⚠️ Reste à payer : ' . $this->devises->montant($restant, $devise);
         } else {
             $lignes[] = '  ✅ Commande entièrement réglée';
         }
