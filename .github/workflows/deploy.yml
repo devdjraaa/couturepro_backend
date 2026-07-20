@@ -64,7 +64,7 @@ jobs:
               --exclude='.env' \
               --exclude='storage/' \
               --exclude='bootstrap/cache/' \
-              -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectionAttempts=3 -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4" \
+              -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectionAttempts=5 -o ConnectTimeout=45 -o ServerAliveInterval=15 -o ServerAliveCountMax=4" \
               ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/ && break
             echo "::warning::rsync a échoué (tentative $essai/3) — nouvelle tentative dans 15 s"
             [ "$essai" = 3 ] && exit 1
@@ -76,8 +76,8 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 \
               -o StrictHostKeyChecking=no \
               -o BatchMode=yes \
-              -o ConnectionAttempts=3 \
-              -o ConnectTimeout=30 \
+              -o ConnectionAttempts=5 \
+              -o ConnectTimeout=45 \
               -o ServerAliveInterval=15 \
               -o ServerAliveCountMax=4 \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENGNX'
@@ -130,8 +130,8 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 \
               -o StrictHostKeyChecking=no \
               -o BatchMode=yes \
-              -o ConnectionAttempts=3 \
-              -o ConnectTimeout=30 \
+              -o ConnectionAttempts=5 \
+              -o ConnectTimeout=45 \
               -o ServerAliveInterval=15 \
               -o ServerAliveCountMax=4 \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
