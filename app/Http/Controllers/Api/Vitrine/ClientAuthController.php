@@ -52,10 +52,21 @@ class ClientAuthController extends Controller
         }
 
         $client = GxtClient::firstOrNew(['email' => $email]);
+        $nouveau = ! $client->exists;
         $client->fill($this->contexte($request));
         $client->telephone_whatsapp = $request->input('telephone_whatsapp') ?: $client->telephone_whatsapp;
         $client->derniere_connexion_at = now();
         $client->save();
+
+        // Lot 2 (20/07) : deux consentements DISTINCTS, enregistrés à la création
+        // du compte. La politique est obligatoire côté formulaire ; la newsletter
+        // est facultative et n'a aucun effet sur l'accès au service.
+        if ($nouveau) {
+            if ($request->boolean('privacy_policy_accepted')) {
+                $client->accepterPolitique();
+            }
+            $client->definirNewsletter($request->boolean('newsletter_opt_in'));
+        }
 
         return $this->reponseAuth($client);
     }
@@ -100,11 +111,20 @@ class ClientAuthController extends Controller
             'telephone_whatsapp' => ['nullable', 'string', 'max:25'],
             'ville'              => ['nullable', 'string', 'max:60'],
             'date_naissance'     => ['nullable', 'date', 'before:today'],
+            // Lot 2 : réglable à tout moment depuis le compte (exigence explicite).
+            'newsletter_opt_in'  => ['nullable', 'boolean'],
         ]);
 
         $client = $request->user();
-        $client->fill(array_filter($data, fn ($v) => $v !== null));
+        $client->fill(array_filter(
+            \Illuminate\Support\Arr::except($data, ['newsletter_opt_in']),
+            fn ($v) => $v !== null
+        ));
         $client->save();
+
+        if ($request->has('newsletter_opt_in')) {
+            $client->definirNewsletter($request->boolean('newsletter_opt_in'));
+        }
 
         return response()->json(['client' => $client]);
     }

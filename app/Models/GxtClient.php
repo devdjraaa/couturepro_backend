@@ -22,12 +22,63 @@ class GxtClient extends Authenticatable
         'utm_source', 'utm_medium', 'utm_campaign', 'referrer_url',
         'appareil', 'systeme_os', 'navigateur', 'pays', 'ville', 'langue',
         'date_naissance', 'derniere_connexion_at',
+        // Lot 2 (20/07) : consentements DISTINCTS — la politique est obligatoire,
+        // la newsletter est facultative et n'a aucun effet sur l'usage du service.
+        'privacy_policy_accepted', 'privacy_policy_accepted_at', 'privacy_policy_version',
+        'newsletter_opt_in', 'newsletter_opt_in_at',
     ];
 
     protected $casts = [
-        'date_naissance'        => 'date',
-        'derniere_connexion_at' => 'datetime',
+        'date_naissance'             => 'date',
+        'derniere_connexion_at'      => 'datetime',
+        'privacy_policy_accepted'    => 'boolean',
+        'privacy_policy_accepted_at' => 'datetime',
+        'newsletter_opt_in'          => 'boolean',
+        'newsletter_opt_in_at'       => 'datetime',
     ];
+
+    /**
+     * Version courante de la politique de confidentialité. Sert à tracer CE qui
+     * a été accepté : si le texte change, on saura qui doit se prononcer à
+     * nouveau. Éditable en admin via VitrineSetting.
+     */
+    public static function versionPolitique(): string
+    {
+        return (string) (VitrineSetting::where('cle', 'politique_version')->value('valeur')['version'] ?? '1.0');
+    }
+
+    /** Enregistre le consentement à la politique, horodaté et versionné. */
+    public function accepterPolitique(): void
+    {
+        $this->update([
+            'privacy_policy_accepted'    => true,
+            'privacy_policy_accepted_at' => now(),
+            'privacy_policy_version'     => self::versionPolitique(),
+        ]);
+    }
+
+    /**
+     * Lien de désinscription à placer dans CHAQUE e-mail d'actualités.
+     * Signé et valable 90 jours : un lien qui expire avant l'ouverture du
+     * message piégerait la personne dans une liste qu'elle veut quitter.
+     */
+    public function lienDesinscription(): string
+    {
+        return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'vitrine.desinscription',
+            now()->addDays(90),
+            ['client' => $this->id],
+        );
+    }
+
+    /** Bascule l'inscription aux actualités (désinscription = date effacée). */
+    public function definirNewsletter(bool $optIn): void
+    {
+        $this->update([
+            'newsletter_opt_in'    => $optIn,
+            'newsletter_opt_in_at' => $optIn ? now() : null,
+        ]);
+    }
 
     public function consents(): HasMany
     {

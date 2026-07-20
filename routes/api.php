@@ -120,6 +120,18 @@ Route::get('vitrine/pages/{cle}', [\App\Http\Controllers\Api\PageLegaleControlle
 // documents et partages sortants — le front ne doit rien figer en dur.
 Route::get('vitrine/coordonnees', fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
 
+// Lot 2 (20/07) : désinscription des actualités depuis le lien d'un e-mail.
+// URL SIGNÉE : elle doit fonctionner sans connexion (on ne demande pas à
+// quelqu'un de se connecter pour arrêter de recevoir des messages), tout en
+// empêchant de désinscrire un tiers en devinant son identifiant.
+Route::get('vitrine/desinscription/{client}', function (\App\Models\GxtClient $client) {
+    $client->definirNewsletter(false);
+
+    return response()->json([
+        'message' => 'Vous ne recevrez plus nos actualités. Votre compte reste actif.',
+    ]);
+})->name('vitrine.desinscription')->middleware('signed');
+
 // ─── Veille n8n : dépôt des résultats hebdo (jeton partagé X-Veille-Token) ───
 Route::post('veille/ingest', [\App\Http\Controllers\Api\VeilleController::class, 'ingest'])->middleware('throttle:10,1');
 
