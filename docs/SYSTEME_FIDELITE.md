@@ -1,7 +1,7 @@
 # Système de points de fidélité — état réel
 
 > **Réponse au Point 31** (Sprint 08vC) — documentation du fonctionnement **actuellement implémenté**.
-> Établi par audit du code (pas de mémoire ni de supposition) — 19/07/2026.
+> Établi par audit du code (pas de mémoire ni de supposition) — 19/07/2026, **mis à jour le 20/07** après correction des défauts techniques (§9).
 > ⚠️ Ce document décrit **ce qui existe**, pas ce qui devrait exister. Les écarts et anomalies sont signalés en fin de document.
 
 ---
@@ -12,7 +12,7 @@
 |---|---|
 | Les **abonnements** (activation) | ✅ **OUI** |
 | Les **renouvellements** d'abonnement | ✅ **OUI** (même mécanisme que l'activation) |
-| Les **commandes validées** | 🟡 **PARTIELLEMENT** — les points sont crédités à la **création** de la commande, pas à sa validation/livraison (le libellé est trompeur), et **uniquement via la synchro offline** |
+| Les **commandes validées** | 🟡 **PARTIELLEMENT** — les points sont crédités à la **création** de la commande, pas à sa livraison. *(Corrigé le 20/07 : le crédit fonctionne désormais aussi sur le chemin web ; le libellé dit « Commande créée ».)* |
 | Les **achats** | ❌ **NON** |
 | Les **ventes** | ❌ **NON** |
 | Le **parrainage / recommandations** | ❌ **NON** — aucune ligne de code, malgré ce qu'affiche l'interface |
@@ -47,8 +47,8 @@ Le solde est rattaché à **`atelier_id`** (contrainte d'unicité). Les clients 
 | Événement | Implémenté | Montant | Type en base |
 |---|---|---|---|
 | Activation / renouvellement d'abonnement | ✅ | `pts_activation` → **31** (mensuel) ou **365** (annuel) | `abonnement_activation` / `activation` |
-| Création d'un **client** | ✅ *(via synchro offline uniquement)* | `pts_par_client` → **1 à 3** selon le plan | `client_cree` |
-| Création d'une **commande** | ✅ *(via synchro offline uniquement)* | `pts_par_commande` → **1 à 3** selon le plan | `commande_validee` |
+| Création d'un **client** | ✅ *(web **et** synchro depuis le 20/07)* | `pts_par_client` → **1 à 3** selon le plan | `client_cree` |
+| Création d'une **commande** | ✅ *(web **et** synchro depuis le 20/07)* | `pts_par_commande` → **1 à 3** selon le plan | `commande_validee` |
 | Ajustement manuel par un admin | ✅ | libre (entier ≠ 0) | `bonus_admin` |
 | Conversion en bonus (débit) | ✅ | `- seuil_conversion_pts` | `conversion` |
 | Partage sur réseau social | ❌ *(type déclaré en base, jamais écrit)* | — | `reseau_social` |
@@ -86,7 +86,7 @@ Valeurs par défaut si un plan ne définit rien : `pts_par_client` = 1, `pts_par
 
 - **Aucun plafond de gain.** Pas de limite journalière, mensuelle ni annuelle. Pas de rate limit sur l'accumulation.
 - **Anti-doublon** : un même client ou une même commande ne peut être crédité qu'une seule fois (contrôle sur `reference_id`).
-- **Les points ne sont jamais crédités depuis l'app web classique** pour les clients et les commandes : le crédit ne se déclenche que dans le flux de **synchronisation offline** (`POST /sync/push`). Un utilisateur qui travaille uniquement en web ne gagne donc **jamais** de points sur ses clients et commandes.
+- ✅ **CORRIGÉ le 20/07** — le crédit clients/commandes ne fonctionnait que via la synchronisation hors ligne : un utilisateur 100 % web ne gagnait jamais de points. La règle est désormais partagée par les deux chemins, avec idempotence vérifiée (une création web puis un push de synchro ne créditent qu'une fois).
 - Les valeurs négatives sont acceptées par le service interne (le solde pourrait théoriquement passer sous zéro par ce chemin) ; l'interface admin, elle, refuse un solde négatif.
 - **Aucune distinction designer / artisan / client** : seul le plan d'abonnement fait varier les montants.
 
@@ -132,13 +132,15 @@ Ces points nécessitent une décision de la direction :
    - « Parrainage d'un atelier = 50 points »
    - « Chaque mois actif = 5 points »
 
-   **Aucune de ces trois règles n'est implémentée** (vérifié : zéro occurrence de parrainage dans tout le backend). Il faut soit **les implémenter**, soit **retirer ces textes**. En l'état, c'est une promesse non tenue aux utilisateurs.
+   **Aucune de ces trois règles n'est implémentée** (vérifié : zéro occurrence de parrainage dans tout le backend).
+   → ✅ **TRANCHÉ le 20/07 (décision 4a)** : ces textes ont été **retirés** et remplacés par les règles réelles.
 
-2. **Clients et commandes ne créditent qu'en mode offline.** Les utilisateurs 100 % web ne gagnent rien. À corriger si le comportement attendu est « toujours créditer ».
+2. ~~**Clients et commandes ne créditent qu'en mode offline.**~~ → ✅ **CORRIGÉ le 20/07** : le crédit fonctionne sur les deux chemins.
 
-3. **Libellé trompeur** : le type s'appelle `commande_validee` et l'interface dit « chaque commande livrée vous rapporte des points », mais le crédit se fait à la **création** de la commande.
+3. **Libellé trompeur** : le type reste `commande_validee` (données déjà en base) → ✅ **description corrigée le 20/07** en « Commande créée ».
 
-4. **La permission `points.convert` n'est pas appliquée.** Elle est déclarée dans le référentiel de permissions d'équipe, mais la route de conversion ne la vérifie pas : **n'importe quel membre d'équipe** authentifié peut convertir les points de l'atelier.
+4. ~~**La permission `points.convert` n'est pas appliquée.**~~ → ✅ **CORRIGÉ le 20/07** : elle est vérifiée à la conversion (le propriétaire n'est pas concerné, il n'est pas membre d'équipe).
+   ⚠️ Constat plus large : **aucune** permission d'équipe n'est appliquée côté serveur sur les autres routes — à arbitrer séparément.
 
 5. **Conversion à durée fixe** (31 jours) alors que le seuil varie de 10 000 à 100 000 selon le plan : un plan Studio paie 10× plus cher le même bonus qu'un plan Gratuit.
 
