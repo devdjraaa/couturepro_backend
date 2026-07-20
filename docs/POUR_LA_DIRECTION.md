@@ -5,6 +5,11 @@ Chaque réglage prend effet immédiatement.
 
 Adresse : **https://gextimo.novafriq.africa/admin**
 
+Le suivi en ligne — **https://gextimo.novafriq.africa/suivi-v2.html** — comporte désormais
+un volet **Direction (Patrick)** avec ces mêmes points. Vous pouvez les cocher vous-même au
+fur et à mesure (bouton *Mode édition*, puis votre code). La page ne montre que ce qui
+reste : les points livrés en sont retirés.
+
 ---
 
 ## En un coup d'œil
