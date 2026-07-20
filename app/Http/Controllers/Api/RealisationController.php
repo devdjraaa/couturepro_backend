@@ -22,7 +22,19 @@ class RealisationController extends Controller
 {
     use ResolvesAtelier, ChecksPlanFeature;
 
-    private const MAX_IMAGES = 6;
+    /**
+     * S02A-28 — Repli si le plan ne définit rien. La limite réelle vient de
+     * `max_photos_realisation` (éditable en admin) : elle était figée à 6 pour
+     * tous les plans, sans moyen de la différencier.
+     */
+    private const MAX_IMAGES_DEFAUT = 6;
+
+    private function maxImages(Atelier $atelier): int
+    {
+        $max = $atelier->abonnement?->getConfigEffective()['max_photos_realisation'] ?? null;
+
+        return $max === null ? self::MAX_IMAGES_DEFAUT : max(1, (int) $max);
+    }
 
     public function __construct(
         private QualitePhotoService $qualite,
@@ -53,7 +65,11 @@ class RealisationController extends Controller
 
         return response()->json(array_merge(
             $this->infoQuota($atelier->id),
-            ['cycle' => $this->quotaCycle($atelier)]
+            [
+                'cycle' => $this->quotaCycle($atelier),
+                // S02A-28 : le front figeait 6 photos pour tout le monde.
+                'max_photos_par_realisation' => $this->maxImages($atelier),
+            ]
         ));
     }
 
@@ -130,9 +146,16 @@ class RealisationController extends Controller
             return response()->json(['message' => 'Cette réalisation n\'est plus modifiable.'], 422);
         }
 
-        $images = $realisation->images ?? [];
-        if (count($images) >= self::MAX_IMAGES) {
-            return response()->json(['message' => 'Maximum ' . self::MAX_IMAGES . ' photos par réalisation.'], 422);
+        $atelier = $this->getAtelier($request);
+        $max     = $this->maxImages($atelier);
+        $images  = $realisation->images ?? [];
+        if (count($images) >= $max) {
+            return response()->json([
+                'message'     => "Votre formule permet {$max} photo(s) par réalisation.",
+                'code'        => 'quota_photos',
+                'max'         => $max,
+                'plan_requis' => $this->planRequisPourLimite('max_photos_realisation', $max),
+            ], 422);
         }
 
         $request->validate([

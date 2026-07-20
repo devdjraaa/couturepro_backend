@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use App\Http\Requests\Api\StoreVetementRequest;
 use App\Http\Requests\Api\UpdateVetementRequest;
@@ -17,8 +18,31 @@ use Illuminate\Support\Facades\Storage;
 
 class VetementController extends Controller
 {
+    use ChecksPlanFeature;
     use ResolvesAtelier;
     use AuthorizesRequests;
+
+    /**
+     * S02A-28 — Plafond de photos par modèle, piloté par le plan.
+     *
+     * ⚠️ Le serveur n'imposait AUCUNE limite : le front s'arrêtait à 5, mais
+     * l'API acceptait n'importe quel nombre d'images. Un appel direct pouvait
+     * donc remplir le stockage sans rien enfreindre.
+     */
+    private function refuseSiTropDePhotos(Atelier $atelier, int $nombre): ?JsonResponse
+    {
+        $max = (int) ($atelier->abonnement?->getConfigEffective()['max_photos_vetement'] ?? 5);
+        if ($max <= 0 || $nombre <= $max) {
+            return null;
+        }
+
+        return response()->json([
+            'message'     => "Votre formule permet {$max} photo(s) par modèle. Vous en avez envoyé {$nombre}.",
+            'code'        => 'quota_photos',
+            'max'         => $max,
+            'plan_requis' => $this->planRequisPourLimite('max_photos_vetement', $max),
+        ], 422);
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -41,6 +65,10 @@ class VetementController extends Controller
 
         $atelier = $this->getAtelier($request);
         $user    = $request->user();
+
+        if ($refus = $this->refuseSiTropDePhotos($atelier, count($request->file('images') ?? []))) {
+            return $refus;
+        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -70,6 +98,12 @@ class VetementController extends Controller
         $this->authorize('update', $vetement);
 
         $data = ['nom' => $request->nom ?? $vetement->nom];
+
+        // Le même plafond s'applique à la modification : sinon on crée avec une
+        // photo puis on « modifie » avec cinquante.
+        if ($refus = $this->refuseSiTropDePhotos($this->getAtelier($request), count($request->file('images') ?? []))) {
+            return $refus;
+        }
 
         $newPaths = [];
         if ($request->hasFile('images')) {
