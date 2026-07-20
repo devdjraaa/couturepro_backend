@@ -22,9 +22,25 @@ return [
     | Tant que 'version' et 'url' sont vides, AUCUNE OTA n'est proposée
     | (comportement sûr). On les renseigne (via .env) au moment de publier
     | un nouveau bundle web.
+    |
+    | ⚠️ PAR APPLICATION. Deux APK distincts sont publiés depuis ce code :
+    | l'app des professionnels (com.couturepro.app) et la console interne
+    | (com.couturepro.admin). Un point d'entrée OTA unique renvoyait le MÊME
+    | bundle aux deux : la console, lancée sur un appareil, téléchargeait le
+    | bundle des pros et se faisait remplacer par lui à chaque démarrage.
+    |
+    | Une application absente de cette table ne reçoit AUCUNE OTA — c'est le
+    | comportement sûr : mieux vaut une console qui ne se met pas à jour à chaud
+    | qu'une console qui devient une autre application.
     */
     'ota' => [
-        'version' => env('APP_OTA_VERSION', ''),
-        'url'      => env('APP_OTA_URL', ''),
+        'com.couturepro.app' => [
+            'version' => env('APP_OTA_VERSION', ''),
+            'url'     => env('APP_OTA_URL', ''),
+        ],
+        'com.couturepro.admin' => [
+            'version' => env('ADMIN_OTA_VERSION', ''),
+            'url'     => env('ADMIN_OTA_URL', ''),
+        ],
     ],
 ];
