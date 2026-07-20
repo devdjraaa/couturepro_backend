@@ -46,6 +46,7 @@ use App\Http\Controllers\Api\SuiviSprintController;
 use App\Http\Controllers\Api\Vitrine\ChatbotController;
 use App\Http\Controllers\Api\Vitrine\ClientAuthController;
 use App\Http\Controllers\Api\Vitrine\ClientCommandeController;
+use App\Http\Controllers\Api\Vitrine\ClientNotificationController;
 use App\Http\Controllers\Api\Vitrine\GxtEvenementController;
 use App\Http\Controllers\Api\VitrineController;
 use App\Http\Controllers\Api\VitrineStatsController;
@@ -182,6 +183,14 @@ Route::prefix('vitrine/client')->group(function () {
         Route::post('commandes',                            [ClientCommandeController::class, 'store'])->middleware('throttle:10,60');
         Route::post('commandes/{commande}/avis',            [ClientCommandeController::class, 'avis'])->middleware('throttle:5,60');
         Route::post('commandes/{commande}/reclamation',     [ClientCommandeController::class, 'reclamation'])->middleware('throttle:5,60');
+
+        // Pt 24 — notifications du client final. Il n'était prévenu que par
+        // e-mail : un e-mail se perd ou part en indésirable, et le client
+        // revenait alors sur son espace sans rien y trouver sur sa commande.
+        Route::get('notifications',                    [ClientNotificationController::class, 'index']);
+        Route::get('notifications/compteur',           [ClientNotificationController::class, 'compteur']);
+        Route::post('notifications/tout-lu',           [ClientNotificationController::class, 'toutMarquerLu']);
+        Route::post('notifications/{notification}/lue', [ClientNotificationController::class, 'marquerLue']);
     });
 });
 

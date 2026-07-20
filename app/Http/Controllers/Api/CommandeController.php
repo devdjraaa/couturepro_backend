@@ -152,12 +152,11 @@ class CommandeController extends Controller
         $ancienStatut = $commande->statut;
         $commande->update($data);
 
-        // P202 : commande vitrine livrée → e-mail au client final (invitation à laisser un avis).
-        if (($data['statut'] ?? null) === 'livre' && $ancienStatut !== 'livre' && $commande->gxt_client_id) {
-            $email = \App\Models\GxtClient::find($commande->gxt_client_id)?->email;
-            if ($email) {
-                \App\Jobs\SendGxtCommandeEmail::dispatch($email, 'livree', $commande->reference, $commande->atelier?->nom ?? 'votre designer');
-            }
+        // P202 + Pt 24 : commande vitrine livrée → le client est prévenu dans
+        // l'application ET par e-mail. Un seul appel : deux appels distincts,
+        // c'est la garantie qu'un jour l'un des deux soit oublié quelque part.
+        if (($data['statut'] ?? null) === 'livre' && $ancienStatut !== 'livre') {
+            app(\App\Services\NotificationsClientService::class)->pourCommande($commande, 'livree');
         }
 
         if (isset($data['statut']) && $data['statut'] !== $ancienStatut) {
@@ -237,12 +236,11 @@ class CommandeController extends Controller
         $ancienneEtape = $commande->etape;
         $commande->update(['etape' => $data['etape']]);
 
-        // P202 : commande vitrine → notifier le client final à chaque avancée d'étape.
-        if ($commande->gxt_client_id && $data['etape'] !== $ancienneEtape && $data['etape'] !== 'commande') {
-            $email = \App\Models\GxtClient::find($commande->gxt_client_id)?->email;
-            if ($email) {
-                \App\Jobs\SendGxtCommandeEmail::dispatch($email, $data['etape'], $commande->reference, $commande->atelier?->nom ?? 'votre designer');
-            }
+        // P202 + Pt 24 : chaque avancée d'étape est portée au client, dans
+        // l'application et par e-mail. L'étape « commande » est exclue : elle
+        // correspond à la création, déjà annoncée par « commande reçue ».
+        if ($data['etape'] !== $ancienneEtape && $data['etape'] !== 'commande') {
+            app(\App\Services\NotificationsClientService::class)->pourCommande($commande, $data['etape']);
         }
 
         return response()->json($commande);
