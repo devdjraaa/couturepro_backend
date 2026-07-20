@@ -51,20 +51,35 @@ jobs:
 
       - name: Sync files to VPS
         run: |
-          rsync -az --delete \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.env' \
-            --exclude='storage/' \
-            --exclude='bootstrap/cache/' \
-            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/
+          # Réessai : la connexion SSH depuis les runners GitHub tombe par
+          # intermittence (2 déploiements perdus sur 8 le 20/07, « connection
+          # unexpectedly closed »). Le VPS était au repos à chaque fois — c'est le
+          # réseau, pas la machine. Sans réessai, un push part vert côté git mais
+          # le code ne part jamais en ligne : c'est ainsi qu'un correctif de
+          # sécurité est resté non déployé sans que rien ne le signale.
+          for essai in 1 2 3; do
+            rsync -az --delete \
+              --exclude='.git' \
+              --exclude='.github' \
+              --exclude='.env' \
+              --exclude='storage/' \
+              --exclude='bootstrap/cache/' \
+              -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectionAttempts=3 -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4" \
+              ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/gextimo_backend/ && break
+            echo "::warning::rsync a échoué (tentative $essai/3) — nouvelle tentative dans 15 s"
+            [ "$essai" = 3 ] && exit 1
+            sleep 15
+          done
 
       - name: Deploy Nginx
         run: |
           ssh -i ~/.ssh/id_ed25519 \
               -o StrictHostKeyChecking=no \
               -o BatchMode=yes \
+              -o ConnectionAttempts=3 \
+              -o ConnectTimeout=30 \
+              -o ServerAliveInterval=15 \
+              -o ServerAliveCountMax=4 \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENGNX'
 
           CONF_SRC=/var/www/gextimo_backend/deploy/nginx.conf
@@ -115,6 +130,10 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 \
               -o StrictHostKeyChecking=no \
               -o BatchMode=yes \
+              -o ConnectionAttempts=3 \
+              -o ConnectTimeout=30 \
+              -o ServerAliveInterval=15 \
+              -o ServerAliveCountMax=4 \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
 
           cd /var/www/gextimo_backend
