@@ -94,7 +94,7 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 | 75 | Historique des mises à jour | ⬜ |
 | 76 | Bouton Conditions d'utilisation | ✅ (ouvre la page externe) |
 | 77 | Server Error inscription Designer | ✅ (réglé le 15/07 — normalisation téléphone) |
-| 78 | Texte standard case CGU + Politique | 🟡 |
+| 78 | Texte standard case CGU + Politique | ✅ **VÉRIFIÉ FAIT (20/07)** — clé `accepter_legal` : « J'accepte les <cgu>Conditions Générales d'Utilisation</cgu> et la <conf>Politique de confidentialité</conf> », deux liens DISTINCTS comme demandé. |
 | 79 | Documents légaux dans les pages | ✅ (éditeur back-office livré) |
 
 ## Correctifs vitrine + web (80-100)
@@ -108,8 +108,8 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 | 85 | Bug « Ajouter une ville » | 🟡 |
 | 86-89 | Sidebar : scroll, état actif, logo, hamburger | 🟡 à re-tester |
 | 90 | Profil : format Nom/Prénom + champs | 🟡 |
-| 91 | Avatar 404 | 🟡 |
-| 92 | Tickets : images + horodatage | 🟡 |
+| 91 | Avatar 404 | ✅ **CORRIGÉ (20/07)** — une photo dont le fichier a disparu laissait le navigateur afficher son icône d'image cassée en pleine liste de clients. Repli sur les initiales, réarmé quand la photo change. |
+| 92 | Tickets : images + horodatage | ✅ **VÉRIFIÉ FAIT (20/07)** — pièces jointes image et horodatage présents sur le ticket comme sur chaque message (`SupportTicketDetailPage`). |
 | 93 | Revue des liens internes | 🟡 |
 | 94-95 | 54 pays africains + affichage | 🟡 |
 | 96 | Nom de marque | ✅ (résolu) |
@@ -125,7 +125,7 @@ Conflits de noms (32), 6 tables (33), 5 phases espace client (34-38), mémoire c
 | 103 | Compte à rebours de lancement | 🟡 |
 | 104 | Messages de récupération | 🟡 |
 | 105 | Taux de commission affiché (15 %) | ✅ |
-| 106 | Import contacts anti-doublon | 🟡 |
+| 106 | Import contacts anti-doublon | ✅ **VÉRIFIÉ FAIT (20/07)** — comparaison sur le numéro NORMALISÉ (chiffres seuls) : « +229 90 00 11 22 » et « 22990001122 » sont reconnus comme le même contact. Compteurs importés / ignorés renvoyés. |
 | 107 | Méthodes d'inscription complémentaires | 🟡 (cf. pt 130) |
 | 108 | Architecture assistant conversationnel | ✅ (Makila AI livré) |
 | 109 | Ancrage/scroll boutons header | 🟡 |
