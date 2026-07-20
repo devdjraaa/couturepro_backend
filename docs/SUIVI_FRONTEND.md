@@ -29,9 +29,9 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| S02A-25 | Bouton « Modifier » → « Enregistrer » | ⬜ | `src/components/vetements/VetementForm.jsx` : le bouton affiche `initialData ? 'Modifier' : 'Ajouter'` **en dur**. En édition, l'utilisateur est déjà dans l'écran de modification → le libellé attendu est **Enregistrer**. ⚠️ Ce composant **n'importe pas `useTranslation`** alors que la clé `formulaire.enregistrer` **existe déjà** dans `src/lang/fr.json` : à passer par `t()` au passage. Idem pour l'entrée du menu ⋮ dans `VetementCard.jsx`. **À porter aussi sur la branche `android`** (code identique). |
-| S02A-26 | Positionnement du bouton | ⚠️ | Trois problèmes cumulés dans `src/pages/CataloguePage.jsx` : (a) le `BottomSheet` n'a **aucun pied de page collant** → sur une fiche longue le bouton principal défile hors écran ; (b) `PatronManager` est rendu **sous** le formulaire pour un compte designer → les boutons « Annuler / Modifier » se retrouvent **au milieu du panneau** ; (c) `PatronManager` ajoute un second bouton pleine largeur juste en dessous → confusion. **Un seul bouton « Enregistrer » suffit**, placé en pied de page collant. |
-| S02A-26b | Doublon d'action « Nouveau » | ⚠️ | Toujours dans `CataloguePage.jsx` : le bouton de l'état vide **et** le bouton flottant déclenchent la même action et s'affichent **en même temps** quand la liste est vide. Le bouton flottant recouvre aussi le menu ⋮ de la dernière carte. |
+| S02A-25 | Bouton « Modifier » → « Enregistrer » | ✅ | ✅ **Fait (web).** Libellé « Enregistrer » en édition, via `t()` (`useTranslation` ajouté). ⚠️ Le portage `android` N'A PAS été fait : les branches ont divergé de 247 commits côté master et 288 côté android — c'est un chantier de réalignement (fusion + build APK + test appareil), pas un portage de fichier. Tracé en REL-V4.
+| S02A-26 | Positionnement du bouton | ✅ | ✅ **Fait.** Un seul bouton d'action, en pied de panneau collant (`sticky bottom-0`, `safe-area-inset-bottom`) dans `VetementForm.jsx`.
+| S02A-26b | Doublon d'action « Nouveau » | ✅ | ✅ **Fait.** Le bouton flottant n'est rendu que si `mesModeles.length > 0` : quand la liste est vide, seul l'état vide porte l'invitation.
 | S02A-28 | Limites en dur à brancher sur le plan | 🟡 | `MAX_IMAGES = 5` dans `VetementForm.jsx` et `MAX_PHOTOS = 6` dans `MesRealisationsPage.jsx` sont **codés en dur** → à brancher sur `usePlanLimit`. Voir aussi `src/services/abonnementService.js` qui embarque 6 configurations de plan en dur (mode démo) — dérive garantie avec le serveur. |
 | S02A-28b | Écran admin des plans désynchronisé | 🟡 | `src/pages/admin/PlansPage.jsx` connaît ~19 clés alors que le serveur en expose ~37 : **15 clés récentes** tombent dans « Autres clés » (champ libre), donc éditables à l'aveugle. À resynchroniser (je te fournis la liste). |
 
@@ -41,8 +41,8 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| S08C-29 | Retirer la validation des avis par le créateur | ⬜ | Aujourd'hui le créateur valide/rejette les avis déposés sur son propre profil (il est juge et partie). La direction veut une **publication automatique**. → Retirer l'interface de modération côté créateur. ↔ `SUIVI_BACKEND.md#S08C-29b` (je supprime la route). |
-| S08C-30 | Moyens de paiement → **FedaPay uniquement** | ⬜ | `src/pages/FacturationPage.jsx` : la liste `['wave','om','especes','virement','autre']` est **en dur**, avec `wave` par défaut. Pour la V1, n'afficher que **FedaPay**, en gardant la structure évolutive. Libellés dans `src/lang/fr.json`. ℹ️ Il existe une **seconde liste incohérente** (`especes`/`mobile_money`/`virement`) dans les écrans commandes/caisse — on la traite après, ne pas y toucher pour l'instant. ↔ `SUIVI_BACKEND.md#S08C-30` |
+| S08C-29 | Retirer la validation des avis par le créateur | ✅ | ✅ **Fait.** `MaVitrinePage.jsx` : boutons Valider/Rejeter retirés, `avisService.moderate` supprimé. Le panneau ne liste plus que les avis **signalés**, en lecture seule, avec la mention que Gextimo les examine.
+| S08C-30 | Moyens de paiement → **FedaPay uniquement** | ✅ | ✅ **Fait.** Nouveau hook `useMoyensPaiement` → `GET /moyens-paiement` (liste + défaut, éditable en admin). Les anciens libellés (`wave`, `om`…) restent traduits : les factures déjà émises portent ces valeurs en base. ℹ️ La liste caisse/commandes n'a **pas** été touchée — elle enregistre comment le client a payé sur place ; la basculer sur FedaPay supprimerait l'encaissement en espèces.
 
 ---
 
@@ -52,7 +52,7 @@
 |---|---|---|---|
 | PHOTO-1 | Retour qualité **instantané et visuel** | ⬜ | À l'envoi d'une photo, retour immédiat **sans aucun texte à lire** : icône, couleur, courte animation — compréhensible par tout utilisateur, quelle que soit sa langue. Si refusée, l'utilisateur peut reprendre autant de fois qu'il veut, **sans pénalité**. ↔ l'analyse (netteté, luminosité, résolution, cadrage) est côté serveur. |
 | PHOTO-3 | Écran de modération admin | 🟡 | Une file de modération existe déjà (`src/pages/admin/AdminRealisationsPage.jsx`, approuver / refuser avec motif). À ajouter : **compte à rebours des 24 h** et action « retoucher légèrement puis valider » (recadrage, ajustements simples) pour les designers peu équipés. |
-| PHOTO-4 | Affichage du quota designer | ⬜ | Afficher en permanence le **solde restant** et la **date du prochain renouvellement**. Alerte à **80 %** avec incitation à monter en gamme. À 0 : bouton d'ajout **inactif** + message « Vous avez atteint votre limite de photos pour ce mois. Renouvellement le [date]. » + bouton **« Passer à l'offre supérieure »**. |
+| PHOTO-4 | Affichage du quota designer | ✅ | ✅ **Fait.** `MesRealisationsPage.jsx` affiche le quota du cycle, la date de remise à zéro, l'alerte à 80 % et le blocage à 0 (bouton désactivé). Tous les seuils viennent du serveur (`/realisations/quota`), le front n'en recalcule aucun.
 | PHOTO-7 | Historique / traçabilité | ⬜ | Côté admin, garder l'accès à la **photo originale** même après retouche. |
 
 ---
@@ -81,9 +81,9 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| ABO-1 | Vérifier la session au clic | ⬜ | Au clic sur « S'abonner » : si une session visiteur active existe → on enregistre directement. Sinon → ouverture **automatique** du module d'inscription/connexion. ↔ je passe la route en authentifiée. |
+| ABO-1 | Vérifier la session au clic | ✅ | ✅ **Fait.** ⚠️ C'était devenu une **régression** : le serveur exigeait déjà un compte (401) mais le front envoyait une clé anonyme et `postJson` aplatissait toute erreur sur `null` — chaque clic « Suivre » échouait en silence. `postDetaille` rend le statut, l'affichage optimiste est annulé sur refus, et un 401 déclenche la connexion.
 | ABO-2 | Inscription simplifiée à la volée | ⬜ | Le module s'ouvre **tout seul** (l'utilisateur ne doit pas le chercher). Seule information obligatoire : **l'adresse e-mail**. ⚠️ Si l'utilisateur ferme ou abandonne avant validation : **aucun compte incomplet, aucun abonnement enregistré**. ℹ️ Le socle existe déjà côté serveur (code e-mail + Google). |
-| ABO-4 | Reprendre l'abonnement automatiquement | ⬜ | Après création du compte / connexion, l'abonnement initialement visé est exécuté **automatiquement** — l'utilisateur ne doit **pas** recliquer sur « S'abonner ». |
+| ABO-4 | Reprendre l'abonnement automatiquement | ✅ | ✅ **Fait.** L'abonnement visé est rejoué automatiquement après connexion, puis l'utilisateur est ramené au profil du créateur.
 | ABO-5 | Case de consentement notifications | ⬜ | S'abonner et accepter les notifications sont **deux consentements séparés** : case dédiée, indépendante de l'abonnement. Exigence APDP / Code du numérique béninois. |
 | ABO-6 | Messages des règles métier | ⬜ | « Vous êtes déjà abonné à ce créateur » si doublon. Un créateur ne peut pas s'abonner à lui-même. |
 | ABO-7 | Espace client : mes abonnements | ⬜ | Liste des créateurs suivis + **désabonnement** à tout moment. |
@@ -98,8 +98,8 @@
 |---|---|---|---|
 | EC-1 | Session persistante | ✅ | Vérifié : jeton stocké, session restaurée au chargement, purge si invalide. **Le problème n'est pas là.** |
 | EC-2 | Ouvrir l'espace client automatiquement | 🟡 | Après authentification, l'espace doit se charger **sans action supplémentaire**. |
-| EC-3 | **Reprise automatique de l'action initiale** | ⬜ | **Le vrai chantier.** Mémoriser l'action demandée avant l'interruption par la connexion (s'abonner, mettre en favori…), puis l'exécuter automatiquement après connexion, avec **message de confirmation**. ⚠️ Vérifié : **aucun mécanisme de ce type n'existe** dans le code. Le seul embryon est un paramètre d'URL `?commander=` qui **pré-ouvre** un formulaire — ce n'est ni générique ni une exécution. À concevoir comme un mécanisme **générique** réutilisable. |
-| EC-4 | Gestion des échecs | ⬜ | Si la reprise échoue (ressource supprimée entre-temps, erreur réseau…), afficher un **message clair** plutôt qu'un blocage silencieux. |
+| EC-3 | **Reprise automatique de l'action initiale** | ✅ | ✅ **Fait.** `src/pages/vitrine/actionEnAttente.js` : intention mémorisée (type + payload + page de retour) en `sessionStorage`, valable 30 min, rejouée une seule fois après connexion. L'écran de connexion **dit pourquoi** il s'affiche. Générique : une nouvelle action n'a qu'un type à déclarer.
+| EC-4 | Gestion des échecs | ✅ | ✅ **Fait.** Succès et échec de la reprise sont annoncés. ⚠️ Au passage : le composant `<Toaster />` n'était **monté nulle part** — les 41 appels `toast.success`/`toast.error` de toute l'application ne produisaient rien. Corrigé dans `main.jsx`.
 | EC-5 | Couvrir **toutes** les actions | ⬜ | Ne pas corriger que l'abonnement : tester le même enchaînement pour les favoris et toute action nécessitant un compte, pour que le défaut ne réapparaisse pas ailleurs. |
 
 ---
@@ -109,10 +109,10 @@
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
 | VID-1 | **Lecture intégrée** (embed) | ⬜ | Aujourd'hui un lien YouTube renvoie **vers YouTube** (simple lien sortant, dans `src/pages/vitrine/CreateurProfilPage.jsx` et `src/pages/StudioPage.jsx`). Attendu, à la manière de Notion : vidéo **intégrée dans une carte**, lecture **sans quitter Gextimo**, avec lecture/pause, barre de progression, muet, volume, plein écran, + bouton pour ouvrir sur YouTube. **Cartes de taille uniforme**, affichage en **grille**. |
-| VID-2 | Compteur visible | ⬜ | Afficher `0/1`, `2/3`, `5/5` selon le plan (Gratuit **1**, Atelier **3**, Studio **5**). ↔ j'expose la limite via la configuration de plan (aujourd'hui 50 en dur côté serveur, identique pour tous). |
+| VID-2 | Compteur visible | ✅ | ✅ **Fait.** Compteur servi par `GET /atelier-videos/quota` (plafond du plan, illimité géré, corrections restantes du mois). Le « /50 » en dur affiché à tout le monde a disparu.
 | VID-3 | Règles de modification | ⬜ | Gratuit : une seule vidéo, une nouvelle **remplace** l'ancienne, aucune correction/suppression mensuelle. Atelier : **1** correction/suppression par mois. Studio : **2**. Compteur mensuel affiché. ↔ la route de modification n'existe pas encore côté serveur. |
 | VID-4 | Import direct de vidéo | ⬜ | Deux entrées possibles : **lien YouTube** ou **import d'un fichier** (tous les créateurs n'ont pas de chaîne). Mode d'affichage adapté selon la source. |
-| VID-5 | Statut « en attente de validation » | ⬜ | Aucune vidéo publiée immédiatement : soumission → **en attente** → vérification → publication ou refus (délai max **24 h**). En cas de refus, le **quota est restitué**. Prévoir l'affichage du statut côté créateur + l'écran de validation côté admin. |
+| VID-5 | Statut « en attente de validation » | 🟡 | 🟡 **Partiel.** Statut de modération affiché par vidéo côté créateur (en validation / refusée, motif en infobulle). **Restant : l'écran de validation côté admin** — aucune page admin vidéos n'existe côté front.
 
 ---
 
@@ -131,6 +131,8 @@
 | REL-V1 | Points vitrine ouverts | ⬜ | Reprendre le contenu encore ouvert de `VITRINE_TODO_FRONTEND.md` (barre de contact, header/footer, textes web). Ce fichier est **déprécié** : les points actifs sont à basculer ici au fil de l'eau. |
 | REL-V2 | Pré-rendu SEO | ⬜ | La vitrine est une application monopage : un robot sans JavaScript reçoit une **coquille vide** et le **même titre** sur toutes les pages. Recommandation prête (métadonnées par page + pré-rendu). ⚠️ **À valider avant de toucher la production.** |
 | REL-V3 | « Mes Réalisations » sur mobile | ⬜ | Ajouter le cache hors-ligne (100 brouillons/en attente) côté application native, branche `android`. |
+| REL-V4 | **Branche `android` désalignée** | ⚠️ | Constaté le 20/07 : `master` a **247 commits** que `android` n'a pas, et `android` en a **288** en propre. L'application mobile ne reçoit donc plus les correctifs web depuis longtemps, et « porter un correctif » n'a plus de sens fichier par fichier. C'est un **chantier de réalignement** à planifier (fusion, résolution de conflits, build APK, test sur appareil) — à ne pas improviser au milieu d'une autre tâche. Bloque de fait REL-V3 et le portage de S02A-25. |
+| REL-V5 | Composant `<Toaster />` jamais monté | ✅ | Constaté le 20/07 : `react-hot-toast` était installé et appelé **41 fois** dans l'application (caisse, commandes, clients, paramètres, studio…), mais le composant `<Toaster />` n'était rendu **nulle part**. Aucune confirmation d'enregistrement ni message d'erreur n'a jamais été visible. Corrigé dans `src/main.jsx`, avec les jetons de thème pour le mode sombre. |
 
 ---
 
