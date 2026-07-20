@@ -198,3 +198,18 @@ Le calibrage n'est pas un choix technique. Trois scénarios possibles :
 
 Recommandation : **scénario 1 + 3**. Le 1 rend le programme réel, le 3 supprime l'inversion
 entre plans. Les valeurs exactes appartiennent à la direction.
+
+
+### Tous les réglages sont désormais éditables en admin (20/07)
+
+La direction peut recalibrer **sans développeur ni redéploiement** :
+
+| Réglage | Où l'éditer |
+|---|---|
+| Points par client / commande / activation | Config du plan (écran Plans) |
+| Seuil de conversion | Config du plan |
+| **Durée du bonus obtenu** (`bonus_jours_conversion`) | Config du plan — *était figée à 31 jours* |
+| **Paliers Bronze/Argent/Or/Platine** | `GET/PUT /admin/vitrine/paliers-fidelite` — *étaient codés en dur* |
+
+Les valeurs actuelles sont **inchangées** : seule la possibilité de les modifier a été ouverte.
+Le tri croissant des paliers est forcé côté serveur (un ordre incohérent fausserait le palier affiché).
