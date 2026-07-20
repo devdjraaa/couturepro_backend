@@ -105,6 +105,23 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         return response()->json(['ok' => true]);
     });
 
+    // Lectures manquantes : ces réglages n'avaient qu'une route d'ÉCRITURE.
+    // On pouvait donc les écraser à l'aveugle, jamais les relire — et aucun
+    // écran ne pouvait afficher la valeur courante avant de la modifier.
+    Route::get('vitrine/paliers-fidelite', fn () => response()->json(['paliers' => \App\Models\VitrineSetting::paliersFidelite()]));
+    Route::get('vitrine/coordonnees',      fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
+    // Lecture ADMIN : renvoie TOUS les moyens, actifs ou non. L'endpoint
+    // métier ne sert que les actifs — le réutiliser ici ferait disparaître de
+    // l'écran tout moyen désactivé, qu'on ne pourrait alors plus jamais
+    // réactiver.
+    Route::get('vitrine/moyens-paiement',  fn () => response()->json(['moyens' => \App\Models\VitrineSetting::moyensPaiement()]));
+    // Le mot de passe VASAT n'est JAMAIS renvoyé, même en admin : seul son
+    // état d'activation est lisible. Un hachage exposé se casse hors ligne.
+    Route::get('vitrine/vasat', fn () => response()->json([
+        'actif'    => (bool) (\App\Models\VitrineSetting::vasat()['actif'] ?? false),
+        'defini'   => ! empty(\App\Models\VitrineSetting::vasat()['mdp_hash']),
+    ]));
+
     // Coordonnées officielles (PDF, WhatsApp) — éditables sans redéploiement.
     Route::put('vitrine/coordonnees', function (\Illuminate\Http\Request $r) {
         $d = $r->validate([
@@ -129,7 +146,6 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::put('vitrine/moderation-avis', [VitrineController::class, 'setModerationAvis']);
 
     // S08C-30 : moyens de paiement de la facturation (FedaPay en V1)
-    Route::get('vitrine/moyens-paiement', [VitrineController::class, 'moyensPaiement']);
     Route::put('vitrine/moyens-paiement', [VitrineController::class, 'setMoyensPaiement']);
 
     // Point 57 : catalogue d'événements dynamiques (célébrations), config-driven.
