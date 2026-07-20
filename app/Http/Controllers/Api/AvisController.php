@@ -24,7 +24,11 @@ class AvisController extends Controller
         $data = $request->validate([
             'auteur_nom'    => ['required', 'string', 'max:80'],
             'note'          => ['required', 'integer', 'min:1', 'max:5'],
-            'texte'         => ['nullable', 'string', 'max:600'],
+            // Correctif prioritaire (direction, 20/07) : le texte était FACULTATIF —
+            // un avis partait vide, sans le moindre message d'erreur. Les trois
+            // champs (nom, note, texte) sont désormais obligatoires. Le minimum de
+            // 10 caractères écarte les « ok » et autres saisies vides de sens.
+            'texte'         => ['required', 'string', 'min:10', 'max:600'],
             'photos'        => ['nullable', 'array', 'max:3'],   // P137 : jusqu'à 3 photos
             'photos.*'      => ['image', 'max:4096'],            // 4 Mo par photo
             // S08C-29e : avis ciblant une collection précise (facultatif).
