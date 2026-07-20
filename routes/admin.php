@@ -75,6 +75,18 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/paliers-fidelite', [VitrineController::class, 'getPaliersFidelite']);
     Route::put('vitrine/paliers-fidelite', [VitrineController::class, 'setPaliersFidelite']);
 
+    // Coordonnées officielles (PDF, WhatsApp) — éditables sans redéploiement.
+    Route::put('vitrine/coordonnees', function (\Illuminate\Http\Request $r) {
+        $d = $r->validate([
+            'marque'    => ['required', 'string', 'max:60'],
+            'site'      => ['required', 'string', 'max:120'],
+            'telephone' => ['required', 'string', 'max:30'],
+        ]);
+        \App\Models\VitrineSetting::updateOrCreate(['cle' => 'coordonnees'], ['valeur' => $d]);
+
+        return response()->json($d);
+    });
+
     // MVP réseaux sociaux (20/07) : stats des pages officielles, lecture seule.
     Route::get('reseaux/statut',        [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'statut']);
     Route::put('reseaux/facebook',      [\App\Http\Controllers\Admin\ReseauxSociauxController::class, 'configurerFacebook']);

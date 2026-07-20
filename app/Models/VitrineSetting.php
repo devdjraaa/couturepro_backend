@@ -107,6 +107,22 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Coordonnées officielles de la marque, utilisées dans les documents et
+     * partages sortants (PDF de mesures, message WhatsApp). Éditables en admin :
+     * un changement de numéro ne doit pas demander un redéploiement.
+     */
+    public static function coordonnees(): array
+    {
+        $cfg = static::where('cle', 'coordonnees')->value('valeur');
+
+        return array_merge([
+            'marque'    => 'Gextimo',
+            'site'      => 'www.gextimo.novafriq.africa',
+            'telephone' => '+229 01 91 47 96 28',
+        ], is_array($cfg) ? $cfg : []);
+    }
+
+    /**
      * Makila — horaires de présence de l'ÉQUIPE HUMAINE (direction, 20/07).
      * Le badge « hors ligne » ne concerne que la disponibilité d'un humain :
      * Makila, lui, répond 24h/24 sans interruption. Bascule automatique sur

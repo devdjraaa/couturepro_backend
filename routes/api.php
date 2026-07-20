@@ -116,6 +116,10 @@ Route::post('vitrine/evenements', [GxtEvenementController::class, 'ingest'])->mi
 // ─── Pages légales éditables (footer vitrine) : lecture publique ───
 Route::get('vitrine/pages/{cle}', [\App\Http\Controllers\Api\PageLegaleController::class, 'show']);
 
+// Coordonnées officielles (marque, site, téléphone) : source unique pour les
+// documents et partages sortants — le front ne doit rien figer en dur.
+Route::get('vitrine/coordonnees', fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
+
 // ─── Veille n8n : dépôt des résultats hebdo (jeton partagé X-Veille-Token) ───
 Route::post('veille/ingest', [\App\Http\Controllers\Api\VeilleController::class, 'ingest'])->middleware('throttle:10,1');
 

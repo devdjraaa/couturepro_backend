@@ -235,6 +235,13 @@ class MesureController extends Controller
         $lignes[] = '';
         $lignes[] = '_Exporté le ' . now()->format('d/m/Y') . '_';
 
+        // Pt 6 (lot 2, 20/07) : bloc de signature sur tout partage sortant.
+        $c = \App\Models\VitrineSetting::coordonnees();
+        $lignes[] = '';
+        $lignes[] = 'Généré par ' . $c['marque'];
+        $lignes[] = $c['site'];
+        $lignes[] = '📞 ' . $c['telephone'];
+
         $message = implode("\n", $lignes);
         $phone   = preg_replace('/\D/', '', $client->telephone);
         $lien    = 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
