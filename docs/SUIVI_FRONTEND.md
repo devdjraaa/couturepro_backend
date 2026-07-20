@@ -97,10 +97,10 @@
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
 | EC-1 | Session persistante | ✅ | Vérifié : jeton stocké, session restaurée au chargement, purge si invalide. **Le problème n'est pas là.** |
-| EC-2 | Ouvrir l'espace client automatiquement | 🟡 | Après authentification, l'espace doit se charger **sans action supplémentaire**. |
+| EC-2 | Ouvrir l'espace client automatiquement | ✅ | ✅ **Fait.** Après authentification, l'espace client s'affiche directement. Si une action était en attente, elle est rejouée d'abord, puis l'utilisateur est ramené à la page d'où il venait.
 | EC-3 | **Reprise automatique de l'action initiale** | ✅ | ✅ **Fait.** `src/pages/vitrine/actionEnAttente.js` : intention mémorisée (type + payload + page de retour) en `sessionStorage`, valable 30 min, rejouée une seule fois après connexion. L'écran de connexion **dit pourquoi** il s'affiche. Générique : une nouvelle action n'a qu'un type à déclarer.
 | EC-4 | Gestion des échecs | ✅ | ✅ **Fait.** Succès et échec de la reprise sont annoncés. ⚠️ Au passage : le composant `<Toaster />` n'était **monté nulle part** — les 41 appels `toast.success`/`toast.error` de toute l'application ne produisaient rien. Corrigé dans `main.jsx`.
-| EC-5 | Couvrir **toutes** les actions | ⬜ | Ne pas corriger que l'abonnement : tester le même enchaînement pour les favoris et toute action nécessitant un compte, pour que le défaut ne réapparaisse pas ailleurs. |
+| EC-5 | Couvrir **toutes** les actions | ✅ | ✅ **Fait.** Enchaînement vérifié sur **toutes** les actions nécessitant un compte : *suivre un créateur* (rejeu de l'action) et *commander* (intention mémorisée **en plus** du paramètre d'URL — le paramètre seul ne survivait pas à un aller-retour hors du site). La reprise se déclenche aussi pour un utilisateur **déjà connecté**, cas où aucun écran de connexion ne venait la déclencher : l'intention serait restée en attente indéfiniment. *Liker*, *laisser un avis* et *acheter un patron* restent anonymes — aucun compte requis, donc rien à enchaîner.
 
 ---
 
