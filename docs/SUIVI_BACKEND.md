@@ -135,6 +135,27 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 
 ---
 
+## 9. Avis v2 — décisions direction du 20/07 (avis par modèle)
+
+> Document « décisions arrêtées » reçu le 20/07 au soir. Livré le jour même.
+> La piste « avis par collection » du 19/07 est **abandonnée** ; les 5 avis
+> historiques (anonymes, niveau créateur) sont conservés tels quels.
+
+| ID | Sujet | Statut | Détail / preuve |
+|---|---|---|---|
+| AV2-BUG | Avis sans texte (correctif prioritaire) | ✅ | Double faute : `texte` facultatif côté serveur ET erreurs avalées par un `catch` muet côté front. Trois champs obligatoires des deux côtés, messages précis. |
+| AV2-1 | Avis rattaché au modèle | ✅ | `avis.vetement_id` (FK nullable), migration `2026_07_20_150000_avis_par_modele`. |
+| AV2-2 | Un avis par compte et par modèle | ✅ | Index unique `(gxt_client_id, vetement_id)` + contrôle applicatif avec message clair. |
+| AV2-3 | Compte obligatoire | ✅ | `storePourModele` exige un `GxtClient` (401 `auth_requise`) ; l'ancienne route anonyme répond 410. |
+| AV2-7 | Signalement motivé | ✅ | Table `avis_signalements` (une empreinte = une voix), seuil **configurable**, motif grave = `revue_prioritaire` immédiate. **Jamais de dépublication automatique** — revue humaine. |
+| AV2-8 | Anti-spam | ✅ | Plafond d'avis/jour par compte + refus du même texte normalisé (30 j). Seuils dans `moderation_avis`. |
+| AV2-9 | « Achat vérifié » | ✅ | Colonne `achat_verifie` prête, logique différée (décision direction). |
+| AV2-11 | Photos validées avant publication | ✅ | `photos_statut` (en_attente/validees/refusees) ; le public ne voit que `validees` ; photos existantes réputées validées. |
+| AV2-12 | Mots bannis | ✅ | Liste **éditable en admin** (démarre vide, comme demandé), frontières de mots (pas de faux positifs sur mots contenus), avis publié mais marqué prioritaire — pas bloqué. |
+| AV2-ADM | File de modération | ✅ | Priorités en tête, filtre photos, compteurs, `GET/PUT admin/vitrine/moderation-avis`, « rétablir » purge les signalements individuels. |
+
+---
+
 ## 8. Reliquat ouvert (anciens trackers)
 
 | ID | Sujet | Statut | Détail / preuve |
@@ -142,7 +163,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | REL-1 | Déploiement automatique + cache nginx | ✅ | **RÉSOLU (19-20/07)** — trois problèmes distincts empilés : (1) le jeton HTTPS n'avait pas la portée `workflow` → **les 2 dépôts sont passés en SSH** (`github-djraa`), blocage levé ; (2) l'étape « Setup SSH » du CI n'avait ni délai ni tolérance → corrigée ; (3) **la vraie cause** des déploiements perdus : le secret `SSH_HOST` du dépôt backend, réécrit avec l'IP littérale. Déploiement automatique rétabli et vérifié. Le correctif nginx (immutable réservé aux assets hashés) est également poussé. |
 | REL-2 | Pré-rendu SEO (pt 125) | ⬜ | Recommandation prête, **à valider avant de toucher la production**. La vitrine est une application monopage : un robot sans JavaScript reçoit une coquille vide. |
 | REL-3 | « Mes Réalisations » sur mobile | ⬜ | Cache hors-ligne (100 brouillons/attente) à ajouter côté application native. |
-| REL-4 | Flux « Éditer les mesures » (pts 68-69) | ⬜ | Charger les libellés de mesures du type de vêtement dans l'éditeur existant. Mesures **par client** (arbitrage acté). Nécessite un test sur appareil. |
+| REL-4 | Flux « Éditer les mesures » (pts 68-69) | 🟡 | **Débloqué le 20/07** — l'étiquette « test appareil » cachait le vrai problème : la colonne `libelles_mesures` avait été **supprimée en avril** (le modèle Eloquent la référençait encore). Colonne rétablie, création/édition d'un modèle acceptent la liste, éditeur front + panneau `MesuresInline` en commande (fusion, jamais d'écrasement). **Reste : le test sur appareil.** Au passage : le `max:5` figé des Requests aurait plafonné un plan Studio à 5 photos malgré la limite par plan — corrigé.
 | REL-5 | Relecture juridique des pages légales | ℹ️ | Compléments rédigés et **surlignés en vert** ; relecture par un juriste = tâche équipe (pt 123). |
 | REL-6 | Clés externes | ℹ️ | GA4 / Meta Pixel / Clarity + Search Console : **bloqué**, dépend de la direction. |
 
