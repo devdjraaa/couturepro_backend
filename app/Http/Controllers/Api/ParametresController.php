@@ -121,8 +121,10 @@ class ParametresController extends Controller
             'site_web'       => $atelier->site_web,
             'latitude'       => $atelier->latitude,
             'longitude'      => $atelier->longitude,
-            'banniere_url'   => $atelier->banniere_url,
-            'banniere_type'  => $atelier->banniere_type,
+            'banniere_url'     => $atelier->banniere_url,
+            'banniere_type'    => $atelier->banniere_type,
+            // VIT-3 : cadrage choisi par le créateur, en fractions de l'image.
+            'banniere_cadrage' => $atelier->banniere_cadrage,
         ]);
     }
 
@@ -147,9 +149,55 @@ class ParametresController extends Controller
         }
 
         $path = $file->store('ateliers/' . $atelier->id . '/banniere', 'public');
-        $atelier->update(['banniere_path' => $path, 'banniere_type' => $type]);
 
-        return response()->json(['banniere_url' => $atelier->banniere_url, 'banniere_type' => $type]);
+        // VIT-3 : le cadrage est remis à zéro. Conserver celui de l'image
+        // précédente appliquerait un recadrage calculé sur une autre photo — le
+        // créateur verrait sa nouvelle bannière tronquée sans comprendre.
+        $atelier->update([
+            'banniere_path'    => $path,
+            'banniere_type'    => $type,
+            'banniere_cadrage' => null,
+        ]);
+
+        return response()->json([
+            'banniere_url'     => $atelier->banniere_url,
+            'banniere_type'    => $type,
+            'banniere_cadrage' => null,
+        ]);
+    }
+
+    /**
+     * VIT-3 — PUT /parametres/atelier/banniere/cadrage
+     *
+     * Le recadrage interactif se fait à l'écran ; ici on ne stocke que le
+     * RÉSULTAT, en fractions de l'image (0 → 1). Pas en pixels : la même
+     * bannière est servie à des tailles différentes selon l'écran, et un
+     * cadrage en pixels deviendrait faux dès la première miniature.
+     */
+    public function cadrerAtelierBanniere(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+
+        if (! $atelier->banniere_path) {
+            return response()->json(['message' => 'Aucune bannière à cadrer.'], 422);
+        }
+
+        $data = $request->validate([
+            'x'        => ['required', 'numeric', 'min:0', 'max:1'],
+            'y'        => ['required', 'numeric', 'min:0', 'max:1'],
+            'largeur'  => ['required', 'numeric', 'min:0.05', 'max:1'],
+            'hauteur'  => ['required', 'numeric', 'min:0.05', 'max:1'],
+        ]);
+
+        // Le cadre doit tenir DANS l'image. Sans ce contrôle, un cadre qui
+        // déborde afficherait des bandes vides sur le profil public.
+        if ($data['x'] + $data['largeur'] > 1.0001 || $data['y'] + $data['hauteur'] > 1.0001) {
+            return response()->json(['message' => 'Le cadrage dépasse les limites de l\'image.'], 422);
+        }
+
+        $atelier->update(['banniere_cadrage' => $data]);
+
+        return response()->json(['banniere_cadrage' => $atelier->fresh()->banniere_cadrage]);
     }
 
     public function supprimerAtelierBanniere(Request $request): JsonResponse

@@ -32,6 +32,7 @@ class Atelier extends Model
         'logo_path',
         'banniere_path',
         'banniere_type',
+        'banniere_cadrage',
         'instagram',
         'facebook',
         'site_web',
@@ -47,6 +48,7 @@ class Atelier extends Model
     ];
 
     protected $casts = [
+        'banniere_cadrage' => 'array',
         'is_maitre'       => 'boolean',
         'is_demo'         => 'boolean',
         'contact_public'  => 'boolean',

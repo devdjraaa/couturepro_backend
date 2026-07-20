@@ -428,6 +428,8 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('parametres/atelier/logo',       [ParametresController::class, 'uploadAtelierLogo']);
     // P134 : bannière du profil créateur (photo/GIF/vidéo).
     Route::post('parametres/atelier/banniere',   [ParametresController::class, 'uploadAtelierBanniere']);
+    // VIT-3 : cadrage de la bannière (l'écran de recadrage est côté façade).
+    Route::put('parametres/atelier/banniere/cadrage', [ParametresController::class, 'cadrerAtelierBanniere']);
     Route::delete('parametres/atelier/banniere', [ParametresController::class, 'supprimerAtelierBanniere']);
     Route::post('parametres/demande-verification', [ParametresController::class, 'demanderVerification']);
     Route::get('parametres/communications',      [ParametresController::class, 'getCommunications']);
