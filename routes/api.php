@@ -382,6 +382,12 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     // CLI-2 — « Gextimo Infos » : onglet distinct des notifications. Une
     // notification concerne VOTRE atelier et appelle une action ; une info est
     // un message éditorial de Gextimo. Les mélanger noie les alertes.
+    //
+    // Volontairement SANS `equipe.permission` — contrairement aux notifications
+    // juste au-dessus. Une info est une communication de Gextimo à toute la
+    // communauté : annonces, formations, alertes de sécurité. La soumettre à
+    // une permission d'équipe reviendrait à cacher une alerte de sécurité aux
+    // employés d'un atelier, c'est-à-dire précisément aux personnes visées.
     Route::get('infos',                 [InfosController::class, 'index']);
     Route::get('infos/compteur',        [InfosController::class, 'compteur']);
     Route::post('infos/tout-lu',        [InfosController::class, 'toutMarquerLu']);
