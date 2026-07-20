@@ -1,29 +1,112 @@
-# Consolidation globale — tout ce qui a été demandé, rien d'oublié
+# Consolidation globale — tout ce qui a été demandé, trié ligne par ligne
 
-> Demande direction du 20/07 : centraliser **l'ensemble** des améliorations,
-> corrections et évolutions transmises à ce jour, pour confirmation avant la
-> suite. Générée le 20/07/2026 par extraction mécanique des suivis —
-> **aucune ligne n'a été retirée à la main**, chaque item garde sa source.
+> Demande direction du 20/07 : centraliser **l'ensemble** des demandes pour
+> confirmation avant la suite. Chaque ligne encore ouverte des anciens suivis a
+> été **pointée une à une** le 20/07 : *fait depuis* (avec preuve), *repris dans
+> le tracker courant*, *à faire* (re-tracé), ou *bloqué par un tiers*.
+> Rien n'a été supprimé — l'extraction brute reste en annexe, chaque item garde
+> la référence de sa source.
 >
 > Tracker interactif : https://gextimo.novafriq.africa/suivi-v2.html
-> (107 items, 77 faits — les 7 documents de retours de juillet + décisions Avis v2)
 
-## Vue d'ensemble
+## Vue d'ensemble après tri
 
-| Source | Total | Faits | Encore ouverts |
-|---|---|---|---|
-| SUIVI_NOVAFRIQ.md (ancien) | 212 | 156 | 52 (37 partiels, 12 à faire, 3 spec) |
-| SUIVI_SPEC_130.md (ancien) | 99 | 44 | 43 (34 partiels, 8 à faire, 1 bug) |
-| SUIVI_BACKEND.md (courant) | 75 | 53 | 4 |
-| SUIVI_FRONTEND.md (courant) | 50 | 23 | 23 |
-| Tracker v2 (courant, source de référence) | 107 | 77 | 28 |
-
-⚠️ Les items des anciens fichiers **recoupent largement** les suivis courants
-(les partiels de la spec 130 ont pour la plupart été achevés ensuite). Le
-détail ci-dessous permet de le vérifier ligne par ligne — c'est volontairement
-redondant : mieux vaut un doublon qu'un oubli.
+| Verdict | Nombre | Où |
+|---|---|---|
+| ✅ Fait depuis (l'ancien statut était périmé) | 17 | preuves §1 |
+| 📌 Déjà repris dans le tracker courant | 8 | IDs v2, §2 |
+| 🔧 À faire — re-tracé au tracker (groupes QA / VIT / CLI / INF) | ~45 | tracker v2 groupe 10, §3 |
+| ⛔ Bloqué par un tiers (direction / juriste / android) | ~15 | §4 |
 
 ---
+
+## 1. ✅ FAIT DEPUIS — statuts périmés des anciens fichiers
+
+| Source | Point | Preuve |
+|---|---|---|
+| Spec 130 | 8-9 / 107 / 130 — méthodes de connexion | **Décision direction du 18/07 : on garde e-mail OTP + Google.** Clos par décision. |
+| Spec 130 | 46 — consentement structuré client | Bandeau + préférences par finalité (P202), `POST /vitrine/client/consentement`. |
+| Spec 130 | 55 — réseaux sociaux Designer | Champs en base **et** rendus sur le profil public (P177 : Instagram, Facebook, LinkedIn, YouTube, TikTok). |
+| Spec 130 | 68 — refonte flux commande | Renommage + client visible + menu déroulant (18/07) + **mesures inline (20/07, testé sur appareil)**. |
+| Spec 130 | 69 — mesures par type de vêtement | **REL-4 livré et testé le 20/07** : `libelles_mesures` rétabli, éditeur, panneau en commande, fusion par client. |
+| Spec 130 | 72 — fidélité 1 client = 1 point | Crédit actif **aussi sur le chemin web** (ne marchait qu'en synchro), idempotent — 20/07. |
+| Spec 130 | 125 — pré-rendu SEO | **REL-2 livré et vérifié en prod le 20/07** — titres par page, contenu réel pour les robots. |
+| Novafriq | 4 — recommandation / boost | Scoring nocturne + sponsorisation + reco v1 livrés ; suite = algo de visibilité (`VISION_STRATEGIQUE.md`). |
+| Novafriq | P104-106 — permissions au changement de plan | **20/07 : référentiel appliqué CÔTÉ SERVEUR (54 routes)** — immédiateté UI à re-tester (→ QA-1). |
+| Novafriq | P136 — bandeau cookies | Bandeau + personnalisation par finalité en prod (P202). |
+| Novafriq | P140 — Mentions→CGU, page unique | Hub légal livré (pts 121-123) : `VitrineLegalPages` + `legal_hub`. |
+| Novafriq | P145 — indicateur FR / texte EN | Audit i18n complet OK + **décision direction : clos**. |
+| Novafriq | P149 — récupération de compte | Espace client **sans mot de passe** (OTP + Google) : récupération inhérente. |
+| Novafriq | P189 — e-mail support erroné | Plus aucune occurrence de `support@gextimo.africa` sur master. |
+| Novafriq | P197 — migration Cloudflare | Migrée — reste la phase 2 proxy (→ INF-1). |
+| Novafriq | SUG-1 — splash screen | Splash événementiel livré (config-driven) ; le module direction du 20/07 l'étend. |
+| Novafriq | P201 — alertes inscription / bienvenue | Notifications système en place — vérification d'usage → QA-1. |
+
+## 2. 📌 DÉJÀ REPRIS dans le tracker courant
+
+| Source | Point | ID tracker v2 |
+|---|---|---|
+| Spec 130 | 1-3 — vidéos (libellé, import, réorg) | VID-1 (Aquilas) + VID-4 |
+| Spec 130 | 99-100 — sync web/mobile caisse | REL-V4 puis REL-3 |
+| Spec 130 | 123 — conformité APDP/RGPD | REL-5 (juriste) |
+| Novafriq | 6/7 + P180-184 — menus header, barre contact, Documentation | VIT-1 (groupe 10) |
+| Novafriq | P115-118 — offline / file de sync | REL-V4 puis REL-3 |
+| Novafriq | P199 — Search Console / Bing | REL-6 (accès direction) — sitemaps prêts |
+| Novafriq | P203 — spec sécurité mobile v5 | REL-V4 + décision direction |
+| Novafriq | P165 — commission 15 % phase 2 | Décision direction déjà actée (« plus tard ») |
+
+## 3. 🔧 À FAIRE — re-tracé au tracker v2, groupe 10 « Reliquat re-trié »
+
+- **QA-1 — campagne de re-test** : pts 4-7, 15, 47, 49, 86-93, 94-95, 97, 106,
+  109 · P21, P28, P46, P48, P50-51, P58, P66-67, P82-91 (reste), P131, P135,
+  P201, P104-106 (immédiateté UI). Constats anciens à confirmer sur la version
+  actuelle — beaucoup sont probablement tombés avec les refontes.
+- **VIT-1 — structure vitrine (Aquilas)** : menus header Solutions / Tarifs /
+  Documentation (P181-184), barre de contact fine (P180 / 7), bulle retour
+  vitrine (98), onboarding client (16-22) et pro (67), P194 logo/CTA.
+- **VIT-2 — textes & retouches (Aquilas)** : message de confiance (12), P128
+  police, P132 header auth, P138 tarif footer, P142 liens footer, P143 nom de
+  menu, P187 / P192 / P193 textes, P190 footer APDP, SUG-23 / SUG-24,
+  P107 / P109 fluidité, 78 texte CGU, 84 ordre Paramètres, P178 « Bientôt ».
+- **CLI-1 — modules côté client (cadrage puis dev)** : notifications client
+  (24), code promo client (30) + admin codes (P1), newsletter (11), historique
+  des mises à jour (75), messages officiels (P167), récupération avancée (104),
+  compte à rebours (103), bibliothèque photos catégorisée (P152), détection
+  pays/devise (P135), type de document vérification (56), bug « Ajouter une
+  ville » (85), P114 tâches de fond.
+- **INF-1 — infra** : Cloudflare phase 2 (proxy) + soumission Search Console
+  dès que la direction fournit les accès.
+
+## 4. ⛔ BLOQUÉ PAR UN TIERS — rien à coder en l'état
+
+| Point | Attend |
+|---|---|
+| S08C-31b — recalibrage fidélité | **Direction** (valeurs éditables en admin, doc transmise) |
+| REL-3 / P115-118 / 99-100 / P203 — mobile offline | **Réalignement android** (REL-V4, chantier dédié) |
+| REL-5 / 123 / P139 — juridique | **Juriste** |
+| REL-6 / P199 — clés analytics + Search Console | **Direction** |
+| P53-55 — règles de downgrade de plan | **Décision direction** |
+| 25 — messagerie client↔créateur | **Cadrage direction** recommandé (nouveau module) |
+| P204 / P205 — partenaires, coordination lancement | **Direction** |
+| 5 — veille externe | Chantier séparé (décision direction) |
+
+---
+
+## Confirmation à envoyer à la direction (prête à copier)
+
+> Consolidation terminée : l'intégralité des demandes transmises à ce jour a été
+> pointée ligne par ligne (`CONSOLIDATION_GLOBALE.md` + tracker
+> https://gextimo.novafriq.africa/suivi-v2.html). 17 points marqués « en cours »
+> dans les anciens suivis étaient en réalité déjà livrés — preuves consignées.
+> Tout ce qui reste est soit re-tracé au tracker (groupes QA / Vitrine / Modules
+> client / Infra), soit en attente d'un élément de ta part : décisions fidélité
+> et downgrade, clés analytics et Search Console, relecture juridique, cadrage
+> de la messagerie interne. Rien n'est perdu : chaque ligne garde la référence
+> de sa source d'origine.
+
+---
+
+# Annexe — extraction brute (traçabilité, aucune ligne retirée)
 
 ## Ancien suivi général (déprécié) — `docs/SUIVI_NOVAFRIQ.md` (59 lignes ouvertes)
 
@@ -175,11 +258,3 @@ redondant : mieux vaut un doublon qu'un oubli.
 - ⚠️ **REL-V4** : Branche `android` désalignée — Constaté le 20/07 : `master` a 247 commits que `android` n'a pas, et `android` en a 288 en propre. L'application mobile ne reçoit donc plus les correctifs web depuis longtemps, et « porter un correctif » n'a plus de sens fichier par fichier. C'est un chantier de réalignement à planifier (fusion, résolution de conflits, build APK, test sur appareil) — à ne pas improvi
 
 ---
-
-## Ce qu'il reste à faire pour la confirmation à la direction
-
-1. Chaque ligne 🟡/⬜ des anciens fichiers doit être pointée : *fait depuis* /
-   *repris dans le tracker v2* / *à ajouter*. Le recoupement mécanique garantit
-   qu'aucune n'a disparu ; le tri fin se fait ligne à ligne.
-2. Une fois le tri terminé, réponse à la direction : « tout est pris en compte »,
-   avec ce fichier en preuve.
