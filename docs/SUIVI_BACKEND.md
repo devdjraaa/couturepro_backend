@@ -88,7 +88,7 @@ Ces constats changent le chiffrage. À valider avec la direction avant de lancer
 | ANN-7 | Diffusion 3× par jour pendant le boost | ✅ | **FAIT (19/07)** — `diffusions_par_jour` (3) exposé dans la config + les annonces boostées sont marquées et remontées en tête du flux public. La rotation d'affichage est côté front ↔ `SUIVI_FRONTEND.md#ANN-7`. |
 | ANN-8 | Flux public des annonces actives | ✅ | **FAIT (19/07)** — `GET /vitrine/annonces` : annonces en cours, boostées d'abord. Vérifié en prod. ↔ `SUIVI_FRONTEND.md#ANN-8` |
 | ANN-9 | Upload de la bannière | ✅ | **FAIT (19/07)** — upload et retrait de la bannière (avec/sans image géré côté rendu). |
-| ANN-10 | Modération des annonces | ⬜ | Aucun statut de validation ni route admin aujourd'hui. À arbitrer : modère-t-on les annonces ? |
+| ANN-10 | Modération des annonces | ✅ | **FAIT (20/07, décision direction)** — publication LIBRE (le designer ne doit pas attendre pour communiquer) + modération **a posteriori** en cas de contenu inapproprié. Même modèle que les avis : un signalement n'enlève rien, il alimente la file admin ; masquage avec motif obligatoire + notification au designer ; **masquage réversible** pour qu'un signalement abusif ne soit jamais définitif. |
 
 ---
 
