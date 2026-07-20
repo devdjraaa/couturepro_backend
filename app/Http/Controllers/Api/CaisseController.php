@@ -156,8 +156,13 @@ class CaisseController extends Controller
             ->withCount(
                 ['commandes as nb_commandes' => fn ($q) => $q->where('statut', '!=', 'annule')->where('is_archived', false)]
             )
-            ->having('total_prix', '>', 0)
+            // ⚠️ PAS de `having('total_prix', ...)` : cet alias vient d'une
+            // sous-requête `withSum`. MySQL le tolère, PostgreSQL le REFUSE
+            // (SQLSTATE 42703) — la production tournant sur PostgreSQL, cette
+            // liste répondait 500 alors qu'elle passait en développement.
+            // Le filtre se fait sur la collection, déjà parcourue juste après.
             ->get()
+            ->filter(fn ($c) => (float) ($c->total_prix ?? 0) > 0)
             ->map(fn ($c) => [
                 'id'             => $c->id,
                 'nom'            => $c->nom,
