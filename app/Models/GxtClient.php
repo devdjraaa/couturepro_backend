@@ -88,6 +88,10 @@ class GxtClient extends Authenticatable
     /** Dernier consentement enregistré (source de vérité pour l'interrupteur tracking). */
     public function dernierConsentement(): HasOne
     {
-        return $this->hasOne(GxtConsent::class, 'client_id')->latestOfMany();
+        // PAS latestOfMany() : il ajoute un tie-breaker MAX(id), or `id` est un
+        // UUID et PostgreSQL n'a pas de fonction max(uuid) → 500 dès qu'on lit ce
+        // consentement (connexion, /me). Même contournement que Atelier::abonnement :
+        // un simple tri décroissant sur created_at, sans agrégat.
+        return $this->hasOne(GxtConsent::class, 'client_id')->latest();
     }
 }
