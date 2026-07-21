@@ -41,22 +41,22 @@ trait ResolvesAtelier
 
     protected function getAtelier(Request $request): Atelier
     {
-        $user = $request->user();
+        // Même résolution que la variante tolérante, mais garantit un Atelier :
+        // `atelierMaitre` EST null tant qu'aucun atelier n'a été créé (entre
+        // l'inscription et la première configuration). Renvoyer null violait le
+        // type de retour `: Atelier` → 500 BRUT (des centaines dans le log).
+        // On répond désormais proprement, avec un code que le front peut
+        // reconnaître pour rediriger vers la création d'atelier.
+        $atelier = $this->getAtelierOuNull($request);
 
-        if ($user instanceof EquipeMembre) {
-            return $user->atelier;
+        if ($atelier === null) {
+            abort(response()->json([
+                'message' => "Aucun atelier n'est encore configuré pour ce compte.",
+                'code'    => 'atelier_absent',
+            ], 409));
         }
 
-        // Support multi-atelier : le frontend envoie X-Atelier-Id pour cibler un sous-atelier
-        $atelierIdHeader = $request->header('X-Atelier-Id');
-        if ($atelierIdHeader) {
-            $atelier = Atelier::where('id', $atelierIdHeader)
-                ->where('proprietaire_id', $user->id)
-                ->first();
-            if ($atelier) return $atelier;
-        }
-
-        return $user->atelierMaitre;
+        return $atelier;
     }
 
     /**
