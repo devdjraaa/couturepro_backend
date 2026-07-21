@@ -168,15 +168,26 @@ class ClientAuthController extends Controller
         ]);
     }
 
+    /**
+     * Longueur max de chaque champ de contexte, alignée sur la colonne SQL.
+     *
+     * On tronquait tout à 255 en aveugle — or ces colonnes font 60 à 120
+     * (seul `referrer_url` fait 255). Un UTM ou un referrer un peu long passait
+     * le filtre à 255 puis explosait à l'insertion (« value too long ») : le
+     * même 500 que le téléphone/l'e-mail. On tronque donc à la vraie taille.
+     */
+    private const LONGUEURS_CONTEXTE = [
+        'referrer_url' => 255, 'utm_campaign' => 120, 'utm_source' => 60,
+        'utm_medium' => 60, 'appareil' => 60, 'systeme_os' => 60,
+        'navigateur' => 60, 'pays' => 60, 'ville' => 60, 'langue' => 10,
+    ];
+
     /** Contexte d'acquisition/technique fourni par le front (uniquement les champs non vides). */
     private function contexte(Request $request): array
     {
-        $champs = ['utm_source', 'utm_medium', 'utm_campaign', 'referrer_url',
-            'appareil', 'systeme_os', 'navigateur', 'pays', 'ville', 'langue'];
-
-        return collect($request->only($champs))
+        return collect($request->only(array_keys(self::LONGUEURS_CONTEXTE)))
             ->filter(fn ($v) => filled($v))
-            ->map(fn ($v) => is_string($v) ? mb_substr($v, 0, 255) : $v)
+            ->map(fn ($v, $k) => is_string($v) ? mb_substr($v, 0, self::LONGUEURS_CONTEXTE[$k]) : $v)
             ->all();
     }
 
