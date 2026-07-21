@@ -135,6 +135,10 @@ class VitrineController extends Controller
             'bio'            => $atelier->bio,
             'banniere_url'   => $atelier->banniere_url,   // P134
             'banniere_type'  => $atelier->banniere_type,  // image | video
+            // VIT-3 : sans ce champ, le cadrage choisi par le créateur ne
+            // parviendrait jamais au profil public — l'image y resterait
+            // centrée d'office, et le réglage n'aurait aucun effet visible.
+            'banniere_cadrage' => $atelier->banniere_cadrage,
             'whatsapp'  => $whatsapp,
             'reseaux'   => [
                 'instagram' => $atelier->instagram,
