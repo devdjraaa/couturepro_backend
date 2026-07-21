@@ -23,7 +23,11 @@ PostgreSQL doit tourner :
 
 ```bash
 sudo systemctl start postgresql
-sudo systemctl enable postgresql   # facultatif : au démarrage
+sudo systemctl enable postgresql   # PAS facultatif : sans cela le service ne
+                                   # redémarre pas après un redémarrage de la
+                                   # machine, et toute la suite échoue sur
+                                   # « connection refused » — une erreur qui ne
+                                   # dit rien de la vraie cause.
 ```
 
 Créer le rôle et la base **dédiée** :
