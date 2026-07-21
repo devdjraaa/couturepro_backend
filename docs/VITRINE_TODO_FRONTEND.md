@@ -1,6 +1,14 @@
 ⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
-Le suivi frontend est désormais centralisé dans **`SUIVI_FRONTEND.md`** (Aquilas), ligne `REL-V1`.
-*Ce fichier reste la source des points vitrine encore ouverts, à basculer au fil de l'eau.*
+
+✅ **Bascule terminée le 21/07/2026.** Ce fichier ne fait plus foi pour rien.
+
+Les 19 points ont été repris : quatre étaient **déjà faits** (P135 détection pays/devise,
+P143 menu Galerie des artisans, P190/P142 footer APDP, P128 police du nom stylisé), les
+autres sont désormais suivis dans le **tracker HTML** sous `VIT-4` (header), `VIT-5`
+(bouton d'inscription sur mobile) et `VIT-6` (footer et textes).
+
+Le détail de chaque point reste lisible ci-dessous, comme référence — mais l'état
+d'avancement, lui, se lit dans le tracker.
 
 ---
 
