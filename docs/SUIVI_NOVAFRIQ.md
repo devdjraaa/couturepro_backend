@@ -564,3 +564,23 @@ Travaux récents (front branche `android` + back), avec les points qu'ils couvre
 - **Infra sync offline (android, en cours)** : P109, P114, P115-117, P118.
 - **Vitrine (confié au frontend, cf. VITRINE_TODO_FRONTEND.md)** : P180, P181-184.
 - **Revue UX transversale** : SUG-24.
+
+## 21/07 (soir) — QA sur appareil et garde-fous
+
+- **QA-3 ✅** — points 1-7, 68-69 et 86-89 testés **en pilotant l'application sur le téléphone**,
+  pas en lisant le code. Conformes sans changement : pt 1-3 (vidéo), pt 4, pt 86-87. Corrigés :
+  pt 5 (la catégorie ne suivait pas l'onglet ouvert), pt 6 (libellé de niveau absent des
+  traductions → chemin brut affiché ; `nb_pieces` avait le même défaut, non signalé), pt 7 (ordre
+  des onglets), pt 68-69 (panneau de mesures muet quand le type de vêtement n'a pas de libellés),
+  pt 88 (ciseaux génériques côté pros, « CP » de CouturePro côté admin). Pt 89 (repli de la barre)
+  **implémenté mais non vérifié à l'écran** — barre réservée au grand écran, à confirmer sur poste.
+- **OTA-1 ✅** — un paquet qui plante ne peut plus être confirmé comme sain. `notifyAppReady()`
+  partait au chargement du module : l'OTA 1.0.120 a été enregistrée « success » alors que l'écran
+  affichait l'erreur, et le retour automatique à la version précédente n'a pas pu se déclencher.
+  Confirmation désormais conditionnée à un arbre React monté + 8 s sans plantage.
+- **QA-4 ✅** — `verifier-traductions.mjs` accroché à la construction. Une clé absente s'affiche
+  telle quelle à l'écran sans que rien ne le signale. A trouvé du premier coup une occurrence en
+  production : `erreurs.generique`, montrée à l'administrateur sur toute erreur d'API sans message.
+- **ANN-8** — bande d'annonces : marge de barre d'état devenue fantôme après son déplacement
+  (67 px pour 29 px de texte), doublon CSS qui écrasait le correctif du figeage au toucher,
+  contenu non centré. Les trois corrigés et mesurés sur l'appareil.
