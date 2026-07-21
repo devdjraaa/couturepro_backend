@@ -226,8 +226,21 @@ class ProprietaireAuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $proprietaire = $request->user()->load('atelierMaitre.abonnement', 'atelierMaitre.parametres');
+        $user = $request->user();
 
-        return response()->json($proprietaire);
+        // Un membre d'équipe (assistant) n'a PAS de relation `atelierMaitre` :
+        // charger cette relation dessus levait « undefined relationship » → 500
+        // à CHAQUE rafraîchissement de session (ouverture de l'app), et l'assistant
+        // se retrouvait déconnecté. On lui renvoie la même forme que sa connexion.
+        if ($user instanceof \App\Models\EquipeMembre) {
+            return response()->json([
+                'membre'      => $user->only(['id', 'nom', 'prenom', 'role', 'code_acces', 'atelier_id']),
+                'permissions' => \App\Models\PermissionEquipe::getForAtelier($user->atelier_id, $user->role),
+            ]);
+        }
+
+        return response()->json(
+            $user->load('atelierMaitre.abonnement', 'atelierMaitre.parametres')
+        );
     }
 }
