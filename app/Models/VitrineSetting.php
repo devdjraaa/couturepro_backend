@@ -353,6 +353,74 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Veille opportunités — sources et mots-clés, ÉDITABLES sans redéploiement.
+     *
+     * L'ancienne veille passait par n8n avec des requêtes génériques en anglais :
+     * elle remontait des marchés de Noël en France et des articles MSN, et
+     * ratait l'essentiel — la Nuit du Kanvo Indigo au Bénin, par exemple.
+     *
+     * Google Actualités est interrogé en locale BÉNINOISE (gl=BJ, hl=fr) : il
+     * couvre d'un coup toute la presse locale (La Nouvelle Tribune, Banouto,
+     * 24h au Bénin, Matin Libre, Bénin Web TV…) sans avoir à brancher chaque
+     * site un par un. Les requêtes ciblées `site:` complètent sur l'officiel.
+     */
+    public static function veilleSources(): array
+    {
+        $cfg = static::where('cle', 'veille_sources')->value('valeur');
+        if (is_array($cfg) && $cfg !== []) {
+            return $cfg;
+        }
+
+        $requetes = [
+            // ── Cœur de métier, au Bénin ──
+            'textile Bénin', 'mode Bénin', 'créateur mode Bénin', 'styliste Bénin',
+            'artisanat Bénin', 'couture Bénin', 'atelier couture Bénin',
+            'pagne tissé Bénin', 'kanvo Bénin', 'indigo Bénin', 'batik Bénin',
+            'coton Bénin transformation', 'GDIZ textile', 'Glo-Djigbé textile',
+            // ── Occasions à saisir ──
+            'salon artisanat Bénin', 'concours mode Bénin', 'défilé mode Bénin',
+            'foire artisanat Bénin', 'appel à projets Bénin artisanat',
+            'financement PME Bénin', 'subvention artisan Bénin',
+            'formation couture Bénin', 'exportation textile Bénin',
+            // ── Sources officielles ──
+            'site:pmepe.gouv.bj', 'site:gouv.bj textile', 'site:gouv.bj artisanat',
+            // ── Élargissement régional, sans quitter le sujet ──
+            "mode africaine Afrique de l'Ouest", 'textile UEMOA', 'mode Togo Bénin Niger',
+        ];
+
+        return array_map(
+            fn ($q) => [
+                'libelle' => $q,
+                // hl/gl/ceid en Bénin : c'est ce qui fait remonter la presse locale.
+                'url' => 'https://news.google.com/rss/search?q=' . rawurlencode($q)
+                    . '&hl=fr&gl=BJ&ceid=BJ:fr',
+            ],
+            $requetes,
+        );
+    }
+
+    /**
+     * Mots-clés de pertinence. Le Bénin pèse le plus lourd : la veille doit
+     * rester béninoise avant d'être africaine (demande direction).
+     */
+    public static function veilleMotsCles(): array
+    {
+        $cfg = static::where('cle', 'veille_mots_cles')->value('valeur');
+        if (is_array($cfg) && $cfg !== []) {
+            return $cfg;
+        }
+
+        return [
+            'benin'   => ['bénin', 'benin', 'cotonou', 'porto-novo', 'abomey', 'parakou',
+                          'ouidah', 'glo-djigbé', 'gdiz', 'kanvo', 'béninois', 'beninois'],
+            'metier'  => ['textile', 'mode', 'couture', 'artisan', 'artisanat', 'styliste',
+                          'pagne', 'tissu', 'indigo', 'batik', 'coton', 'confection', 'défilé'],
+            'occasion' => ['appel à projet', 'appel a projet', 'concours', 'salon', 'foire',
+                           'financement', 'subvention', 'formation', 'bourse', 'exportation'],
+        ];
+    }
+
+    /**
      * CLI-1 — Catégories de la bibliothèque photos (P152).
      *
      * Le serveur acceptait déjà n'importe quelle valeur, mais la liste proposée

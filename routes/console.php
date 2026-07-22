@@ -26,6 +26,11 @@ Schedule::command('abonnements:process-bonus-expiry')->dailyAt('01:00');
 // Rapport technique hebdo (PageSpeed, HTTPS, dispo) — lundi 7h, 2 sites.
 Schedule::command('veille:seo')->weeklyOn(1, '07:00');
 
+// Veille opportunités : QUOTIDIENNE (elle était hebdomadaire et ratait
+// l'essentiel). De nuit, car le tri par Makila tourne sur le modèle local et
+// prend une trentaine de secondes par article.
+Schedule::command('veille:opportunites')->dailyAt('04:30');
+
 // ─── Espace client (P202 Phase 4) ───────────────────────────────────────────
 // Recalcul nocturne des synthèses client (engagement/segment/RFM/CLV) et designer
 // (score de confiance, revenus/prédiction) à partir de gxt_evenements + commandes.
