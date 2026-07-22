@@ -6,20 +6,30 @@ use App\Http\Controllers\Controller;
 use App\Models\Commande;
 use App\Models\CommandeItem;
 use App\Models\Vetement;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommandeItemController extends Controller
 {
+    use AuthorizesRequests;
+
     // GET /commandes/{commande}/items
     public function index(Commande $commande): JsonResponse
     {
+        // Le middleware de permission ne contrôle que le RÔLE, pas la
+        // propriété : sans ceci, l'UUID d'une commande d'un autre atelier
+        // suffisait à la lire et à la modifier.
+        $this->authorize('view', $commande);
+
         return response()->json($commande->items()->with('vetement:id,nom')->get());
     }
 
     // POST /commandes/{commande}/items
     public function store(Request $request, Commande $commande): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         $data = $request->validate([
             'items'                 => ['required', 'array', 'min:1'],
             'items.*.vetement_id'   => ['nullable', 'uuid', 'exists:vetements,id'],
@@ -52,6 +62,8 @@ class CommandeItemController extends Controller
     // PUT /commandes/{commande}/items/{item}
     public function update(Request $request, Commande $commande, CommandeItem $item): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         if ($item->commande_id !== $commande->id) {
             return response()->json(['message' => 'Non autorisé.'], 403);
         }
@@ -78,6 +90,8 @@ class CommandeItemController extends Controller
     // DELETE /commandes/{commande}/items/{item}
     public function destroy(Commande $commande, CommandeItem $item): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         if ($item->commande_id !== $commande->id) {
             return response()->json(['message' => 'Non autorisé.'], 403);
         }

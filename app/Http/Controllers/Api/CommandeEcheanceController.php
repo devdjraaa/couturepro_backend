@@ -5,20 +5,30 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Commande;
 use App\Models\CommandeEcheance;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommandeEcheanceController extends Controller
 {
+    use AuthorizesRequests;
+
     // GET /commandes/{commande}/echeances
     public function index(Commande $commande): JsonResponse
     {
+        // Le middleware de permission ne contrôle que le RÔLE, pas la
+        // propriété : sans ceci, l'UUID d'une commande d'un autre atelier
+        // suffisait à la lire et à la modifier.
+        $this->authorize('view', $commande);
+
         return response()->json($commande->echeances);
     }
 
     // POST /commandes/{commande}/echeances
     public function store(Request $request, Commande $commande): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         $data = $request->validate([
             'date_echeance' => ['required', 'date', 'after_or_equal:today'],
             'note'          => ['nullable', 'string', 'max:500'],
@@ -37,6 +47,8 @@ class CommandeEcheanceController extends Controller
     // PUT /commandes/{commande}/echeances/{echeance}
     public function update(Request $request, Commande $commande, CommandeEcheance $echeance): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         if ($echeance->commande_id !== $commande->id) {
             return response()->json(['message' => 'Non autorisé.'], 403);
         }
@@ -59,6 +71,8 @@ class CommandeEcheanceController extends Controller
     // DELETE /commandes/{commande}/echeances/{echeance}
     public function destroy(Commande $commande, CommandeEcheance $echeance): JsonResponse
     {
+        $this->authorize('update', $commande);
+
         if ($echeance->commande_id !== $commande->id) {
             return response()->json(['message' => 'Non autorisé.'], 403);
         }
