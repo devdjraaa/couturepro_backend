@@ -368,6 +368,9 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('devis/{devis}/traiter',  [DevisController::class, 'traiter']);
 
     // Équipe
+    // Ce que chaque rôle peut faire, dans CET atelier : le patron choisissait
+    // un rôle sans savoir ce qu'il accordait.
+    Route::get('equipe/roles', [EquipeMembreController::class, 'roles']);
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);
     Route::post('equipe',                   [EquipeMembreController::class, 'store']);
     Route::delete('equipe/{membre}',        [EquipeMembreController::class, 'destroy']);

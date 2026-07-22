@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\ResolvesAtelier;
 use App\Models\Atelier;
 use App\Models\EquipeMembre;
+use App\Models\PermissionEquipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -22,6 +23,45 @@ class EquipeMembreController extends Controller
             ->get(['id', 'nom', 'prenom', 'telephone', 'role', 'code_acces', 'derniere_sync_at', 'created_at']);
 
         return response()->json($membres);
+    }
+
+    /**
+     * GET /equipe/roles — ce que chaque rôle peut faire, DANS CET ATELIER.
+     *
+     * Le patron choisissait un rôle dans une liste sans savoir ce qu'il
+     * accordait. Le seul indice affiché — « Création & archivage » pour
+     * l'assistant — était même devenu faux : ses droits ont été élargis le
+     * 20/07 (modification des clients, commandes et mesures, encaissement),
+     * et la mention n'a pas suivi. Une description écrite à la main dérive
+     * dès qu'on touche aux permissions.
+     *
+     * On renvoie donc les droits EFFECTIFS, lus là où ils sont appliqués, et
+     * atelier par atelier : un patron peut avoir resserré les siens, et lui
+     * montrer les valeurs par défaut lui mentirait.
+     *
+     * Le refus est aussi utile que l'autorisation — « ne peut pas supprimer »
+     * est ce qui décide un patron à confier un rôle plutôt qu'un autre. On
+     * renvoie donc les deux listes.
+     */
+    public function roles(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        $toutes  = PermissionEquipe::ALL_PERMISSIONS;
+
+        $roles = [];
+        foreach (['assistant', 'membre'] as $role) {
+            $accordees = PermissionEquipe::getForAtelier((string) $atelier->id, $role);
+            $roles[] = [
+                'role'     => $role,
+                'accorde'  => array_values(array_intersect($toutes, $accordees)),
+                'refuse'   => array_values(array_diff($toutes, $accordees)),
+            ];
+        }
+
+        return response()->json([
+            'roles'       => $roles,
+            'permissions' => $toutes,
+        ]);
     }
 
     public function store(Request $request): JsonResponse
