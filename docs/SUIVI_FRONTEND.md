@@ -132,11 +132,11 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| VID-1 | **Lecture intégrée** (embed) | ⬜ | Aujourd'hui un lien YouTube renvoie **vers YouTube** (simple lien sortant, dans `src/pages/vitrine/CreateurProfilPage.jsx` et `src/pages/StudioPage.jsx`). Attendu, à la manière de Notion : vidéo **intégrée dans une carte**, lecture **sans quitter Gextimo**, avec lecture/pause, barre de progression, muet, volume, plein écran, + bouton pour ouvrir sur YouTube. **Cartes de taille uniforme**, affichage en **grille**. |
+| VID-1 | **Lecture intégrée** (embed) | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** Lecteur intégré livré : `src/components/video/CarteVideo.jsx` (iframe chargée **au clic seulement** — six lecteurs posés d'emblée alourdissent la page), cadre 16/9 uniforme, vignette, fichiers importés lus par `<video>`. Analyse des liens dans `src/utils/videoEmbed.js` : YouTube (watch, court, Shorts, live), Vimeo, Dailymotion, avec refus propre d'une URL non reconnue. Monté sur le studio **et** sur le profil public du créateur. |
 | VID-2 | Compteur visible | ✅ | ✅ **Fait.** Compteur servi par `GET /atelier-videos/quota` (plafond du plan, illimité géré, corrections restantes du mois). Le « /50 » en dur affiché à tout le monde a disparu.
-| VID-3 | Règles de modification | ⬜ | Gratuit : une seule vidéo, une nouvelle **remplace** l'ancienne, aucune correction/suppression mensuelle. Atelier : **1** correction/suppression par mois. Studio : **2**. Compteur mensuel affiché. ↔ la route de modification n'existe pas encore côté serveur. |
-| VID-4 | Import direct de vidéo | ⬜ | Deux entrées possibles : **lien YouTube** ou **import d'un fichier** (tous les créateurs n'ont pas de chaîne). Mode d'affichage adapté selon la source. |
-| VID-5 | Statut « en attente de validation » | 🟡 | 🟡 **Partiel.** Statut de modération affiché par vidéo côté créateur (en validation / refusée, motif en infobulle). **Restant : l'écran de validation côté admin** — aucune page admin vidéos n'existe côté front.
+| VID-3 | Règles de modification | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** Quota mensuel de corrections piloté par le plan (`AtelierVideoController`, « plus rien en dur »), route `PUT /atelier-videos/{id}` en place. |
+| VID-4 | Import direct de vidéo | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** Import direct de fichier : `AtelierVideo::SOURCE_FICHIER`, colonne `fichier_path`, formulaire du studio (13 occurrences fichier/upload). |
+| VID-5 | Statut « en attente de validation » | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** Statut « en attente de validation » : `STATUT_EN_ATTENTE` imposé à la création — aucune publication immédiate — avec `STATUT_PUBLIEE` / `STATUT_REFUSEE`, `motif_refus` et délai annoncé au créateur. |
 
 ---
 
@@ -167,7 +167,7 @@
 |---|---|---|---|
 | REL-V1 | Points vitrine ouverts | ⬜ | Reprendre le contenu encore ouvert de `VITRINE_TODO_FRONTEND.md` (barre de contact, header/footer, textes web). Ce fichier est **déprécié** : les points actifs sont à basculer ici au fil de l'eau. |
 | REL-V2 | Pré-rendu SEO | ⬜ | La vitrine est une application monopage : un robot sans JavaScript reçoit une **coquille vide** et le **même titre** sur toutes les pages. Recommandation prête (métadonnées par page + pré-rendu). ⚠️ **À valider avant de toucher la production.** |
-| REL-V3 | « Mes Réalisations » sur mobile | ⬜ | Ajouter le cache hors-ligne (100 brouillons/en attente) côté application native, branche `android`. |
+| REL-V3 | « Mes Réalisations » sur mobile | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** Couvert par `realisationsCache.js` (cache traversant, cent entrées, priorité aux brouillons et dossiers en attente) **et** par la route et l'entrée de menu ajoutées le 22/07 — la page était jusque-là importée sans être routée. |
 | REL-V4 | Branches `master` et `android` distinctes | ℹ️ | **Décision, pas dette (22/07).** L'écart entre les deux branches est **voulu** : « c'est normal, mobile est différent de master », « ne cherche pas à vouloir rendre les deux identiques ». Un correctif web n'est donc **pas porté d'office** sur mobile. Exemple du jour : l'arc du splash a été relevé au pixel sur le logo côté web, alors qu'android garde sa version allégée pour la fluidité de la WebView — « android laisse, c'est déjà bon comme ça ». Deux versions du même écran, chacune juste dans son contexte. Ne plus compter cet écart comme un risque. |
 | REL-V5 | Composant `<Toaster />` jamais monté | ✅ | Constaté le 20/07 : `react-hot-toast` était installé et appelé **41 fois** dans l'application (caisse, commandes, clients, paramètres, studio…), mais le composant `<Toaster />` n'était rendu **nulle part**. Aucune confirmation d'enregistrement ni message d'erreur n'a jamais été visible. Corrigé dans `src/main.jsx`, avec les jetons de thème pour le mode sombre. |
 
