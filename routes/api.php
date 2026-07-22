@@ -157,8 +157,11 @@ Route::get('vitrine/desinscription/{client}', function (\App\Models\GxtClient $c
     ]);
 })->name('vitrine.desinscription')->middleware('signed');
 
-// ─── Veille n8n : dépôt des résultats hebdo (jeton partagé X-Veille-Token) ───
+// ─── Veille : dépôt et lecture par l'automate (jeton partagé X-Veille-Token) ───
+// La collecte est faite par `veille:opportunites` ; n8n lit le relevé pour en
+// envoyer le digest. L'ingestion reste ouverte pour toute source extérieure.
 Route::post('veille/ingest', [\App\Http\Controllers\Api\VeilleController::class, 'ingest'])->middleware('throttle:10,1');
+Route::get('veille/jour', [\App\Http\Controllers\Api\VeilleController::class, 'jour'])->middleware('throttle:30,1');
 
 // ─── Chatbot vitrine (brief 16/07 pt 1) : assistance + mémoire des échanges ───
 Route::prefix('vitrine/chatbot')->group(function () {
