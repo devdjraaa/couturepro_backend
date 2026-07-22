@@ -38,7 +38,7 @@
 | Novafriq | P145 — indicateur FR / texte EN | Audit i18n complet OK + **décision direction : clos**. |
 | Novafriq | P149 — récupération de compte | Espace client **sans mot de passe** (OTP + Google) : récupération inhérente. |
 | Novafriq | P189 — e-mail support erroné | Plus aucune occurrence de `support@gextimo.africa` sur master. |
-| Novafriq | P197 — migration Cloudflare | Migrée — reste la phase 2 proxy (→ INF-1). |
+| Novafriq | P197 — migration Cloudflare | Migrée — phase 2 proxy PARTIELLE (22/07) : activée sur novafriq.africa seul, pas sur gextimo.*/gextimoapi.* (→ INF-1). |
 | Novafriq | SUG-1 — splash screen | Splash événementiel livré (config-driven) ; le module direction du 20/07 l'étend. |
 | Novafriq | P201 — alertes inscription / bienvenue | Notifications système en place — vérification d'usage → QA-1. |
 
@@ -74,8 +74,11 @@
   compte à rebours (103), bibliothèque photos catégorisée (P152), détection
   pays/devise (P135), type de document vérification (56), bug « Ajouter une
   ville » (85), P114 tâches de fond.
-- **INF-1 — infra** : Cloudflare phase 2 (proxy) + soumission Search Console
-  dès que la direction fournit les accès.
+- **INF-1 — infra** : Cloudflare proxy activé sur novafriq.africa (vérifié 22/07,
+  fonctionnel) mais PAS sur gextimo.novafriq.africa ni gextimoapi.novafriq.africa —
+  les deux qui portent le vrai trafic sont encore en direct (IP VPS exposée). À
+  basculer en Proxied côté DNS Cloudflare, puis vérifier SSL + allowNavigation
+  (capacitor.config.json). Search Console : toujours pas de vérification en place.
 
 ## 4. ⛔ BLOQUÉ PAR UN TIERS — rien à coder en l'état
 
