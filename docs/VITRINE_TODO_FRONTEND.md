@@ -25,11 +25,9 @@ d'avancement, lui, se lit dans le tracker.
 
 ## 1. Header & navigation
 
-### 🟡 P180 — Barre de contact fine au-dessus du header
-**PARTIEL — vérifié le 22/07.** Une barre de contact existe (`ContactBar`, VitrineChrome.jsx) mais
-autre contenu que la spec : e-mail, fond clair, centrée — au lieu de téléphone **+229 01 91 47 96 28**
-+ WhatsApp, fond sombre, alignée à droite. À confirmer avec la direction/Aquilas : évolution
-assumée du design, ou reste à faire tel quel spécifié.
+### ✅ P180 — Barre de contact fine au-dessus du header
+**FAIT — 22/07.** Refaite conforme à la spec : fond sombre, alignée à droite, téléphone
+**+229 01 91 47 96 28** puis WhatsApp du même numéro, séparateur vertical.
 
 ### 🟡 P181 — Menu déroulant « Solutions »
 **STRUCTURE FAITE — vérifié le 22/07.** `NavDropdown` existe et fonctionne, mais contenu différent :
@@ -37,15 +35,18 @@ Créateurs / Espace client / Artisans, au lieu de Application Mobile Artisan/Des
 probablement plus pertinent pour une vitrine WEB (liens app mobile ont peu de sens ici) — à
 confirmer que c'est un choix assumé, pas un oubli.
 
-### 🟡 P182 — Menu déroulant « Tarifs »
-**STRUCTURE FAITE — vérifié le 22/07.** Contenu différent : Plans / Boost, au lieu de
-Artisans/Designers/Web séparés — probablement une simplification assumée (un seul barème de plans
-pour tous types de comptes). À confirmer.
+### ℹ️ P182 — Menu déroulant « Tarifs »
+**TRANCHÉ — 22/07 : contenu actuel conservé, pas un oubli.** La spec demande 3 tarifs séparés
+(Artisans/Designers/Web) ; vérifié : une seule page de tarifs existe, sans distinction par type de
+compte. Trois libellés différents pointant vers la même page auraient été trompeurs. Le contenu
+actuel (Plans / Boost) correspond à l'architecture réelle du produit.
 
-### 🟡 P183-184 — Menu « Documentation » (cartes) + page
-**PARTIEL — vérifié le 22/07.** Le menu déroulant existe mais renvoie vers des pages génériques
-(Aide/Suivi/Qui sommes-nous), pas vers les 3 cartes spécifiques ci-dessous. Le HTML « déjà conçu,
-fourni par la direction » n'est ni dans le dépôt ni accessible pour cette session — à transmettre.
+### ✅ P183-184 — Menu « Documentation » (cartes) + page
+**FAIT — 22/07.** Dropdown mis à jour avec les 3 rubriques et leur texte exact (Créer votre
+vitrine / Tarifs & Commissions / Vos données & sécurité), chacune vers le contenu réel. Page
+`/documentation` créée en complément (cartes, accès direct). Le HTML « déjà conçu » de la
+direction n'a pas été retrouvé — mise en page reconstruite dans le système de design existant,
+cohérente avec le reste du site plutôt qu'identique à un visuel non fourni.
 Menu déroulant « Documentation » avec 3 cartes (icône + titre + petite description) :
 1. **Créer votre vitrine** — publier ses collections, gérer sa boutique en ligne ;
 2. **Tarifs & Commissions** — comprendre les formules Gratuite/Standard/Premium avant de s'inscrire ;
