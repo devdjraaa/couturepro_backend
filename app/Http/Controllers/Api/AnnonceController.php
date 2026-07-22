@@ -37,6 +37,12 @@ class AnnonceController extends Controller
             'annonces' => $annonces,
             'quota'    => $this->infoQuota($atelier->id),
             'boost'    => VitrineSetting::boostAnnonce(),
+            // Les bornes voyagent avec la liste, comme les tarifs du Boost :
+            // l'écran ne recalcule aucune règle, il affiche ce que le serveur
+            // autorise. Elles n'étaient exposées que par `/annonces/quota`, que
+            // cet écran n'appelle pas — il codait donc « 1 à 10 » en dur, et
+            // aurait ignoré tout changement de limite.
+            'duree'    => ['min' => Annonce::DUREE_MIN, 'max' => Annonce::DUREE_MAX],
         ]);
     }
 
