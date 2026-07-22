@@ -95,7 +95,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
-    Route::post('signaler',                      [SignalementController::class, 'store']);
+    Route::post('signaler',                      [SignalementController::class, 'store'])->middleware('throttle:10,60');
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
     // Brief 16/07 (pt 6) : habillage saisonnier local (overlay d'ouverture, config admin).
     Route::get('splash-theme',                   [VitrineController::class, 'splashTheme']);
