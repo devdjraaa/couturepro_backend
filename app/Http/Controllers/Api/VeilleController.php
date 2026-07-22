@@ -8,10 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-// Veille opportunités : ingestion depuis n8n (jeton partagé) + consultation admin.
+// Veille opportunités : collecte par `veille:opportunites`, dépôt ouvert aux
+// sources extérieures (jeton partagé), lecture par l'automate et par l'admin.
 class VeilleController extends Controller
 {
-    /** POST /api/veille/ingest — appelé par n8n chaque lundi (en-tête X-Veille-Token). */
+    /**
+     * POST /api/veille/ingest — dépôt d'un relevé par une source extérieure
+     * (en-tête X-Veille-Token). La collecte quotidienne passe désormais par
+     * `veille:opportunites` et écrit directement ; cette route reste ouverte
+     * pour toute source tierce qui voudrait alimenter la veille.
+     */
     public function ingest(Request $request): JsonResponse
     {
         $tokenAttendu = config('services.veille_ingest.token');
@@ -79,11 +85,21 @@ class VeilleController extends Controller
         ]);
     }
 
-    /** GET /admin/veille — 8 dernières semaines, sélection IA en tête. */
+    /**
+     * GET /admin/veille — les derniers relevés, sélection de Makila en tête.
+     *
+     * La colonne s'appelle encore `semaine` : elle datait du rythme
+     * hebdomadaire de l'automate. Elle porte désormais un JOUR. Le nom est
+     * conservé pour ne pas casser la route d'ingestion, que des sources
+     * extérieures peuvent appeler ; seul le pas de temps a changé.
+     *
+     * D'où 14 relevés au lieu de 8 : à raison d'un par jour, huit ne
+     * couvraient plus qu'une semaine d'historique.
+     */
     public function index(): JsonResponse
     {
         $semaines = DB::table('gxt_veille_items')
-            ->select('semaine')->distinct()->orderByDesc('semaine')->limit(8)->pluck('semaine');
+            ->select('semaine')->distinct()->orderByDesc('semaine')->limit(14)->pluck('semaine');
 
         $resultat = $semaines->map(function ($semaine) {
             $items = DB::table('gxt_veille_items')->where('semaine', $semaine)
