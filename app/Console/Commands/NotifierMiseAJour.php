@@ -28,7 +28,10 @@ class NotifierMiseAJour extends Command
 {
     protected $signature = 'app:notifier-maj
                             {version : Numéro de la version publiée}
-                            {--majeure : Version native (installation requise) plutôt qu\'une mise à jour à chaud}';
+                            {--majeure : Version native (installation requise) plutôt qu\'une mise à jour à chaud}
+                            {--titre= : Intitulé de la nouveauté, inscrit au journal « Quoi de neuf »}
+                            {--ligne=* : Détail de la nouveauté (répétable)}
+                            {--type=amelioration : nouveaute|amelioration|correction}';
 
     protected $description = "Prévient les professionnels qu'une mise à jour est disponible";
 
@@ -36,6 +39,12 @@ class NotifierMiseAJour extends Command
     {
         $version = (string) $this->argument('version');
         $majeure = (bool) $this->option('majeure');
+
+        // Le journal « Quoi de neuf » était rempli À LA MAIN : on publiait des
+        // versions, on prévenait les professionnels… et l'écran des nouveautés
+        // restait figé plusieurs jours en arrière. La publication l'alimente
+        // désormais elle-même, si la version n'y figure pas déjà.
+        $this->inscrireAuJournal($version);
 
         // Le titre et le détail viennent du journal des nouveautés quand la
         // version y est décrite : c'est là que se trouve le vrai contenu.
@@ -103,5 +112,36 @@ class NotifierMiseAJour extends Command
         ));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Ajoute la version au journal « Quoi de neuf » si elle n'y est pas.
+     * On n'écrase JAMAIS une entrée existante : la direction peut l'avoir
+     * rédigée à la main, et sa formulation vaut mieux que la nôtre.
+     */
+    private function inscrireAuJournal(string $version): void
+    {
+        $entrees = collect(VitrineSetting::journalMaj());
+
+        if ($entrees->contains(fn ($e) => ($e['version'] ?? null) === $version)) {
+            return;
+        }
+
+        $titre = (string) ($this->option('titre') ?: 'Améliorations et corrections');
+        $lignes = array_values(array_filter((array) $this->option('ligne')));
+
+        $entrees->push([
+            'version' => $version,
+            'date'    => now('Africa/Porto-Novo')->toDateString(),
+            'titre'   => mb_substr($titre, 0, 120),
+            'type'    => in_array($this->option('type'), ['nouveaute', 'amelioration', 'correction'], true)
+                ? $this->option('type')
+                : 'amelioration',
+            'lignes'  => array_slice($lignes, 0, 10),
+        ]);
+
+        VitrineSetting::updateOrCreate(['cle' => 'journal_maj'], ['valeur' => $entrees->values()->all()]);
+
+        $this->line("Version {$version} inscrite au journal « Quoi de neuf ».");
     }
 }
