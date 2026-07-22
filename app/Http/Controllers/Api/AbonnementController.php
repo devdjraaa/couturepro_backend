@@ -209,13 +209,20 @@ class AbonnementController extends Controller
 
     public function activerCode(Request $request): JsonResponse
     {
-        $request->validate(['code' => ['required', 'string', 'size:12']]);
+        // Le code généré en admin vaut « COUP- » + 8 caractères = 13, or on exigeait
+        // exactement 12 : la saisie était rejetée AVANT même la recherche. On borne
+        // large plutôt que de figer une longueur — la recherche est de toute façon
+        // une égalité exacte sur une colonne unique et indexée.
+        $request->validate(['code' => ['required', 'string', 'max:32']]);
 
         $atelier     = $this->getAtelier($request);
         $code        = strtoupper(trim($request->code));
 
         $transaction = TransactionAbonnement::where('code_transaction', $code)
-            ->where('statut', 'actif')
+            // Un code neuf est créé « disponible » (cf. Admin\TransactionController).
+            // On cherchait « actif », valeur que la contrainte de la table
+            // n'autorise même pas : aucun code n'a donc jamais pu être utilisé.
+            ->where('statut', 'disponible')
             ->whereNull('utilise_at')
             ->where(function ($q) use ($atelier) {
                 $q->whereNull('atelier_id')->orWhere('atelier_id', $atelier->id);
