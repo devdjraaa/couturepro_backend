@@ -38,6 +38,12 @@ Schedule::command('veille:opportunites')
     ->withoutOverlapping(30)
     ->appendOutputTo(storage_path('logs/veille.log'));
 
+// Une heure et demie après l'envoi prévu du digest : le temps que l'automate
+// ait eu sa chance, sans attendre la journée pour constater un silence.
+Schedule::command('veille:verifier-digest')
+    ->dailyAt('09:00')
+    ->appendOutputTo(storage_path('logs/veille.log'));
+
 // ─── Espace client (P202 Phase 4) ───────────────────────────────────────────
 // Recalcul nocturne des synthèses client (engagement/segment/RFM/CLV) et designer
 // (score de confiance, revenus/prédiction) à partir de gxt_evenements + commandes.

@@ -87,6 +87,37 @@ class VeilleController extends Controller
     }
 
     /**
+     * POST /api/veille/digest-envoye — l'automate signale qu'il a fait son travail.
+     *
+     * Une alerte posée DANS le workflow ne se déclenche pas si le workflow ne
+     * tourne pas : n8n arrêté, planificateur désactivé, machine redémarrée —
+     * les pannes les plus probables sont justement celles qu'il ne peut pas
+     * signaler lui-même.
+     *
+     * On inverse donc la charge de la preuve : l'automate annonce sa réussite,
+     * et c'est l'ABSENCE de cette annonce qui déclenche l'alerte, depuis le
+     * planificateur Laravel qui, lui, est surveillé. Le silence devient un
+     * signal au lieu d'être invisible.
+     */
+    public function digestEnvoye(Request $request): JsonResponse
+    {
+        $tokenAttendu = config('services.veille_ingest.token');
+        abort_if(! $tokenAttendu || ! hash_equals($tokenAttendu, (string) $request->header('X-Veille-Token')), 401);
+
+        VitrineSetting::updateOrCreate(
+            ['cle' => 'veille_digest_dernier_envoi'],
+            ['valeur' => [
+                'jour'     => now('Africa/Porto-Novo')->toDateString(),
+                'horodate' => now()->toIso8601String(),
+                'articles' => (int) $request->input('total', 0),
+                'retenus'  => (int) $request->input('retenus', 0),
+            ]],
+        );
+
+        return response()->json(['ok' => true]);
+    }
+
+    /**
      * GET /admin/veille/config — recherches et mots-clés de pertinence.
      *
      * Ils étaient « éditables en base », donc éditables par personne : il
@@ -177,6 +208,12 @@ class VeilleController extends Controller
             ];
         });
 
-        return response()->json($resultat);
+        // L'incident remonte AVEC les relevés : c'est le seul écran qu'on ouvre
+        // pour la veille, et une alerte qu'il faut aller chercher ailleurs
+        // n'est pas une alerte.
+        return response()->json([
+            'releves'  => $resultat,
+            'incident' => VitrineSetting::where('cle', 'veille_incident')->value('valeur'),
+        ]);
     }
 }

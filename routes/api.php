@@ -162,6 +162,10 @@ Route::get('vitrine/desinscription/{client}', function (\App\Models\GxtClient $c
 // envoyer le digest. L'ingestion reste ouverte pour toute source extérieure.
 Route::post('veille/ingest', [\App\Http\Controllers\Api\VeilleController::class, 'ingest'])->middleware('throttle:10,1');
 Route::get('veille/jour', [\App\Http\Controllers\Api\VeilleController::class, 'jour'])->middleware('throttle:30,1');
+// L'automate confirme l'envoi du digest : c'est l'ABSENCE de cette confirmation
+// qui déclenche l'alerte, une alerte interne au workflow ne pouvant rien
+// signaler quand le workflow lui-même ne tourne pas.
+Route::post('veille/digest-envoye', [\App\Http\Controllers\Api\VeilleController::class, 'digestEnvoye'])->middleware('throttle:10,1');
 
 // ─── Chatbot vitrine (brief 16/07 pt 1) : assistance + mémoire des échanges ───
 Route::prefix('vitrine/chatbot')->group(function () {
