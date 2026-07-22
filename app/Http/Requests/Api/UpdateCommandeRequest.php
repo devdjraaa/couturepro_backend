@@ -21,7 +21,7 @@ class UpdateCommandeRequest extends FormRequest
             'note_interne'             => ['sometimes', 'nullable', 'string', 'max:1000'],
             'description'              => ['sometimes', 'nullable', 'string', 'max:2000'],
             'urgence'                  => ['sometimes', 'nullable', 'boolean'],
-            'photo_tissu'              => ['sometimes', 'nullable', 'image', 'max:8192'],
+            'photo_tissu'              => ['sometimes', 'nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:8192'],
         ];
     }
 }

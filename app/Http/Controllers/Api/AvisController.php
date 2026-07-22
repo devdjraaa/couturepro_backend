@@ -70,7 +70,7 @@ class AvisController extends Controller
             // vide partait sans message. Les trois champs sont obligatoires.
             'texte'      => ['required', 'string', 'min:10', 'max:600'],
             'photos'     => ['nullable', 'array', 'max:3'],
-            'photos.*'   => ['image', 'max:4096'],
+            'photos.*'   => ['image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
         ]);
 
         $reglages = VitrineSetting::moderationAvis();

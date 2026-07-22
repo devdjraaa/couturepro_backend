@@ -115,7 +115,7 @@ class TicketSupportController extends Controller
     {
         $data = $request->validate([
             'message' => ['required', 'string', 'max:5000'],
-            'photo'   => ['nullable', 'image', 'max:5120'],
+            'photo'   => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
         ]);
 
         $atelier = $this->getAtelier($request);

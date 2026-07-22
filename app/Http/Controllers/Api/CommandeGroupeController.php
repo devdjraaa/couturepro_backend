@@ -59,7 +59,7 @@ class CommandeGroupeController extends Controller
             'sous_commandes.*.urgence'               => ['nullable', 'boolean'],
             'sous_commandes.*.mode_paiement_acompte' => ['nullable', 'in:especes,mobile_money,virement'],
             'sous_commandes.*.motif_surplus_acompte' => ['nullable', 'string', 'max:500'], // P14-16 : motif si acompte > total
-            'sous_commandes.*.photo_tissu'           => ['nullable', 'image', 'max:4096'], // P24 : photo tissu par article
+            'sous_commandes.*.photo_tissu'           => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'], // P24 : photo tissu par article
         ]);
 
         // P14-16 : un acompte ne peut dépasser le total d'un article (prix × quantité) sans motif.

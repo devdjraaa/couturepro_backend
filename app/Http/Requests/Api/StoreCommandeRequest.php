@@ -36,7 +36,7 @@ class StoreCommandeRequest extends FormRequest
             'note_interne'          => ['nullable', 'string', 'max:1000'],
             'description'           => ['nullable', 'string', 'max:2000'],
             'urgence'                => ['nullable', 'boolean'],
-            'photo_tissu'            => ['nullable', 'image', 'max:8192'],
+            'photo_tissu'            => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:8192'],
             'mode_paiement_acompte'  => ['nullable', 'in:especes,mobile_money,virement'],
         ];
     }

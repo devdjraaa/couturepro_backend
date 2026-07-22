@@ -69,7 +69,7 @@ class TicketController extends Controller
         $data = $request->validate([
             'contenu'         => ['required', 'string', 'max:5000'],
             'is_note_interne' => ['boolean'],
-            'photo'           => ['nullable', 'image', 'max:5120'],
+            'photo'           => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
         ]);
 
         $pjPath = null;
