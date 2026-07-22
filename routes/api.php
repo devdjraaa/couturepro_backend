@@ -424,6 +424,9 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     // S08C-30 : moyens de paiement de la facturation (source unique, éditable en admin)
     Route::get('moyens-paiement',                [VitrineController::class, 'moyensPaiement']);
     Route::put('parametres/profil',              [ParametresController::class, 'updateProfil']);
+    // Photo de profil : elle n'existait pas — le propriétaire restait sur ses initiales.
+    Route::post('parametres/profil/photo',       [ParametresController::class, 'uploadPhotoProfil']);
+    Route::delete('parametres/profil/photo',     [ParametresController::class, 'supprimerPhotoProfil']);
     Route::put('parametres/atelier',             [ParametresController::class, 'updateAtelier']);
     Route::post('parametres/atelier/logo',       [ParametresController::class, 'uploadAtelierLogo']);
     // P134 : bannière du profil créateur (photo/GIF/vidéo).

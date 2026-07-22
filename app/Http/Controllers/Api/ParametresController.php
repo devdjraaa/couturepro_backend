@@ -436,6 +436,45 @@ class ParametresController extends Controller
         return response()->json(['logo_url' => $atelier->logo_url]);
     }
 
+    /**
+     * POST /api/parametres/profil/photo — photo de profil du propriétaire.
+     *
+     * Les clients avaient une photo, le propriétaire non : il ne voyait que ses
+     * initiales sans aucun moyen d'y remédier. Mêmes règles que le logo
+     * d'atelier — formats d'image explicites (la règle `image` nue accepterait
+     * le SVG, qui peut porter du script) et ancienne photo supprimée du disque.
+     */
+    public function uploadPhotoProfil(Request $request): JsonResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+
+        $proprietaire = $request->user();
+
+        if ($proprietaire->photo_path) {
+            Storage::disk('public')->delete($proprietaire->photo_path);
+        }
+
+        $chemin = $request->file('photo')->store('proprietaires/' . $proprietaire->id, 'public');
+        $proprietaire->update(['photo_path' => $chemin]);
+
+        return response()->json(['photo_url' => $proprietaire->fresh()->photo_url]);
+    }
+
+    /** DELETE /api/parametres/profil/photo — revenir aux initiales. */
+    public function supprimerPhotoProfil(Request $request): JsonResponse
+    {
+        $proprietaire = $request->user();
+
+        if ($proprietaire->photo_path) {
+            Storage::disk('public')->delete($proprietaire->photo_path);
+            $proprietaire->update(['photo_path' => null]);
+        }
+
+        return response()->json(['photo_url' => null]);
+    }
+
     // POST /api/parametres/demande-verification — le créateur demande le badge vérifié
     // (pièce justificative et/ou lien). L'admin tranche ensuite via /admin/ateliers/{id}/verifier.
     public function demanderVerification(Request $request): JsonResponse

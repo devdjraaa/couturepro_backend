@@ -2,21 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class Proprietaire extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasUuids, Notifiable, SoftDeletes;
 
+    protected $appends = ['photo_url'];
+
     protected $fillable = [
         'telephone',
         'email',
+        'photo_path',
         'nom',
         'prenom',
         'nom_atelier',
@@ -63,6 +68,17 @@ class Proprietaire extends Authenticatable
     }
 
     // Normalise systématiquement le numéro à l'écriture.
+    /**
+     * URL de la photo de profil. On stocke le CHEMIN et on reconstruit l'URL à
+     * la lecture : le domaine du disque public peut changer, pas les fichiers.
+     */
+    protected function photoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->photo_path ? url(Storage::url($this->photo_path)) : null,
+        );
+    }
+
     public function setTelephoneAttribute($value): void
     {
         $this->attributes['telephone'] = self::normalizePhone($value);
