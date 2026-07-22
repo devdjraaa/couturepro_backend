@@ -25,21 +25,27 @@ d'avancement, lui, se lit dans le tracker.
 
 ## 1. Header & navigation
 
-### ⬜ P180 — Barre de contact fine au-dessus du header
-Ajouter, juste au-dessus du header, une fine barre de contact : fond sombre, alignée à droite,
-sur une seule ligne, avec une icône téléphone suivie du numéro (**+229 01 91 47 96 28**), un
-séparateur vertical, puis une icône WhatsApp avec le même numéro. Style sobre, hauteur fine
-(~36-40 px), texte blanc.
+### 🟡 P180 — Barre de contact fine au-dessus du header
+**PARTIEL — vérifié le 22/07.** Une barre de contact existe (`ContactBar`, VitrineChrome.jsx) mais
+autre contenu que la spec : e-mail, fond clair, centrée — au lieu de téléphone **+229 01 91 47 96 28**
++ WhatsApp, fond sombre, alignée à droite. À confirmer avec la direction/Aquilas : évolution
+assumée du design, ou reste à faire tel quel spécifié.
 
-### ⬜ P181 — Menu déroulant « Solutions »
-Entre « Comment ça marche » et « Créateurs », avec : **Application Mobile Artisan** et
-**Application Mobile Designer** (icône à gauche, couleurs rouge/noir Gextimo).
-S'inspirer du menu déroulant « Solutions » de **kkiapay.com**.
+### 🟡 P181 — Menu déroulant « Solutions »
+**STRUCTURE FAITE — vérifié le 22/07.** `NavDropdown` existe et fonctionne, mais contenu différent :
+Créateurs / Espace client / Artisans, au lieu de Application Mobile Artisan/Designer. Choix
+probablement plus pertinent pour une vitrine WEB (liens app mobile ont peu de sens ici) — à
+confirmer que c'est un choix assumé, pas un oubli.
 
-### ⬜ P182 — Menu déroulant « Tarifs »
-Avec : **Tarifs Artisans**, **Tarifs Designers**, **Tarifs Web** — même style que le menu Solutions.
+### 🟡 P182 — Menu déroulant « Tarifs »
+**STRUCTURE FAITE — vérifié le 22/07.** Contenu différent : Plans / Boost, au lieu de
+Artisans/Designers/Web séparés — probablement une simplification assumée (un seul barème de plans
+pour tous types de comptes). À confirmer.
 
-### ⬜ P183-184 — Menu « Documentation » (cartes) + page
+### 🟡 P183-184 — Menu « Documentation » (cartes) + page
+**PARTIEL — vérifié le 22/07.** Le menu déroulant existe mais renvoie vers des pages génériques
+(Aide/Suivi/Qui sommes-nous), pas vers les 3 cartes spécifiques ci-dessous. Le HTML « déjà conçu,
+fourni par la direction » n'est ni dans le dépôt ni accessible pour cette session — à transmettre.
 Menu déroulant « Documentation » avec 3 cartes (icône + titre + petite description) :
 1. **Créer votre vitrine** — publier ses collections, gérer sa boutique en ligne ;
 2. **Tarifs & Commissions** — comprendre les formules Gratuite/Standard/Premium avant de s'inscrire ;
@@ -50,9 +56,9 @@ renvoie vers la bonne section de la page Documentation. La rubrique amène sur u
 cartes** ; chaque carte ouvre le contenu complet correspondant (**déjà conçu — voir le HTML
 fourni par la direction**).
 
-### ⬜ P132 — Header / retour sur les pages inscription-connexion
-Aucun moyen de revenir en arrière depuis inscription/connexion. Le header doit être présent sur
-toutes les pages — retour via clic sur le logo (→ accueil) ou icône « accueil » visible partout.
+### ✅ P132 — Header / retour sur les pages inscription-connexion
+**FAIT — vérifié le 22/07.** Header simplifié explicitement tagué « VIT-2 — P132 » dans
+VitrineChrome.jsx : logo cliquable vers l'accueil + lien « retour à la vitrine ».
 
 ### 🟡 P131 — Bouton « S'inscrire » absent sur mobile
 Visible sur desktop mais pas sur la version mobile du header. À ajouter sur mobile aussi.
@@ -71,8 +77,8 @@ Header actuel : « Comment ça marche », « Créateurs », « Artisans », « C
 ## 2. Footer & pages légales
 
 ### ⬜ P138 — Footer « Devenir créateur » : afficher le tarif
-Il manque le tarif dans la section « Devenir créateur » du footer (une référence visuelle a été
-envoyée séparément par la direction).
+**TOUJOURS OUVERT — vérifié le 22/07**, absent du footer. Bloqué sur la référence visuelle de la
+direction, non retrouvée dans cette session.
 
 ### 🟡 P139 — CGV complètes (marketplace)
 Il manque les CGV, indispensables pour une marketplace. Un document existe mais incomplet — une
