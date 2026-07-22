@@ -12,9 +12,15 @@ use App\Models\DemandeRecuperation;
 use App\Models\Proprietaire;
 use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\RateLimiter;
 
 class RecuperationController extends Controller
 {
+    /** Réponse secrète : 5 essais par NUMÉRO, puis 15 min de verrou.
+     *  Par compte et non par IP — la route délivre un jeton complet. */
+    private const MAX_ESSAIS_QUESTION = 5;
+    private const FENETRE_QUESTION    = 900;
+
     public function __construct(private OtpService $otpService) {}
 
     // Étape 1 : entrer l'email OU le téléphone → OTP envoyé sur l'email associé
@@ -203,15 +209,40 @@ class RecuperationController extends Controller
             'reponse_secrete' => ['required', 'string'],
         ]);
 
-        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($request->telephone))->first();
+        $telephone = Proprietaire::normalizePhone($request->telephone);
+
+        // Verrou PAR COMPTE, pas seulement par IP. Cette route délivre un jeton de
+        // session COMPLET si la réponse est bonne, et une réponse secrète est à
+        // faible entropie (un prénom, une ville, un nom d'animal). Sans compteur,
+        // elle se forçait en quelques milliers d'essais — et un throttle par IP se
+        // contourne en changeant d'IP. Le compteur suit le NUMÉRO visé.
+        $cle = 'question-secrete:' . $telephone;
+
+        if (RateLimiter::tooManyAttempts($cle, self::MAX_ESSAIS_QUESTION)) {
+            $minutes = (int) ceil(RateLimiter::availableIn($cle) / 60);
+
+            return response()->json([
+                'message' => "Trop de tentatives. Réessayez dans {$minutes} minute(s).",
+            ], 429);
+        }
+
+        $proprietaire = Proprietaire::where('telephone', $telephone)->first();
 
         if (!$proprietaire) {
+            RateLimiter::hit($cle, self::FENETRE_QUESTION);
+
             return response()->json(['message' => 'Aucun compte associé à ce numéro.'], 404);
         }
 
         if (!\Illuminate\Support\Facades\Hash::check($request->reponse_secrete, $proprietaire->reponse_secrete)) {
+            RateLimiter::hit($cle, self::FENETRE_QUESTION);
+
             return response()->json(['message' => 'Réponse incorrecte.'], 422);
         }
+
+        // Réussite : on relâche le verrou, le propriétaire légitime n'est pas puni
+        // par ses propres essais ratés.
+        RateLimiter::clear($cle);
 
         $token = $proprietaire->createToken('auth_token')->plainTextToken;
 

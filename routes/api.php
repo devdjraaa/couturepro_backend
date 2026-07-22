@@ -215,13 +215,13 @@ Route::post('suivi-sprints', [SuiviSprintController::class, 'save']);
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('inscription',   [ProprietaireAuthController::class, 'inscription'])->middleware('recaptcha'); // P196
-    Route::post('verifier-otp',  [ProprietaireAuthController::class, 'verifierOtp']);
-    Route::post('renvoyer-otp',  [ProprietaireAuthController::class, 'renvoyerOtp']);
+    Route::post('verifier-otp',  [ProprietaireAuthController::class, 'verifierOtp'])->middleware('throttle:10,1');
+    Route::post('renvoyer-otp',  [ProprietaireAuthController::class, 'renvoyerOtp'])->middleware('throttle:5,10');
     // P123 : corriger l'e-mail d'un compte non vérifié (tél + mot de passe) puis renvoi OTP
     Route::post('corriger-email', [ProprietaireAuthController::class, 'corrigerEmail'])
         ->middleware('throttle:5,1');
-    Route::post('login',         [ProprietaireAuthController::class, 'login']);
-    Route::post('equipe/login',  [EquipeMembreAuthController::class, 'login']);
+    Route::post('login',         [ProprietaireAuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::post('equipe/login',  [EquipeMembreAuthController::class, 'login'])->middleware('throttle:10,1');
 
     // P150 : connexion sociale (Google/Facebook/Apple) — actifs selon les clés .env.
     Route::get('social/providers',          [SocialAuthController::class, 'providers']);
@@ -232,16 +232,16 @@ Route::prefix('auth')->group(function () {
         ->middleware('throttle:10,1');
 
     Route::prefix('recuperation')->group(function () {
-        Route::post('initier',              [RecuperationController::class, 'etape1']);
-        Route::post('verifier-otp',         [RecuperationController::class, 'etape2']);
-        Route::post('nouveau-telephone',    [RecuperationController::class, 'etape3']);
-        Route::post('verifier-otp-nouveau', [RecuperationController::class, 'etape4']);
-        Route::post('nouveau-mot-de-passe', [RecuperationController::class, 'etape5']);
+        Route::post('initier',              [RecuperationController::class, 'etape1'])->middleware('throttle:5,10');
+        Route::post('verifier-otp',         [RecuperationController::class, 'etape2'])->middleware('throttle:10,1');
+        Route::post('nouveau-telephone',    [RecuperationController::class, 'etape3'])->middleware('throttle:10,1');
+        Route::post('verifier-otp-nouveau', [RecuperationController::class, 'etape4'])->middleware('throttle:10,1');
+        Route::post('nouveau-mot-de-passe', [RecuperationController::class, 'etape5'])->middleware('throttle:10,1');
 
         // Recovery via question secrète : récupère la question puis valide la réponse
         // → retourne un token directement (pas de changement de mot de passe forcé)
-        Route::post('question/lire',     [RecuperationController::class, 'lireQuestionSecrete']);
-        Route::post('question/verifier', [RecuperationController::class, 'verifierQuestionSecrete']);
+        Route::post('question/lire',     [RecuperationController::class, 'lireQuestionSecrete'])->middleware('throttle:10,10');
+        Route::post('question/verifier', [RecuperationController::class, 'verifierQuestionSecrete'])->middleware('throttle:10,1');
     });
 });
 
