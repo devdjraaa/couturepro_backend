@@ -157,7 +157,7 @@
 | AV2-F1 | Formulaire par modèle | ✅ | Choix du modèle **obligatoire** + validation des trois champs + erreurs affichées (le `catch` muet avalait tout). |
 | AV2-F2 | Connexion avec rejeu | ✅ | Sans compte, l'avis saisi (texte compris) est mémorisé, la connexion s'ouvre en expliquant pourquoi, l'avis est **publié automatiquement** après connexion, retour au profil. Photos non conservées (fichiers) : le message le dit, sans promettre une édition qui n'existe pas. |
 | AV2-F3 | Signalement motivé | ✅ | 4 motifs en un clic (contenu illégal / insulte / discrimination / autre) — motif grave = revue prioritaire immédiate côté admin. |
-| AV2-F4 | UI admin de modération | ⬜ | **Pour toi** : écran des réglages (`GET/PUT admin/vitrine/moderation-avis` : seuils, motifs graves, mots bannis) + file photos en attente (`GET admin/avis?filtre=photos`, `POST admin/avis/{id}/photos` action valider/refuser). L'API est prête et documentée. |
+| AV2-F4 | UI admin de modération | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** `ModerationPage.jsx`, 3 onglets (Avis/Annonces/Vidéos), routé `/admin/moderation` et lié dans la barre latérale admin. Motif obligatoire à chaque retrait — repris tel quel dans l'avis envoyé au créateur. C'est le pendant du correctif des signalements : on ne sanctionne plus automatiquement (faille du 19/07 corrigée), il fallait donc pouvoir sanctionner à la main. |
 
 ---
 
