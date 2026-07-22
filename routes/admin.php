@@ -166,6 +166,11 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
         Route::get('avis',                    [AdminAvisController::class, 'index']);
         Route::post('avis/{avis}/masquer',    [AdminAvisController::class, 'masquer']);
         Route::post('avis/{avis}/retablir',   [AdminAvisController::class, 'retablir']);
+
+        // Créations signalées : équivalent MANUEL de la sanction automatique
+        // retirée (elle archivait un vêtement au 3ᵉ signalement anonyme).
+        Route::post('creations/{vetement}/archiver', [\App\Http\Controllers\Admin\CreationController::class, 'archiver']);
+        Route::post('creations/{vetement}/retablir', [\App\Http\Controllers\Admin\CreationController::class, 'retablir']);
         // Décision 11 : validation des photos jointes AVANT publication.
         Route::post('avis/{avis}/photos',     [AdminAvisController::class, 'modererPhotos']);
     });
