@@ -71,7 +71,7 @@ Route::prefix('vitrine')->group(function () {
     // Catalogue public (galerie de l'accueil vitrine) — alimente getCreations() côté front.
     Route::get('creations',            [VitrineController::class, 'creations']);
     // P159-160 : like public d'une création (anonyme, dé-doublonné par visitor_key).
-    Route::post('creations/{vetement}/like', [VitrineController::class, 'toggleLike']);
+    Route::post('creations/{vetement}/like', [VitrineController::class, 'toggleLike'])->middleware('throttle:20,60');
     // P173 : s'abonner / se désabonner d'un créateur (anonyme).
     Route::post('createurs/{atelier}/abonnement', [VitrineController::class, 'toggleAbonnement']);
     // P161-163 : patrons payants — achat (→ paiement), récupération par code, téléchargement.
@@ -93,7 +93,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('vasat/acces', [VitrineController::class, 'accesVasat'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/devis', [DevisController::class, 'store'])->middleware('throttle:5,10');
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
-    Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
+    Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement'])->middleware('throttle:30,60');
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
     Route::post('signaler',                      [SignalementController::class, 'store'])->middleware('throttle:10,60');
     Route::get('banniere',                       [VitrineController::class, 'banniere']);
