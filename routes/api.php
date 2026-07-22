@@ -75,7 +75,7 @@ Route::prefix('vitrine')->group(function () {
     // P173 : s'abonner / se désabonner d'un créateur (anonyme).
     Route::post('createurs/{atelier}/abonnement', [VitrineController::class, 'toggleAbonnement']);
     // P161-163 : patrons payants — achat (→ paiement), récupération par code, téléchargement.
-    Route::post('patrons/{patron}/acheter',              [PatronPublicController::class, 'acheter']);
+    Route::post('patrons/{patron}/acheter',              [PatronPublicController::class, 'acheter'])->middleware('throttle:10,10');
     Route::get('patrons/achats/{code}',                  [PatronPublicController::class, 'statut']);
     Route::get('patrons/achats/{code}/telecharger',      [PatronPublicController::class, 'telecharger']);
     // REL-2 / Pt 125 : pré-rendu HTML pour TOUS les robots (nginx route les
@@ -91,7 +91,7 @@ Route::prefix('vitrine')->group(function () {
     Route::post('creations/{vetement}/avis', [AvisController::class, 'storePourModele'])->middleware('throttle:5,60');
     // VASAT (produit masqué) : accès par mot de passe, anti force brute.
     Route::post('vasat/acces', [VitrineController::class, 'accesVasat'])->middleware('throttle:10,60');
-    Route::post('createurs/{atelier}/devis', [DevisController::class, 'store']);
+    Route::post('createurs/{atelier}/devis', [DevisController::class, 'store'])->middleware('throttle:5,10');
     Route::post('avis/{avis}/signaler',     [AvisController::class, 'signaler'])->middleware('throttle:10,60');
     Route::post('createurs/{atelier}/evenement', [VitrineStatsController::class, 'evenement']);
     Route::get('suivi/{reference}',              [VitrineController::class, 'suivi']);
@@ -109,7 +109,7 @@ Route::prefix('vitrine')->group(function () {
     // P204 : partenaires (liste par catégorie + bandeau accueil + candidature)
     Route::get('partenaires',                    [PartenairePublicController::class, 'index']);
     Route::get('partenaires/cles',               [PartenairePublicController::class, 'cles']);
-    Route::post('partenaires/candidature',       [PartenairePublicController::class, 'candidater']);
+    Route::post('partenaires/candidature',       [PartenairePublicController::class, 'candidater'])->middleware('throttle:5,60');
 });
 
 // ─── Tracking métier vitrine (P202 Phase 3) : ingestion groupée, connecté ou anonyme ───
@@ -210,7 +210,7 @@ Route::prefix('app')->group(function () {
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
 Route::get('suivi-sprints',  [SuiviSprintController::class, 'show']);
-Route::post('suivi-sprints', [SuiviSprintController::class, 'save']);
+Route::post('suivi-sprints', [SuiviSprintController::class, 'save'])->middleware('throttle:10,1');
 
 // ─── Auth publique ───────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
