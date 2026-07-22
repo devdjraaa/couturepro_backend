@@ -366,12 +366,42 @@ class VitrineSetting extends Model
      */
     public static function veilleSources(): array
     {
+        // Sources écrites en toutes lettres (URL complètes) : réservé aux flux
+        // qui ne sont pas des recherches Google Actualités.
         $cfg = static::where('cle', 'veille_sources')->value('valeur');
         if (is_array($cfg) && $cfg !== []) {
             return $cfg;
         }
 
-        $requetes = [
+        return array_map(
+            fn ($q) => [
+                'libelle' => $q,
+                // hl/gl/ceid en Bénin : c'est ce qui fait remonter la presse locale.
+                'url' => 'https://news.google.com/rss/search?q=' . rawurlencode($q)
+                    . '&hl=fr&gl=BJ&ceid=BJ:fr',
+            ],
+            static::veilleRecherches(),
+        );
+    }
+
+    /**
+     * Les termes de recherche, ÉDITABLES DEPUIS L'ADMINISTRATION.
+     *
+     * Ils étaient modifiables « en base », ce qui revenait à ne l'être pour
+     * personne : il fallait une console. La direction peut désormais en ajouter
+     * depuis l'écran de veille, sans déploiement ni intervention technique.
+     *
+     * On stocke le TERME, pas l'URL : personne n'a à connaître la forme des
+     * adresses de Google Actualités pour enrichir la recherche.
+     */
+    public static function veilleRecherches(): array
+    {
+        $cfg = static::where('cle', 'veille_recherches')->value('valeur');
+        if (is_array($cfg) && $cfg !== []) {
+            return array_values(array_filter(array_map('trim', $cfg)));
+        }
+
+        return [
             // ── Cœur de métier, au Bénin ──
             'textile Bénin', 'mode Bénin', 'créateur mode Bénin', 'styliste Bénin',
             'artisanat Bénin', 'couture Bénin', 'atelier couture Bénin',
@@ -387,16 +417,6 @@ class VitrineSetting extends Model
             // ── Élargissement régional, sans quitter le sujet ──
             "mode africaine Afrique de l'Ouest", 'textile UEMOA', 'mode Togo Bénin Niger',
         ];
-
-        return array_map(
-            fn ($q) => [
-                'libelle' => $q,
-                // hl/gl/ceid en Bénin : c'est ce qui fait remonter la presse locale.
-                'url' => 'https://news.google.com/rss/search?q=' . rawurlencode($q)
-                    . '&hl=fr&gl=BJ&ceid=BJ:fr',
-            ],
-            $requetes,
-        );
     }
 
     /**

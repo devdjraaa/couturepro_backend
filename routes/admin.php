@@ -55,6 +55,9 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
 
     // Veille opportunités (n8n) : consultation des résultats hebdo dans l'admin.
     Route::get('veille', [\App\Http\Controllers\Api\VeilleController::class, 'index']);
+    // Recherches et mots-clés enrichissables par la direction, sans déploiement.
+    Route::get('veille/config', [\App\Http\Controllers\Api\VeilleController::class, 'config']);
+    Route::put('veille/config', [\App\Http\Controllers\Api\VeilleController::class, 'setConfig']);
 
     // Signalements (modération)
     Route::get('signalements',                        [SignalementController::class, 'index']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\VitrineSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +84,69 @@ class VeilleController extends Controller
             'selection' => $items->where('ia_selection', true)->values(),
             'autres'    => $items->where('ia_selection', false)->values(),
         ]);
+    }
+
+    /**
+     * GET /admin/veille/config — recherches et mots-clés de pertinence.
+     *
+     * Ils étaient « éditables en base », donc éditables par personne : il
+     * fallait une console sur le serveur. La direction, qui connaît le terrain
+     * bien mieux que nous, peut désormais enrichir la recherche elle-même.
+     */
+    public function config(): JsonResponse
+    {
+        return response()->json([
+            'recherches' => VitrineSetting::veilleRecherches(),
+            'mots_cles'  => VitrineSetting::veilleMotsCles(),
+        ]);
+    }
+
+    /**
+     * PUT /admin/veille/config — enregistrement des recherches et mots-clés.
+     *
+     * Les listes sont nettoyées ici et non à l'affichage : un doublon ou un
+     * terme vide ferait interroger deux fois la même source, ou une source
+     * vide, à chaque exécution.
+     *
+     * Aucune liste ne peut être vidée entièrement : une veille sans terme de
+     * recherche ne remonte rien, et le constat n'arriverait que le lendemain,
+     * dans un digest vide dont personne ne comprendrait la cause.
+     */
+    public function setConfig(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'recherches'           => ['required', 'array', 'min:1', 'max:120'],
+            // `nullable` et non `required` : le nettoyage ci-dessous retire les
+            // entrées vides et les doublons. Les refuser ferait échouer tout
+            // l'enregistrement pour une ligne blanche restée dans le formulaire.
+            'recherches.*'         => ['nullable', 'string', 'max:120'],
+            'mots_cles'            => ['required', 'array'],
+            'mots_cles.benin'      => ['required', 'array', 'min:1', 'max:200'],
+            'mots_cles.benin.*'    => ['nullable', 'string', 'max:60'],
+            'mots_cles.metier'     => ['required', 'array', 'min:1', 'max:200'],
+            'mots_cles.metier.*'   => ['nullable', 'string', 'max:60'],
+            'mots_cles.occasion'   => ['required', 'array', 'max:200'],
+            'mots_cles.occasion.*' => ['nullable', 'string', 'max:60'],
+        ]);
+
+        $nettoyer = fn (array $l) => array_values(array_unique(array_filter(array_map('trim', $l))));
+
+        $recherches = $nettoyer($data['recherches']);
+        abort_if($recherches === [], 422, 'Il faut au moins un terme de recherche.');
+
+        $mots = [];
+        foreach (['benin', 'metier', 'occasion'] as $axe) {
+            // La comparaison se fait en minuscules dans la notation : les
+            // enregistrer tels quels laisserait un mot saisi en capitales sans
+            // jamais correspondre à quoi que ce soit.
+            $mots[$axe] = $nettoyer(array_map('mb_strtolower', $data['mots_cles'][$axe]));
+        }
+        abort_if($mots['benin'] === [] || $mots['metier'] === [], 422, 'Les axes Bénin et métier ne peuvent pas être vides.');
+
+        VitrineSetting::updateOrCreate(['cle' => 'veille_recherches'], ['valeur' => $recherches]);
+        VitrineSetting::updateOrCreate(['cle' => 'veille_mots_cles'], ['valeur' => $mots]);
+
+        return response()->json(['recherches' => $recherches, 'mots_cles' => $mots]);
     }
 
     /**
