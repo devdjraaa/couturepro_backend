@@ -22,6 +22,10 @@ use Illuminate\Support\Str;
  * historique par JOUR au lieu d'une photo hebdomadaire.
  *
  * Deux temps :
+ *   0. SITES FAVORIS — les domaines qui ont déjà rapporté un article retenu
+ *      sont réinterrogés directement, sur tout le vocabulaire du métier. Un
+ *      site qui a publié une fois publiera encore, et ce détour rattrape les
+ *      articles dont le titre ne contient aucun des mots que nous suivons.
  *   1. COLLECTE — chaque source est lue, les articles sont notés selon leur
  *      ancrage béninois, leur rapport au métier et l'occasion qu'ils
  *      représentent. Ce tri ne dépend d'aucun service extérieur.
@@ -103,7 +107,22 @@ class VeilleOpportunites extends Command
             );
         }
 
+        // Les sites qui ont rapporté sont réinterrogés directement aux
+        // exécutions suivantes, sur tout le vocabulaire du métier : un titre
+        // formulé autrement n'échappe plus à la veille faute de contenir le
+        // mot exact que nous suivions.
+        $domaines = $retenus
+            ->filter(fn ($a) => ($a['domaine'] ?? '') !== '')
+            ->mapWithKeys(fn ($a) => [$a['domaine'] => $a['nom_source'] ?? $a['domaine']])
+            ->all();
+        VitrineSetting::memoriserSitesFavoris($domaines);
+
         $this->info(sprintf('Veille du %s enregistrée : %d article(s).', $jour, $retenus->count()));
+        $this->info(sprintf(
+            '%d site(s) en mémoire, %d réinterrogé(s) à la prochaine exécution.',
+            count(VitrineSetting::sitesFavoris()),
+            count(VitrineSetting::recherchesSitesFavoris()),
+        ));
 
         return self::SUCCESS;
     }
@@ -136,7 +155,24 @@ class VeilleOpportunites extends Command
                 if ($titre === '' || $lien === '') {
                     continue;
                 }
-                $items[] = ['titre' => $titre, 'lien' => $lien];
+
+                // Le lien pointe vers news.google.com et ne dit rien de
+                // l'éditeur. C'est la balise `<source url>` qui porte le vrai
+                // domaine — celui qu'on veut retenir et réinterroger.
+                $domaine = '';
+                $nomSource = '';
+                if (isset($item->source)) {
+                    $nomSource = trim((string) $item->source);
+                    $domaine = strtolower((string) parse_url((string) $item->source['url'], PHP_URL_HOST));
+                    $domaine = preg_replace('/^www\./', '', $domaine) ?? '';
+                }
+
+                $items[] = [
+                    'titre' => $titre,
+                    'lien' => $lien,
+                    'domaine' => $domaine,
+                    'nom_source' => $nomSource,
+                ];
             }
 
             return $items;

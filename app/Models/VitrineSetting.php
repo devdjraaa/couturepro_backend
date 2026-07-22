@@ -364,6 +364,12 @@ class VitrineSetting extends Model
      * 24h au Bénin, Matin Libre, Bénin Web TV…) sans avoir à brancher chaque
      * site un par un. Les requêtes ciblées `site:` complètent sur l'officiel.
      */
+    /** Au-delà, chaque exécution paie une requête de plus pour un site de moins en moins productif. */
+    private const MAX_SITES_FAVORIS = 12;
+
+    /** On garde une mémoire plus large que ce qu'on interroge : un site peut redevenir productif. */
+    private const MAX_MEMOIRE_FAVORIS = 60;
+
     public static function veilleSources(): array
     {
         // Sources écrites en toutes lettres (URL complètes) : réservé aux flux
@@ -380,7 +386,84 @@ class VitrineSetting extends Model
                 'url' => 'https://news.google.com/rss/search?q=' . rawurlencode($q)
                     . '&hl=fr&gl=BJ&ceid=BJ:fr',
             ],
-            static::veilleRecherches(),
+            array_merge(static::veilleRecherches(), static::recherchesSitesFavoris()),
+        );
+    }
+
+    /**
+     * Les SITES QUI ONT DÉJÀ RAPPORTÉ, interrogés directement.
+     *
+     * Un site qui a publié une fois un article utile en publiera d'autres : la
+     * presse béninoise spécialisée, les portails gouvernementaux, les organes
+     * qui couvrent les salons. S'en remettre uniquement aux mots-clés revient
+     * à espérer que le titre du prochain article contienne les bons termes —
+     * et à rater tout ce qui est formulé autrement.
+     *
+     * Chaque favori est donc réinterrogé sur l'ensemble du vocabulaire du
+     * métier, ce qui rattrape les articles dont le titre ne dit ni « Bénin »
+     * ni le mot exact que nous suivions.
+     *
+     * Le domaine vient de la balise `<source url>` du flux : les liens, eux,
+     * pointent tous vers news.google.com et ne disent rien de l'éditeur.
+     */
+    public static function recherchesSitesFavoris(): array
+    {
+        $favoris = static::sitesFavoris();
+        if ($favoris === []) {
+            return [];
+        }
+
+        // Les plus productifs d'abord, et pas au-delà : chaque favori est une
+        // requête de plus à chaque exécution.
+        uasort($favoris, fn ($a, $b) => ($b['succes'] ?? 0) <=> ($a['succes'] ?? 0));
+        $retenus = array_slice(array_keys($favoris), 0, self::MAX_SITES_FAVORIS, true);
+
+        $metier = array_slice(static::veilleMotsCles()['metier'] ?? [], 0, 8);
+        if ($metier === []) {
+            return [];
+        }
+        $ou = '(' . implode(' OR ', $metier) . ')';
+
+        return array_map(fn ($domaine) => "site:{$domaine} {$ou}", $retenus);
+    }
+
+    /** Domaines ayant déjà produit un article retenu : domaine => {nom, succes, dernier}. */
+    public static function sitesFavoris(): array
+    {
+        $cfg = static::where('cle', 'veille_sites_favoris')->value('valeur');
+
+        return is_array($cfg) ? $cfg : [];
+    }
+
+    /**
+     * Enregistre les domaines des articles retenus.
+     *
+     * On ne compte QUE les articles retenus : un site qui remonte du bruit à
+     * chaque exécution deviendrait sinon le mieux classé de la liste, et ses
+     * requêtes prendraient la place de celles qui rapportent.
+     */
+    public static function memoriserSitesFavoris(array $domaines): void
+    {
+        if ($domaines === []) {
+            return;
+        }
+
+        $favoris = static::sitesFavoris();
+        $jour = now('Africa/Porto-Novo')->toDateString();
+
+        foreach ($domaines as $domaine => $nom) {
+            $favoris[$domaine] = [
+                'nom'     => mb_substr((string) ($nom ?: $domaine), 0, 120),
+                'succes'  => (int) ($favoris[$domaine]['succes'] ?? 0) + 1,
+                'dernier' => $jour,
+            ];
+        }
+
+        uasort($favoris, fn ($a, $b) => ($b['succes'] ?? 0) <=> ($a['succes'] ?? 0));
+
+        static::updateOrCreate(
+            ['cle' => 'veille_sites_favoris'],
+            ['valeur' => array_slice($favoris, 0, self::MAX_MEMOIRE_FAVORIS, true)],
         );
     }
 

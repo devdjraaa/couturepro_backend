@@ -29,7 +29,14 @@ Schedule::command('veille:seo')->weeklyOn(1, '07:00');
 // Veille opportunités : QUOTIDIENNE (elle était hebdomadaire et ratait
 // l'essentiel). De nuit, car le tri par Makila tourne sur le modèle local et
 // prend une trentaine de secondes par article.
-Schedule::command('veille:opportunites')->dailyAt('04:30');
+// Le cron du serveur envoie toute la sortie dans /dev/null : une tâche qui
+// échoue le fait donc en silence, et le seul indice serait un digest vide le
+// lendemain matin, sans cause visible. On garde une trace, et on ne relance
+// pas une collecte par-dessus une autre si la précédente traîne.
+Schedule::command('veille:opportunites')
+    ->dailyAt('04:30')
+    ->withoutOverlapping(30)
+    ->appendOutputTo(storage_path('logs/veille.log'));
 
 // ─── Espace client (P202 Phase 4) ───────────────────────────────────────────
 // Recalcul nocturne des synthèses client (engagement/segment/RFM/CLV) et designer
