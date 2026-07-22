@@ -144,7 +144,7 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| SUP-1 | Encart d'information dans les tickets | ⬜ | Dans `src/pages/SupportPage.jsx`, ajouter un encart permanent (icône « i » ou bannière) : « Pour vos réclamations, suggestions d'amélioration, remarques, demandes d'assistance ou toute autre requête, veuillez créer un ticket afin de nous en informer. Notre équipe vous répondra dans les meilleurs délais. » ⚠️ Aujourd'hui le seul texte pédagogique est dans l'état vide, et il **disparaît dès le premier ticket créé**. |
+| SUP-1 | Encart d'information dans les tickets | ✅ | ✅ **Fait — vérifié sur appareil le 22/07.** Encart permanent dans `SupportPage.jsx`, HORS du bloc d'état vide — le texte pédagogique vivait avant uniquement là, donc disparaissait dès le premier ticket créé, précisément pour ceux qui utilisent réellement le support. Testé avec des tickets déjà existants : l'encart reste affiché. |
 
 ---
 
