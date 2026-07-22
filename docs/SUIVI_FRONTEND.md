@@ -74,10 +74,10 @@
 
 | ID | Sujet | Statut | Détail / où |
 |---|---|---|---|
-| PHOTO-1 | Retour qualité **instantané et visuel** | ⬜ | À l'envoi d'une photo, retour immédiat **sans aucun texte à lire** : icône, couleur, courte animation — compréhensible par tout utilisateur, quelle que soit sa langue. Si refusée, l'utilisateur peut reprendre autant de fois qu'il veut, **sans pénalité**. ↔ l'analyse (netteté, luminosité, résolution, cadrage) est côté serveur. |
-| PHOTO-3 | Écran de modération admin | 🟡 | Une file de modération existe déjà (`src/pages/admin/AdminRealisationsPage.jsx`, approuver / refuser avec motif). À ajouter : **compte à rebours des 24 h** et action « retoucher légèrement puis valider » (recadrage, ajustements simples) pour les designers peu équipés. |
+| PHOTO-1 | Retour qualité **instantané et visuel** | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** `VerdictQualite.jsx` : icône + couleur + animation, AUCUN texte affiché (accessible via `title`/`aria-label` pour lecteur d'écran). Un pictogramme par cause (agrandir/recadrer/soleil/mise au point), se referme seul (6 s si bloquant, 3,5 s sinon), pastille verte dédiée si la photo passe. Sans pénalité confirmé côté serveur : le quota hebdomadaire ne compte que `soumis_at` (soumission formelle), jamais `ajouterPhoto` — reprendre une photo refusée est gratuit autant de fois que nécessaire. |
+| PHOTO-3 | Écran de modération admin | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** `AdminRealisationsPage.jsx` : compte à rebours des 24 h (rouge si dépassé, orange sous 6 h), réévalué chaque minute sans recharger. Action « retoucher » (recadrage/ajustements sur canvas) livrée en plus de approuver/refuser, pour les designers peu équipés. |
 | PHOTO-4 | Affichage du quota designer | ✅ | ✅ **Fait.** `MesRealisationsPage.jsx` affiche le quota du cycle, la date de remise à zéro, l'alerte à 80 % et le blocage à 0 (bouton désactivé). Tous les seuils viennent du serveur (`/realisations/quota`), le front n'en recalcule aucun.
-| PHOTO-7 | Historique / traçabilité | ⬜ | Côté admin, garder l'accès à la **photo originale** même après retouche. |
+| PHOTO-7 | Historique / traçabilité | ✅ | ✅ **Fait — vérifié dans le code le 22/07.** L'original n'est JAMAIS écrasé : la retouche s'enregistre dans `retouche_path`/`retouche_url`, distinct de `path`. Toute nouvelle retouche repart de l'ORIGINAL (jamais d'une retouche précédente) pour éviter un empilement de corrections qui dégraderait la photo à chaque passage. Publication : la version retouchée s'affiche si elle existe, sinon l'original — jamais de blocage silencieux si le filigrane échoue. |
 
 ---
 
