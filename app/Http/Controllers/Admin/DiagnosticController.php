@@ -23,6 +23,7 @@ class DiagnosticController extends Controller
             'base'       => $this->database(),
             'stockage'   => $this->stockage(),
             'modules'    => $this->modules(),
+            'ota'        => $this->ota(),
             'erreurs'    => $this->dernieresErreurs(),
         ]);
     }
@@ -96,6 +97,35 @@ class DiagnosticController extends Controller
             'abonnements_actifs' => $this->safe(fn () => Abonnement::where('statut', 'actif')->count(), null),
             'derniere_veille_seo' => $this->safe(fn () => Cache::get('veille_seo_last_run'), null),
         ];
+    }
+
+    /**
+     * Mises à jour OTA sur les 7 derniers jours, par version — c'était invisible
+     * jusqu'ici : le 22/07, la 1.0.143 a échoué en silence sur un appareil de
+     * test, et rien ne l'aurait signalé sans un test manuel. Chaque appareil
+     * rapporte désormais l'issue d'une tentative (voir `OtaEvenementController`) ;
+     * ce bloc en fait la somme, la version la plus récente en tête.
+     */
+    private function ota(): array
+    {
+        return $this->safe(function () {
+            $lignes = DB::table('gxt_ota_evenements')
+                ->where('created_at', '>=', now()->subDays(7))
+                ->select('app_id', 'version', 'evenement', DB::raw('count(*) as n'))
+                ->groupBy('app_id', 'version', 'evenement')
+                ->orderByDesc('version')
+                ->get();
+
+            $parVersion = [];
+            foreach ($lignes as $l) {
+                $cle = "{$l->app_id}@{$l->version}";
+                $parVersion[$cle]['app_id'] ??= $l->app_id;
+                $parVersion[$cle]['version'] ??= $l->version;
+                $parVersion[$cle][$l->evenement] = (int) $l->n;
+            }
+
+            return array_values($parVersion);
+        }, []);
     }
 
     /** Dernières lignes ERROR/CRITICAL du log Laravel (P110 : erreurs importantes visibles au support). */

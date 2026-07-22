@@ -710,4 +710,43 @@ class VitrineSetting extends Model
 
         return $catalogue;
     }
+
+    /**
+     * Empreinte SHA-256 de chaque paquet OTA publié, par application et par
+     * version — pour que l'appareil vérifie lui-même l'intégrité de ce qu'il
+     * télécharge avant de l'installer.
+     *
+     * Jusqu'ici rien ne garantissait qu'un paquet servi était bien celui
+     * publié : une écriture interrompue sur le serveur aurait été téléchargée
+     * et installée sans qu'aucune vérification ne l'arrête. L'empreinte est
+     * enregistrée séparément du dépôt du fichier (`release.sh` appelle
+     * `app:enregistrer-checksum-ota` juste après), donc son absence ne bloque
+     * jamais une publication : elle durcit une vérification qui n'existait
+     * pas, elle n'en remplace aucune.
+     *
+     * Bornée à 20 versions par application : la seule utilisée est la plus
+     * récente, l'historique ne sert qu'au diagnostic d'un incident encore
+     * chaud.
+     */
+    public static function enregistrerChecksumOta(string $appId, string $version, string $sha256): void
+    {
+        $table = static::checksumsOta();
+        $table[$appId] ??= [];
+        $table[$appId][$version] = $sha256;
+        $table[$appId] = array_slice($table[$appId], -20, null, true);
+
+        static::updateOrCreate(['cle' => 'ota_checksums'], ['valeur' => $table]);
+    }
+
+    public static function checksumOta(string $appId, string $version): ?string
+    {
+        return static::checksumsOta()[$appId][$version] ?? null;
+    }
+
+    private static function checksumsOta(): array
+    {
+        $cfg = static::where('cle', 'ota_checksums')->value('valeur');
+
+        return is_array($cfg) ? $cfg : [];
+    }
 }

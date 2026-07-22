@@ -51,3 +51,7 @@ Schedule::command('gxt:recalculer-metrics')->dailyAt('02:30');
 
 // Brief 16/07 (pts 3+6) : vœux d'anniversaire aux clients vitrine (message discret, Brevo).
 Schedule::command('gxt:anniversaires')->dailyAt('08:00');
+
+// Journal OTA (voir OtaEvenementController) : purge hebdomadaire, un journal
+// n'a pas besoin de grossir indéfiniment pour rester utile au diagnostic.
+Schedule::command('ota:purger-evenements')->weeklyOn(1, '03:00');

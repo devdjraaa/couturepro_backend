@@ -213,6 +213,14 @@ Route::prefix('vitrine/client')->group(function () {
 Route::prefix('app')->group(function () {
     Route::get('version',  [AppVersionController::class, 'version']);   // grosse MAJ (APK)
     Route::post('updates', [AppVersionController::class, 'updates']);   // OTA self-hosted (Capgo)
+
+    // Un appareil rapporte l'issue d'une tentative OTA — succès ou échec. Hors
+    // du groupe authentifié : c'est justement quand la mise à jour échoue
+    // qu'on a le moins de garantie qu'une session soit encore valide, et un
+    // échec doit pouvoir être signalé même juste après une inscription, avant
+    // tout atelier créé.
+    Route::post('ota-evenement', [\App\Http\Controllers\Api\OtaEvenementController::class, 'store'])
+        ->middleware('throttle:20,1');
 });
 
 // ─── Suivi des sprints (état partagé public ; écriture protégée par code) ─────
@@ -259,6 +267,7 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     // Auth
     Route::post('auth/logout', [ProprietaireAuthController::class, 'logout']);
     Route::get('auth/me',      [ProprietaireAuthController::class, 'me']);
+
 
     // Dashboard
     Route::get('dashboard',       [DashboardController::class, 'index']);

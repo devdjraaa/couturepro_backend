@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\VitrineSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -67,9 +68,21 @@ class AppVersionController extends Controller
             return response()->json((object) []);
         }
 
-        return response()->json([
+        $reponse = [
             'version' => $otaVersion,
             'url'     => $otaUrl,
-        ]);
+        ];
+
+        // Le plugin vérifie lui-même l'intégrité du paquet contre cette empreinte
+        // avant de l'installer. Absente pour une version publiée avant ce
+        // mécanisme (ou si `release.sh` a échoué à l'enregistrer) : dans ce cas
+        // on ne bloque rien, on sert simplement la mise à jour sans ce filet —
+        // c'est un durcissement en plus, jamais une condition pour publier.
+        $checksum = VitrineSetting::checksumOta($appId, $otaVersion);
+        if ($checksum) {
+            $reponse['checksum'] = $checksum;
+        }
+
+        return response()->json($reponse);
     }
 }
