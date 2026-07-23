@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\VitrineSetting;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -32,6 +33,10 @@ class VerifierDigestVeille extends Command
 
     public function handle(): int
     {
+        // Deux surveillances distinctes, un seul passage quotidien : ce sont
+        // toutes deux des « ce qui aurait du tourner et n'a pas tourne ».
+        $this->verifierSilenceRenduRobots();
+
         $jour = now('Africa/Porto-Novo')->toDateString();
         $dernier = VitrineSetting::where('cle', 'veille_digest_dernier_envoi')->value('valeur');
         $dernierJour = is_array($dernier) ? ($dernier['jour'] ?? null) : null;
@@ -75,6 +80,43 @@ class VerifierDigestVeille extends Command
         $this->prevenirAdministrateurs($message, $jour);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Le controle du rendu aux robots tourne-t-il encore ?
+     *
+     * Meme raisonnement que pour le digest : une surveillance qui s'arrete ne
+     * previent personne, et c'est la panne la plus sournoise — on croit etre
+     * couvert alors qu'on ne l'est plus. n8n a deja tourne SIX JOURS a l'arret
+     * sans que rien ne le signale.
+     *
+     * Le controle passe toutes les 6 h : au-dela de 24 h de silence, il ne
+     * tourne manifestement plus.
+     */
+    private function verifierSilenceRenduRobots(): void
+    {
+        $dernier = Cache::get(VeilleRenduRobots::CLE_DERNIER_PASSAGE);
+
+        if ($dernier && now()->diffInHours(\Illuminate\Support\Carbon::parse($dernier)) < 24) {
+            return;
+        }
+
+        $message = $dernier
+            ? 'Le controle du rendu aux robots n\'a plus tourne depuis le '
+              .\Illuminate\Support\Carbon::parse($dernier)->format('d/m/Y H:i').'.'
+            : "Le controle du rendu aux robots n'a jamais tourne.";
+
+        $this->warn($message);
+        Log::warning($message);
+
+        try {
+            VitrineSetting::updateOrCreate(
+                ['cle' => 'veille_incident_rendu_robots'],
+                ['valeur' => ['message' => $message, 'horodate' => now()->toIso8601String()]],
+            );
+        } catch (\Throwable $e) {
+            Log::error('Incident rendu robots non enregistre', ['erreur' => $e->getMessage()]);
+        }
     }
 
     /**

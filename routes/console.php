@@ -26,6 +26,18 @@ Schedule::command('abonnements:process-bonus-expiry')->dailyAt('01:00');
 // Rapport technique hebdo (PageSpeed, HTTPS, dispo) — lundi 7h, 2 sites.
 Schedule::command('veille:seo')->weeklyOn(1, '07:00');
 
+// Le pre-rendu aux robots se verifie TOUTES LES 6 H, pas une fois par semaine :
+// il peut redevenir inerte au prochain deploiement, et chaque jour de silence
+// est un jour ou Google indexe une page vide. C'est exactement ce qui s'est
+// produit entre le 20 et le 23/07.
+//   `withoutOverlapping` : une execution lente ne doit pas en croiser une autre.
+//   `runInBackground`    : ne pas retarder les autres taches planifiees.
+Schedule::command('veille:rendu-robots')
+    ->everySixHours()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/veille.log'));
+
 // Veille opportunités : QUOTIDIENNE (elle était hebdomadaire et ratait
 // l'essentiel). De nuit, car le tri par Makila tourne sur le modèle local et
 // prend une trentaine de secondes par article.
