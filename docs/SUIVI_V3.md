@@ -79,7 +79,9 @@ avaient survécu si longtemps.
 | GX-4 | Mention « Bientôt » sur les modules non prêts | ⬜ | Idem. |
 | GX-5 | Recommandation par catégorie | ⬜ | La reco v1 (créateurs favoris en tête) tourne. La version par catégorie suppose de **catégoriser les créations** — chantier de données, pas d'affichage. |
 | GX-6 | Facturation : prévisualisation et gabarits avancés | 🟡 | Le module et la normalisation DGI sont livrés. Restent l'aperçu avant émission et les gabarits par atelier. |
-| GX-7 | Export des mesures en CSV | 🟡 | Le partage WhatsApp est en place et testé. L'export CSV groupé est livré ; **l'export individuel reste à confirmer à l'écran**. |
+| GX-7 | Export des mesures en CSV | ✅ 23/07 | Individuel corrigé : le bouton pointait vers un `<a download>` sans jeton (401) et l'URL venait d'une méthode `async` (`[object Promise]`) → récupération via client authentifié. 4 tests serveur. |
+| GX-8 | Bulle Makila « hors ligne » plantée en bas à droite | ✅ 23/07 | Aucun minuteur : elle restait plantée en permanence et chevauchait le bandeau d'install. Désormais auto-disparition (6 s) + croix + mémoire de session. Vérifié à l'écran. |
+| GX-9 | Mention « Une solution NovafriQ » absente du widget Makila | ✅ 23/07 | Le pied de page vitrine la portait, pas le widget Makila (présent sur chaque page). Ligne d'attribution ajoutée en bas du chat, cliquable vers novafriq.africa. Textes fr/en + URL éditables (zéro hardcoding). Vérifié à l'écran. |
 
 ## 2.2 Gextimo — à re-tester sur appareil
 
