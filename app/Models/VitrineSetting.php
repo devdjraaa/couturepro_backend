@@ -175,8 +175,8 @@ class VitrineSetting extends Model
             'essai_jours' => 14,
             'essai_titre' => ['fr' => '{jours} jours offerts', 'en' => '{jours} days free'],
             'essai_texte' => [
-                'fr' => 'Chaque nouveau compte démarre avec {jours} jours d\'accès complet au plan payant, sans carte bancaire. À la fin de l\'essai, le compte bascule sur le plan Gratuit si aucun paiement n\'est fait.',
-                'en' => 'Every new account starts with {jours} days of full access to the paid plan, no credit card. When the trial ends, the account moves to the Free plan unless a payment is made.',
+                'fr' => 'Chaque nouveau compte démarre avec {jours} jours d\'accès complet au plan payant, sans rien payer et sans moyen de paiement à renseigner. À la fin de l\'essai, le compte bascule sur le plan Gratuit si aucun paiement n\'est fait.',
+                'en' => 'Every new account starts with {jours} days of full access to the paid plan, with nothing to pay and no payment details to enter. When the trial ends, the account moves to the Free plan unless a payment is made.',
             ],
 
             // La note sous la grille.
