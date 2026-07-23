@@ -44,7 +44,7 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
 | Domaine | État | Ce qui reste |
 |---|---|---|
 | **Gextimo — produit** | 🟢 | Reliquat vitrine, quelques re-tests appareil |
-| **Gextimo — SEO** | ⚠️ | **Le pré-rendu est inerte en production** — priorité 1 |
+| **Gextimo — SEO** | ✅ | Pré-rendu actif : les robots reçoivent le vrai contenu (23/07) |
 | **Gextimo — administration** | ✅ | Kit de formulaire unifié sur les 27 écrans (22/07) |
 | **NovafriQ — site** | ✅ | Contenu éditable, formulaire de contact réparé |
 | **NovafriQ — back-office** | ✅ | API en ligne sur `novafriqapi.novafriq.africa`, HTTPS actif |
@@ -53,14 +53,15 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
 
 ---
 
-# §1 — À traiter en premier
+# §1 — Les trois anomalies de production *(corrigées le 23 juillet)*
 
-Trois anomalies vérifiées aujourd'hui. Elles ont en commun d'être **invisibles** : rien
-ne casse à l'écran, personne ne s'en plaint, et le préjudice court en silence.
+Elles avaient en commun d'être **invisibles** : rien ne cassait à l'écran, personne ne
+s'en plaignait, et le préjudice courait en silence. C'est précisément pour ça qu'elles
+avaient survécu si longtemps.
 
 | ID | Sujet | Statut | Constat |
 |---|---|---|---|
-| **P1** | **Pré-rendu SEO inerte** | ⚠️ | Vérifié le 23/07 : `curl -A Googlebot` sur l'accueil, `/createurs` et un profil renvoie **le même titre générique** qu'un navigateur. Tout le travail serveur existe et fonctionne (`SeoRenderController` testé en direct), mais **nginx ne route aucun robot vers lui**. Conséquence : Google indexe une page vide de contenu depuis le lancement. Cause connue : le vhost est en `600 root:root`, hors de portée du `sudo` autorisé au déploiement — il faut poser la règle à la main sur le serveur. |
+| **P1** | **Pré-rendu SEO inerte** | ✅ 23/07 | Vérifié le 23/07 : `curl -A Googlebot` sur l'accueil, `/createurs` et un profil renvoie **le même titre générique** qu'un navigateur. Tout le travail serveur existe et fonctionne (`SeoRenderController` testé en direct), mais **nginx ne route aucun robot vers lui**. Conséquence : Google indexe une page vide de contenu depuis le lancement. **Corrigé le 23/07** : règle nginx posée à la main sur le serveur (le vhost est en `600 root:root`, hors de portée du déploiement automatique). Vérifié en production — Googlebot reçoit le vrai titre, sa description, sa canonique et 5 balises Open Graph, là où un navigateur garde l'application ; les aperçus WhatsApp et Facebook aussi. Trois pièges documentés dans `deploy/README-SEO.md`. Le premier jet a été refusé par nginx et le retour en arrière a fonctionné : le site n'a jamais été interrompu. |
 | **P2** | **Formulaire de contact NovafriQ cassé** | ✅ 23/07 | Vérifié le 23/07 dans le paquet servi en production : le formulaire poste vers `formspree.io/f/VOTRE_ID_FORMSPREE` — l'identifiant d'exemple n'a **jamais** été remplacé. Chaque message échoue et retombe sur un lien `mailto` que le visiteur doit cliquer lui-même. **Depuis la mise en ligne, personne ne peut nous écrire depuis le site.** Corrigé par le back-office NovafriQ (§4), qui reçoit les messages en base. |
 | **P3** | **Aucun contenu NovafriQ n'est éditable** | ✅ 23/07 | Tout le texte du site — postes ouverts, membres, FAQ, produits, feuille de route — est écrit en dur dans le JSX. Changer une virgule demande un commit et un déploiement. La page Actualités annonce un blog qui n'existe pas. C'est l'objet du chantier §4. |
 
@@ -72,7 +73,7 @@ ne casse à l'écran, personne ne s'en plaint, et le préjudice court en silence
 
 | ID | Sujet | Statut | Détail |
 |---|---|---|---|
-| GX-1 | Routage des robots vers le pré-rendu | ⚠️ | = **P1**. Le seul geste manquant est côté serveur. |
+| GX-1 | Routage des robots vers le pré-rendu | ✅ 23/07 | = **P1**. Règle nginx posée, vérifiée en production. Détail et pièges : `deploy/README-SEO.md`. |
 | GX-2 | Bouton « S'inscrire » invisible sous 1024 px | ⬜ | Le lien existe dans le menu déroulant mobile ; le bouton de la barre du haut porte `hidden lg:inline-flex`. Le remonter est un choix visuel à confirmer. |
 | GX-3 | Ordre des rubriques Paramètres | ⬜ | Jamais vérifié à l'écran faute de spec assez précise. |
 | GX-4 | Mention « Bientôt » sur les modules non prêts | ⬜ | Idem. |
