@@ -110,8 +110,8 @@ Décisions prises avec la direction avant de commencer :
 | NF-3 | API publique (contenu, articles, messages) + API d'administration | ✅ 23/07 |
 | NF-4 | Kit d'administration déclaratif — une ressource se **déclare**, ses écrans en découlent | ✅ 23/07 |
 | NF-5 | Ressources déclarées : produits, membres, postes, partenaires, FAQ, 8 listes, articles, rubriques, messages, comptes | ✅ 23/07 |
-| NF-6 | Site public branché sur l'API, avec copie de secours | ⬜ |
-| NF-7 | Formulaire de contact réparé → boîte de réception du back-office | 🟡 serveur fait, reste à brancher le site = **P2** |
+| NF-6 | Site public branché sur l'API, avec copie de secours | 🟡 3 pages sur 10 |
+| NF-7 | Formulaire de contact réparé → boîte de réception du back-office | ✅ 23/07 *(en attente de déploiement)* |
 | NF-8 | Blog / actualités réel (la page en annonce un qui n'existe pas) | ⬜ |
 | NF-9 | Déploiement : base, `.env`, vhost `/api`, CI/CD, certificat | ⬜ |
 | NF-10 | Reliquats sur le serveur : `/var/www/novafriq_new` et un `pari-finale.conf` vide dans `sites-enabled` | ⬜ |
