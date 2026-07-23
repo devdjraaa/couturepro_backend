@@ -1,3 +1,14 @@
+⛔ **ARCHIVE — NE PLUS METTRE À JOUR** (depuis le 23/07/2026)
+
+Le suivi est désormais **unique** : → **`SUIVI_V3.md`**
+Tracker cochable : `couturepro_frontend/public/suivi-v3.html`
+
+Ce fichier est conservé pour son **détail narratif** (cause racine, piège évité, preuve
+de chaque correction), qui n'a pas sa place dans un tracker mais vaut d'être gardé.
+**Ses statuts ne font plus autorité.**
+
+---
+
 # Suivi FRONTEND — Gextimo (Aquilas)
 
 > ## ⚠️ Répartition revue le 20/07 — à lire avant de commencer

@@ -1,3 +1,13 @@
+⛔ **ARCHIVE — NE PLUS METTRE À JOUR** (depuis le 23/07/2026)
+
+Le suivi est désormais **unique** : → **`SUIVI_V3.md`**
+
+⚠️ **Fichier le plus trompeur du lot.** Ses statuts datent du 20/07 et une bonne partie
+de ses 🟡 a été vérifiée close depuis, par les campagnes QA des 20, 21 et 22 juillet.
+**Ne pas s'y fier sans recouper avec `SUIVI_V3.md`.**
+
+---
+
 ⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
 Le reliquat encore ouvert a été repris dans **`SUIVI_BACKEND.md`** (backend) et **`SUIVI_FRONTEND.md`** (frontend).
 *Ce fichier est conservé pour l'historique des 130 points livrés.*

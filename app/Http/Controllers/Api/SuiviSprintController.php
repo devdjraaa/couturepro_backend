@@ -19,14 +19,38 @@ use Illuminate\Support\Facades\Hash;
  */
 class SuiviSprintController extends Controller
 {
-    private function path(): string
+    /**
+     * Tableaux connus, et leur fichier.
+     *
+     * Sans cette séparation, ouvrir la V3 et enregistrer ÉCRASERAIT l'état de
+     * la V2 : la sauvegarde remplace la table `checked` en entier, et les
+     * identifiants des deux versions ne se recouvrent pas. La V2 serait
+     * revenue toute décochée, en silence.
+     *
+     * Liste fermée, jamais le paramètre reçu tel quel : il compose un chemin de
+     * fichier.
+     */
+    private const TABLEAUX = [
+        'v2' => 'suivi-sprints.json',
+        'v3' => 'suivi-v3.json',
+    ];
+
+    /** Le tableau demandé, V2 par défaut — l'ancienne page n'envoie rien. */
+    private function tableau(Request $request): string
     {
-        return storage_path('app/suivi-sprints.json');
+        $t = (string) $request->query('tableau', $request->input('tableau', 'v2'));
+
+        return isset(self::TABLEAUX[$t]) ? $t : 'v2';
     }
 
-    private function read(): array
+    private function path(string $tableau = 'v2'): string
     {
-        $p = $this->path();
+        return storage_path('app/' . self::TABLEAUX[$tableau]);
+    }
+
+    private function read(string $tableau = 'v2'): array
+    {
+        $p = $this->path($tableau);
         if (! is_file($p)) {
             return ['code_hash' => null, 'checked' => [], 'updated_at' => null];
         }
@@ -35,9 +59,9 @@ class SuiviSprintController extends Controller
         return is_array($d) ? $d : ['code_hash' => null, 'checked' => [], 'updated_at' => null];
     }
 
-    private function write(array $d): void
+    private function write(array $d, string $tableau = 'v2'): void
     {
-        @file_put_contents($this->path(), json_encode($d, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        @file_put_contents($this->path($tableau), json_encode($d, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
 
     private function payload(array $d): array
@@ -51,10 +75,10 @@ class SuiviSprintController extends Controller
         ];
     }
 
-    /** GET /api/suivi-sprints */
-    public function show(): JsonResponse
+    /** GET /api/suivi-sprints[?tableau=v3] */
+    public function show(Request $request): JsonResponse
     {
-        return response()->json($this->payload($this->read()));
+        return response()->json($this->payload($this->read($this->tableau($request))));
     }
 
     /**
@@ -67,7 +91,8 @@ class SuiviSprintController extends Controller
      */
     public function save(Request $request): JsonResponse
     {
-        $d = $this->read();
+        $tableau = $this->tableau($request);
+        $d = $this->read($tableau);
 
         // ── Volet 1 : validations (propriétaire) ──────────────────────────────
         if ($request->has('checked')) {
@@ -110,7 +135,7 @@ class SuiviSprintController extends Controller
         }
 
         $d['updated_at'] = now()->toIso8601String();
-        $this->write($d);
+        $this->write($d, $tableau);
 
         return response()->json($this->payload($d));
     }

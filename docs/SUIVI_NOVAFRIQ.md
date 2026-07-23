@@ -1,8 +1,10 @@
-⛔ **PÉRIMÉ — NE PLUS METTRE À JOUR.** (depuis le 19/07/2026)
-Le suivi est désormais **séparé par couche** :
-· backend → **`SUIVI_BACKEND.md`** · frontend (Aquilas) → **`SUIVI_FRONTEND.md`**
-· tracker cochable → **`couturepro_frontend/public/suivi-v2.html`**
-*Ce fichier est conservé pour l'historique uniquement.*
+⛔ **ARCHIVE — NE PLUS METTRE À JOUR.** (périmé le 19/07/2026, archivé le 23/07/2026)
+
+Le suivi est désormais **unique** : → **`SUIVI_V3.md`**
+Tracker cochable : `couturepro_frontend/public/suivi-v3.html`
+
+Ce fichier garde l'historique des 7 blocs, des 205 points du volet 1 et des 24
+suggestions. **Ses statuts ne font plus autorité.**
 
 ---
 
