@@ -158,11 +158,20 @@ Le back-office pèse **41 ko à part** et n'est chargé qu'à l'ouverture de `/a
 visiteur du site public n'en télécharge pas une ligne. C'est la contrepartie du choix de
 le loger dans le site plutôt que sur un domaine séparé.
 
-⚠️ **Vérifié par l'API, pas encore vu à l'écran.** Les dix ressources répondent, un
-élément créé avec sa liste imbriquée se relit correctement, se range en fin de liste,
-rafraîchit le site, et sa suppression est confirmée **en base** — pas sur son code de
-retour. Mais le rendu réel du back-office dans un navigateur n'a pas été observé. À dire
-plutôt qu'à supposer acquis.
+**Vu à l'écran le 23/07, dans un navigateur réel.** Connexion par le formulaire,
+19 entrées de menu, les dix listes affichent le bon nombre de lignes, les écrans vides
+disent ce qu'ils sont, et la fenêtre d'édition a son **haut atteignable** (158 px du bord),
+sa hauteur plafonnée et son corps qui défile — le défaut de Gextimo, vérifié absent.
+
+⚠️ **Et c'est là qu'un défaut invisible autrement a été trouvé** : les fenêtres modales
+n'avaient **ni bordure ni fond**. Rendues dans un portail attaché au `body`, elles vivent
+hors du conteneur où étaient déclarées les variables de couleur, qui ne cascadaient donc
+pas jusqu'à elles. La construction passait, les tests passaient, l'API répondait. Il
+fallait ouvrir la fenêtre pour le voir. Corrigé et re-vérifié à l'écran.
+
+Côté site, les neuf pages ont été confrontées au DOM : chaque liste affiche le compte
+attendu (5 piliers, 6 engagements, 9 services, 4 membres, 9 questions…) et **aucune clé
+technique ne fuit à l'écran**.
 
 Trois écarts **volontaires**, à ne pas prendre pour des oublis :
 
