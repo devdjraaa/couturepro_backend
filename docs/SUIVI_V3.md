@@ -25,7 +25,8 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
 
 **Ce qui change en V3 :**
 
-- **un seul document**, trois destinataires clairement séparés : moi, toi, les tiers ;
+- **un seul document**, trois porteurs clairement séparés : le développement (Aquilas /
+  Markus), la direction (Pat Dona), et ce qui dépend de tiers ;
 - **le fait remplace le déclaratif** : chaque statut ci-dessous est vérifié dans le code
   ou en production à la date indiquée, jamais recopié d'un ancien fichier ;
 - **le livré est résumé, pas raconté**. Le détail narratif reste dans les archives. Un
@@ -45,10 +46,10 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
 | **Gextimo — produit** | 🟢 | Reliquat vitrine, quelques re-tests appareil |
 | **Gextimo — SEO** | ⚠️ | **Le pré-rendu est inerte en production** — priorité 1 |
 | **Gextimo — administration** | ✅ | Kit de formulaire unifié sur les 27 écrans (22/07) |
-| **NovafriQ — site** | ⚠️ | **Formulaire de contact cassé en production** |
-| **NovafriQ — back-office** | 🚧 | Chantier ouvert le 23/07, rien en ligne |
+| **NovafriQ — site** | ✅ | Contenu éditable, formulaire de contact réparé |
+| **NovafriQ — back-office** | ✅ | API en ligne sur `novafriqapi.novafriq.africa`, HTTPS actif |
 | **Infrastructure** | ✅ | Sauvegardes, OTA, veille, files d'attente : sains |
-| **Direction** | ⬜ | 15 réglages et arbitrages en attente |
+| **Direction (Pat Dona)** | ⬜ | 15 réglages et arbitrages en attente |
 
 ---
 
@@ -60,12 +61,12 @@ ne casse à l'écran, personne ne s'en plaint, et le préjudice court en silence
 | ID | Sujet | Statut | Constat |
 |---|---|---|---|
 | **P1** | **Pré-rendu SEO inerte** | ⚠️ | Vérifié le 23/07 : `curl -A Googlebot` sur l'accueil, `/createurs` et un profil renvoie **le même titre générique** qu'un navigateur. Tout le travail serveur existe et fonctionne (`SeoRenderController` testé en direct), mais **nginx ne route aucun robot vers lui**. Conséquence : Google indexe une page vide de contenu depuis le lancement. Cause connue : le vhost est en `600 root:root`, hors de portée du `sudo` autorisé au déploiement — il faut poser la règle à la main sur le serveur. |
-| **P2** | **Formulaire de contact NovafriQ cassé** | ⚠️ | Vérifié le 23/07 dans le paquet servi en production : le formulaire poste vers `formspree.io/f/VOTRE_ID_FORMSPREE` — l'identifiant d'exemple n'a **jamais** été remplacé. Chaque message échoue et retombe sur un lien `mailto` que le visiteur doit cliquer lui-même. **Depuis la mise en ligne, personne ne peut nous écrire depuis le site.** Corrigé par le back-office NovafriQ (§4), qui reçoit les messages en base. |
+| **P2** | **Formulaire de contact NovafriQ cassé** | ✅ 23/07 | Vérifié le 23/07 dans le paquet servi en production : le formulaire poste vers `formspree.io/f/VOTRE_ID_FORMSPREE` — l'identifiant d'exemple n'a **jamais** été remplacé. Chaque message échoue et retombe sur un lien `mailto` que le visiteur doit cliquer lui-même. **Depuis la mise en ligne, personne ne peut nous écrire depuis le site.** Corrigé par le back-office NovafriQ (§4), qui reçoit les messages en base. |
 | **P3** | **Aucun contenu NovafriQ n'est éditable** | ✅ 23/07 | Tout le texte du site — postes ouverts, membres, FAQ, produits, feuille de route — est écrit en dur dans le JSX. Changer une virgule demande un commit et un déploiement. La page Actualités annonce un blog qui n'existe pas. C'est l'objet du chantier §4. |
 
 ---
 
-# §2 — Ce qui m'attend (développement)
+# §2 — Développement (Aquilas / Markus)
 
 ## 2.1 Gextimo — reliquat vitrine
 
@@ -113,7 +114,7 @@ Décisions prises avec la direction avant de commencer :
 | NF-6 | Site public branché sur l'API, avec copie de secours | ✅ 23/07 — 10 pages sur 10 |
 | NF-7 | Formulaire de contact réparé → boîte de réception du back-office | ✅ 23/07 *(en attente de déploiement)* |
 | NF-8 | Blog / actualités réel (la page en annonce un qui n'existe pas) | ✅ 23/07 |
-| NF-9 | Déploiement : base, `.env`, vhost `/api`, CI/CD, certificat | ⬜ |
+| NF-9 | Déploiement : base, `.env`, vhost `/api`, CI/CD, certificat | ✅ 23/07 — **API en ligne** |
 | NF-10 | Reliquats sur le serveur : `/var/www/novafriq_new` et un `pari-finale.conf` vide dans `sites-enabled` | ⬜ |
 
 **Ce que « façon Filament » veut dire ici.** Ce qui fait Filament n'est pas son
@@ -189,10 +190,11 @@ d'administration vit dans `src/admin/`, qu'il ne touche pas.
 
 ---
 
-# §3 — Ce qui t'attend (direction)
+# §3 — Direction (Pat Dona)
 
 Ce ne sont **pas** des développements. Tout est en place et paramétrable : ce sont des
-saisies et des arbitrages qui se font depuis l'administration, sans développeur. Mode
+saisies et des arbitrages que **Pat Dona** fait lui-même depuis l'administration, sans
+développeur. Mode
 d'emploi détaillé dans `POUR_LA_DIRECTION.md`.
 
 ## Bloquant
@@ -227,8 +229,8 @@ d'emploi détaillé dans `POUR_LA_DIRECTION.md`.
 
 # §4 — Bloqué sur des tiers
 
-Tracé ici pour mémoire. **Ne pas relister ailleurs** : ces points ne dépendent ni de moi
-ni de toi.
+Tracé ici pour mémoire. **Ne pas relister ailleurs** : ces points ne dépendent ni du
+développement ni de la direction.
 
 | ID | Sujet | Dépend de |
 |---|---|---|
