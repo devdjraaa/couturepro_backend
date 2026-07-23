@@ -58,7 +58,12 @@ class EssaiGratuitTest extends TestCase
         $this->postJson('/api/auth/verifier-otp', ['telephone' => $telephone, 'code' => $code])
              ->assertOk();
 
-        return Atelier::where('nom', 'Atelier Awa')->latest('created_at')->firstOrFail();
+        // Recherche par PROPRIÉTAIRE : deux inscriptions créent des ateliers de
+        // même nom, et un tri par date les départage mal quand elles tombent
+        // dans la même seconde.
+        $proprietaire = Proprietaire::where('telephone', Proprietaire::normalizePhone($telephone))->firstOrFail();
+
+        return Atelier::where('proprietaire_id', $proprietaire->id)->firstOrFail();
     }
 
     public function test_la_duree_par_defaut_est_bien_celle_annoncee_sur_les_tarifs(): void

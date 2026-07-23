@@ -599,9 +599,13 @@ class VitrineController extends Controller
     /** GET /api/vitrine/plans — offres d'abonnement actives (publique, page tarifs). */
     public function plans(): JsonResponse
     {
+        // `visible_vitrine` filtre ici, et le type de compte accompagne chaque
+        // plan pour que la page n'affiche à un artisan que ce qui le concerne.
+        // Le tri de l'affichage reste au front : le visiteur bascule entre
+        // artisan et designer sans recharger.
         return response()->json(
-            NiveauConfig::actif()->get([
-                'cle', 'label', 'label_en', 'duree_jours', 'prix_xof',
+            NiveauConfig::actif()->where('visible_vitrine', true)->get([
+                'cle', 'label', 'label_en', 'type_compte', 'duree_jours', 'prix_xof',
                 'prix_mensuel_equivalent_xof', 'description_courte',
                 'description_courte_en', 'config',
             ])

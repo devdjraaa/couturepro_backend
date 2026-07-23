@@ -52,12 +52,29 @@ class AbonnementController extends Controller
         ], 201);
     }
 
-    public function plans(): JsonResponse
+    public function plans(Request $request): JsonResponse
     {
-        $plans = NiveauConfig::actif()->get([
-            'cle', 'label', 'duree_jours', 'prix_xof',
-            'prix_mensuel_equivalent_xof', 'description_courte', 'ordre_affichage', 'config',
-        ]);
+        // Un artisan ne doit pas se voir proposer les plans réservés aux
+        // designers, et inversement. Le type de l'atelier maître fait foi ;
+        // `tous` reste servi à chacun. On garde aussi le plan actuellement
+        // souscrit même s'il ne correspond plus au filtre — sinon l'écran
+        // d'abonnement afficherait « plan actuel » sans la carte associée.
+        $atelier = $request->user()?->atelierMaitre;
+        $type    = $atelier?->type ?: 'artisan';
+        $actuel  = $atelier?->abonnement?->niveau_cle;
+
+        $plans = NiveauConfig::actif()
+            ->where('visible_app', true)
+            ->where(function ($q) use ($type, $actuel) {
+                $q->whereIn('type_compte', ['tous', $type]);
+                if ($actuel) {
+                    $q->orWhere('cle', $actuel);
+                }
+            })
+            ->get([
+                'cle', 'label', 'type_compte', 'duree_jours', 'prix_xof',
+                'prix_mensuel_equivalent_xof', 'description_courte', 'ordre_affichage', 'config',
+            ]);
 
         return response()->json($plans);
     }

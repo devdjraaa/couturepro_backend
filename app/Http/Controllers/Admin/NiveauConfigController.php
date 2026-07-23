@@ -59,6 +59,10 @@ class NiveauConfigController extends Controller
 
         $data = $request->validate([
             'cle'                          => ['required', 'string', 'max:50', 'unique:niveaux_config,cle'],
+            'type_compte'                  => ['nullable', 'in:tous,artisan,designer'],
+            'visible_vitrine'              => ['nullable', 'boolean'],
+            'visible_app'                  => ['nullable', 'boolean'],
+
             'label'                        => ['required', 'string', 'max:100'],
             'label_en'                     => ['nullable', 'string', 'max:120'],
             'duree_jours'                  => ['required', 'integer', 'min:1'],
@@ -86,6 +90,10 @@ class NiveauConfigController extends Controller
 
         $data = $request->validate([
             'label'                        => ['sometimes', 'string', 'max:100'],
+            'type_compte'                  => ['nullable', 'in:tous,artisan,designer'],
+            'visible_vitrine'              => ['nullable', 'boolean'],
+            'visible_app'                  => ['nullable', 'boolean'],
+
             'label_en'                     => ['nullable', 'string', 'max:120'],
             'duree_jours'                  => ['sometimes', 'integer', 'min:1'],
             'prix_xof'                     => ['sometimes', 'numeric', 'min:0'],

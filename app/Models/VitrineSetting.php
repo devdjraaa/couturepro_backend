@@ -179,6 +179,38 @@ class VitrineSetting extends Model
                 'en' => 'Every new account starts with {jours} days of full access to the paid plan, with nothing to pay and no payment details to enter. When the trial ends, the account moves to the Free plan unless a payment is made.',
             ],
 
+            // ── Libellés des fonctionnalités ─────────────────────────────
+            // Le texte de chaque ligne d'un plan, éditable ici. Il était figé
+            // dans les fichiers de traduction : changer « Photos VIP » en
+            // « Photos mises en avant » demandait un développeur et un
+            // déploiement, pour un mot.
+            //
+            // `{n}` est remplacé par la valeur réelle du plan. La direction
+            // saisit 7 sous-ateliers, la ligne dit « Jusqu'à 7 ateliers » —
+            // sur la vitrine ET dans l'application, sans y toucher deux fois.
+            //
+            // Une entrée vide retombe sur le texte livré : un libellé effacé
+            // par erreur ne doit pas laisser un blanc sur une page de tarifs.
+            'libelles' => [
+                'creations'          => ['fr' => '{n} créations en vitrine',              'en' => '{n} showcase creations'],
+                'creations_illimite' => ['fr' => 'Créations en vitrine illimitées',       'en' => 'Unlimited showcase creations'],
+                'clients'            => ['fr' => '{n} clients par mois',                  'en' => '{n} clients per month'],
+                'clients_illimite'   => ['fr' => 'Clients illimités',                     'en' => 'Unlimited clients'],
+                'equipe'             => ['fr' => "Équipe jusqu'à {n} membres",            'en' => 'Team up to {n} members'],
+                'equipe_illimite'    => ['fr' => "Membres d'équipe illimités",            'en' => 'Unlimited team members'],
+                'galerie_oui'        => ['fr' => 'Vos créations visibles dans la galerie publique', 'en' => 'Your creations visible in the public gallery'],
+                'galerie_non'        => ['fr' => 'Profil visible par lien direct, absent de la galerie publique', 'en' => 'Profile visible by direct link, not listed in the gallery'],
+                'pdf'                => ['fr' => 'Factures et devis en PDF',              'en' => 'PDF invoices and quotes'],
+                'photos_vip'         => ['fr' => 'Photos mises en avant dans la galerie', 'en' => 'Featured photos in the gallery'],
+                'photos_vip_quota'   => ['fr' => '{n} photos mises en avant par mois',    'en' => '{n} featured photos per month'],
+                'factures_wa'        => ['fr' => 'Envoi des factures par WhatsApp',       'en' => 'Send invoices via WhatsApp'],
+                'factures_wa_quota'  => ['fr' => '{n} factures par WhatsApp / mois',      'en' => '{n} WhatsApp invoices / month'],
+                'caisse'             => ['fr' => 'Caisse : encaissements et suivi du solde', 'en' => 'Cash register: payments and balance tracking'],
+                'dgi'                => ['fr' => 'Facture normalisée DGI',                'en' => 'DGI-compliant invoice'],
+                'multi'              => ['fr' => 'Plusieurs ateliers sous un même compte', 'en' => 'Several workshops under one account'],
+                'multi_quota'        => ['fr' => "Jusqu'à {n} ateliers supplémentaires",  'en' => 'Up to {n} extra workshops'],
+            ],
+
             // La note sous la grille.
             'note_actif' => true,
             'note' => [

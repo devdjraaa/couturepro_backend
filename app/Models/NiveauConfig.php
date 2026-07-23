@@ -20,6 +20,9 @@ class NiveauConfig extends Model
         'cle',
         'label',
         'label_en',
+        'type_compte',
+        'visible_vitrine',
+        'visible_app',
         'duree_jours',
         'prix_xof',
         'prix_mensuel_equivalent_xof',
@@ -36,6 +39,8 @@ class NiveauConfig extends Model
         'prix_xof'                      => 'decimal:2',
         'prix_mensuel_equivalent_xof'   => 'decimal:2',
         'is_actif'                      => 'boolean',
+        'visible_vitrine'               => 'boolean',
+        'visible_app'                   => 'boolean',
         'duree_jours'                   => 'integer',
         'ordre_affichage'               => 'integer',
     ];
