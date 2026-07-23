@@ -161,6 +161,24 @@ class VitrineSetting extends Model
                 'texte'   => ['fr' => 'Pour exposer vos créations et vendre en ligne.', 'en' => 'To showcase your creations and sell online.'],
             ],
 
+            // L'essai gratuit. C'est l'argument de vente le plus fort et il
+            // n'apparaissait NULLE PART sur la page des tarifs : tout nouveau
+            // compte reçoit d'emblée un plan PAYANT pendant cette durée
+            // (Studio pour un designer, Atelier pour un artisan).
+            //
+            // `essai_jours` est la SOURCE UNIQUE : l'inscription la lit aussi.
+            // Avant, la durée était écrite en dur à trois endroits du
+            // contrôleur d'inscription — la changer demandait un déploiement, et
+            // rien ne garantissait que la page annonce la même chose que ce que
+            // le compte recevait vraiment.
+            'essai_actif' => true,
+            'essai_jours' => 14,
+            'essai_titre' => ['fr' => '{jours} jours offerts', 'en' => '{jours} days free'],
+            'essai_texte' => [
+                'fr' => 'Chaque nouveau compte démarre avec {jours} jours d\'accès complet au plan payant, sans carte bancaire. À la fin de l\'essai, le compte bascule sur le plan Gratuit si aucun paiement n\'est fait.',
+                'en' => 'Every new account starts with {jours} days of full access to the paid plan, no credit card. When the trial ends, the account moves to the Free plan unless a payment is made.',
+            ],
+
             // La note sous la grille.
             'note_actif' => true,
             'note' => [

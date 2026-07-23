@@ -71,6 +71,11 @@ class ProprietaireAuthController extends Controller
 
         $proprietaire->update(['telephone_verified_at' => now()]);
 
+        // Durée de l'essai : lue dans les réglages de tarification, pas écrite
+        // en dur. C'est la MÊME valeur que celle annoncée sur la page publique
+        // des tarifs — sans quoi on peut promettre 14 jours et en accorder 7.
+        $joursEssai = max(1, (int) (\App\Models\VitrineSetting::tarification()['essai_jours'] ?? 14));
+
         $atelier = Atelier::create([
             'proprietaire_id' => $proprietaire->id,
             // Nom saisi par l'utilisateur à l'inscription (zéro hardcode) ;
@@ -79,7 +84,7 @@ class ProprietaireAuthController extends Controller
             'type'            => $proprietaire->type_atelier ?: 'artisan',
             'is_maitre'       => true,
             'statut'          => 'actif',
-            'essai_expire_at' => now()->addDays(14),
+            'essai_expire_at' => now()->addDays($joursEssai),
         ]);
 
         // CLI-1 — devise déduite du pays, lui-même deviné à partir de l'indicatif
@@ -103,9 +108,9 @@ class ProprietaireAuthController extends Controller
             'atelier_id'            => $atelier->id,
             'niveau_cle'            => $niveauEssai?->cle ?? $cleEssai,
             'statut'                => 'essai',
-            'jours_restants'        => 14,
+            'jours_restants'        => $joursEssai,
             'timestamp_debut'       => now(),
-            'timestamp_expiration'  => now()->addDays(14),
+            'timestamp_expiration'  => now()->addDays($joursEssai),
             'config_snapshot'       => $niveauEssai?->config,
         ]);
 
