@@ -61,7 +61,7 @@ ne casse à l'écran, personne ne s'en plaint, et le préjudice court en silence
 |---|---|---|---|
 | **P1** | **Pré-rendu SEO inerte** | ⚠️ | Vérifié le 23/07 : `curl -A Googlebot` sur l'accueil, `/createurs` et un profil renvoie **le même titre générique** qu'un navigateur. Tout le travail serveur existe et fonctionne (`SeoRenderController` testé en direct), mais **nginx ne route aucun robot vers lui**. Conséquence : Google indexe une page vide de contenu depuis le lancement. Cause connue : le vhost est en `600 root:root`, hors de portée du `sudo` autorisé au déploiement — il faut poser la règle à la main sur le serveur. |
 | **P2** | **Formulaire de contact NovafriQ cassé** | ⚠️ | Vérifié le 23/07 dans le paquet servi en production : le formulaire poste vers `formspree.io/f/VOTRE_ID_FORMSPREE` — l'identifiant d'exemple n'a **jamais** été remplacé. Chaque message échoue et retombe sur un lien `mailto` que le visiteur doit cliquer lui-même. **Depuis la mise en ligne, personne ne peut nous écrire depuis le site.** Corrigé par le back-office NovafriQ (§4), qui reçoit les messages en base. |
-| **P3** | **Aucun contenu NovafriQ n'est éditable** | ⬜ | Tout le texte du site — postes ouverts, membres, FAQ, produits, feuille de route — est écrit en dur dans le JSX. Changer une virgule demande un commit et un déploiement. La page Actualités annonce un blog qui n'existe pas. C'est l'objet du chantier §4. |
+| **P3** | **Aucun contenu NovafriQ n'est éditable** | ✅ 23/07 | Tout le texte du site — postes ouverts, membres, FAQ, produits, feuille de route — est écrit en dur dans le JSX. Changer une virgule demande un commit et un déploiement. La page Actualités annonce un blog qui n'existe pas. C'est l'objet du chantier §4. |
 
 ---
 
@@ -110,9 +110,9 @@ Décisions prises avec la direction avant de commencer :
 | NF-3 | API publique (contenu, articles, messages) + API d'administration | ✅ 23/07 |
 | NF-4 | Kit d'administration déclaratif — une ressource se **déclare**, ses écrans en découlent | ✅ 23/07 |
 | NF-5 | Ressources déclarées : produits, membres, postes, partenaires, FAQ, 8 listes, articles, rubriques, messages, comptes | ✅ 23/07 |
-| NF-6 | Site public branché sur l'API, avec copie de secours | 🟡 3 pages sur 10 |
+| NF-6 | Site public branché sur l'API, avec copie de secours | ✅ 23/07 — 10 pages sur 10 |
 | NF-7 | Formulaire de contact réparé → boîte de réception du back-office | ✅ 23/07 *(en attente de déploiement)* |
-| NF-8 | Blog / actualités réel (la page en annonce un qui n'existe pas) | ⬜ |
+| NF-8 | Blog / actualités réel (la page en annonce un qui n'existe pas) | ✅ 23/07 |
 | NF-9 | Déploiement : base, `.env`, vhost `/api`, CI/CD, certificat | ⬜ |
 | NF-10 | Reliquats sur le serveur : `/var/www/novafriq_new` et un `pari-finale.conf` vide dans `sites-enabled` | ⬜ |
 
