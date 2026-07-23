@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Retire les six plans d'abonnement hérités et rebascule ceux qui les utilisent.
@@ -30,6 +31,21 @@ return new class extends Migration
         'magnat_annuel'    => 'master_annuel',
     ];
 
+    /**
+     * TOUTES les tables qui pointent vers `niveaux_config.cle`.
+     *
+     * Il y en a quatre, pas deux. N'en traiter qu'une partie ne se voit que sur
+     * un environnement qui a de l'historique : la suppression passe là où les
+     * autres tables sont vides, et échoue ailleurs sur la clé étrangère. Cette
+     * liste est vérifiée contre le schéma, pas devinée.
+     */
+    private const REFERENCES = [
+        'abonnements'             => 'niveau_cle',
+        'transactions_abonnement' => 'niveau_cle',
+        'paiements'               => 'niveau_cle',
+        'offres_speciales'        => 'niveau_base_cle',
+    ];
+
     public function up(): void
     {
         foreach (self::REMPLACEMENTS as $ancien => $actuel) {
@@ -40,23 +56,35 @@ return new class extends Migration
                 continue;
             }
 
-            // Le cliché de configuration suit le nouveau plan : sans cela,
-            // l'atelier garderait les quotas de l'ancien.
-            DB::table('abonnements')->where('niveau_cle', $ancien)->update([
-                'niveau_cle'      => $actuel,
-                'config_snapshot' => $config,
-                'updated_at'      => now(),
-            ]);
+            foreach (self::REFERENCES as $table => $colonne) {
+                if (! Schema::hasTable($table)) {
+                    continue;
+                }
 
-            DB::table('transactions_abonnement')->where('niveau_cle', $ancien)
-                ->update(['niveau_cle' => $actuel, 'updated_at' => now()]);
+                $maj = [$colonne => $actuel];
+                if (Schema::hasColumn($table, 'updated_at')) {
+                    $maj['updated_at'] = now();
+                }
+                // Le cliché de configuration suit le nouveau plan : sans cela,
+                // l'atelier garderait les quotas de l'ancien.
+                if ($table === 'abonnements') {
+                    $maj['config_snapshot'] = $config;
+                }
+
+                DB::table($table)->where($colonne, $ancien)->update($maj);
+            }
         }
 
         foreach (array_keys(self::REMPLACEMENTS) as $ancien) {
             // Garde-fou : on ne supprime que ce qui n'est plus référencé nulle
             // part. Mieux vaut laisser un plan mort qu'une base incohérente.
-            $encoreUtilise = DB::table('abonnements')->where('niveau_cle', $ancien)->exists()
-                || DB::table('transactions_abonnement')->where('niveau_cle', $ancien)->exists();
+            $encoreUtilise = false;
+            foreach (self::REFERENCES as $table => $colonne) {
+                if (Schema::hasTable($table) && DB::table($table)->where($colonne, $ancien)->exists()) {
+                    $encoreUtilise = true;
+                    break;
+                }
+            }
 
             if (! $encoreUtilise) {
                 DB::table('niveaux_config')->where('cle', $ancien)->delete();
