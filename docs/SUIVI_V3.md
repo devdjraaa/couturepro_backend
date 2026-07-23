@@ -1,4 +1,4 @@
-# Suivi V3 — NovafriQ, Gextimo, HerboQuiz
+# Suivi V3 — NovafriQ & Gextimo
 
 > **Document de suivi unique.** Il remplace les cinq trackers qui coexistaient et se
 > contredisaient. À partir d'ici, **un seul fichier fait autorité** ; les anciens sont
@@ -30,8 +30,8 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
   ou en production à la date indiquée, jamais recopié d'un ancien fichier ;
 - **le livré est résumé, pas raconté**. Le détail narratif reste dans les archives. Un
   tracker sert à savoir quoi faire, pas à relire ce qui est fini ;
-- **les trois projets** sont dans le même tableau. NovafriQ et HerboQuiz existaient hors
-  de tout suivi.
+- **les deux projets sont dans le même tableau** : le site NovafriQ n'apparaissait
+  dans aucun suivi alors qu'il a ses propres anomalies en production.
 
 **Légende** — ✅ Fait · 🟡 Partiel · ⬜ À faire · ⚠️ Bug confirmé · 🚧 Bloqué (tiers) ·
 ℹ️ Décision, pas une tâche
@@ -47,7 +47,6 @@ Un tracker qui se contredit ne se corrige pas, il se refond.
 | **Gextimo — administration** | ✅ | Kit de formulaire unifié sur les 27 écrans (22/07) |
 | **NovafriQ — site** | ⚠️ | **Formulaire de contact cassé en production** |
 | **NovafriQ — back-office** | 🚧 | Chantier ouvert le 23/07, rien en ligne |
-| **HerboQuiz** | 🟡 | Application prête, **contenu et diffusion en attente** |
 | **Infrastructure** | ✅ | Sauvegardes, OTA, veille, files d'attente : sains |
 | **Direction** | ⬜ | 15 réglages et arbitrages en attente |
 
@@ -106,8 +105,8 @@ Décisions prises avec la direction avant de commencer :
 
 | ID | Sujet | Statut |
 |---|---|---|
-| NF-1 | `novafriq_backend` — Laravel 13, Sanctum, PostgreSQL, UUID, suppressions douces | 🚧 en cours |
-| NF-2 | Reprise **intégrale** du contenu actuel en base — rien ne doit se perdre | ⬜ |
+| NF-1 | `novafriq_backend` — Laravel 13, Sanctum, PostgreSQL, UUID, suppressions douces | ✅ 23/07 |
+| NF-2 | Reprise **intégrale** du contenu actuel en base — rien ne doit se perdre | ✅ 23/07 |
 | NF-3 | API publique (contenu, articles, messages) + API d'administration | ⬜ |
 | NF-4 | Kit d'administration déclaratif — une ressource se **déclare**, ses écrans en découlent | ⬜ |
 | NF-5 | Ressources : produits, membres, postes, partenaires, FAQ, listes, articles, messages, réglages | ⬜ |
@@ -124,20 +123,26 @@ reproduit, en repartant du kit d'administration Gextimo du 22/07. Ajouter un typ
 contenu doit coûter **un fichier de déclaration, pas quatre écrans**. Aucune bibliothèque
 tierce : le sur-mesure est un choix, comme sur Gextimo.
 
+**Reprise du contenu — vérifiée, pas supposée (NF-2).** 182 réglages, 45 éléments de
+liste, 3 produits, 4 membres, 4 postes, 9 questions, 3 rubriques d'articles. La reprise a
+été **confrontée automatiquement au code source** : sur 152 chaînes longues extraites du
+JSX, toutes sont retrouvées en base sauf trois oublis réels, comblés dans la foulée — la
+page « introuvable », les libellés du formulaire de contact, et l'indice du champ message.
+Le reste des écarts signalés étaient des tracés SVG et des coupures de mon extraction.
+
+Trois écarts **volontaires**, à ne pas prendre pour des oublis :
+
+- le texte « en attendant l'ouverture du blog » est remplacé, puisque le blog existera ;
+- les partenaires ne sont **pas** semés : le site annonce que les emplacements « seront
+  complétés au fil des partenariats officialisés ». Inventer des lignes serait mentir ;
+- le semis **ne remplace jamais** une valeur déjà modifiée en administration. Il pose la
+  définition du réglage et ne renseigne la valeur qu'à la création — sans quoi chaque
+  déploiement effacerait le travail de l'éditeur, sans erreur et sans témoin.
+
 ⚠️ **Un collaborateur pousse sur `main`** (Kaiffre, 7 commits d'avance au 23/07) et le
 dépôt se déploie tout seul. Toujours `git fetch` avant de toucher au site. Le code
 d'administration vit dans `src/admin/`, qu'il ne touche pas.
 
-## 2.4 HerboQuiz
-
-Projet à part, avec son propre document de reprise : **`herboquiz_backend/CONTEXTE.md`**.
-Ne pas dupliquer ici — seulement l'échéance, parce qu'elle est proche.
-
-| ID | Sujet | Statut |
-|---|---|---|
-| HQ-1 | Application complète, en ligne sur `herboquiz.novafriq.africa` | ✅ |
-| HQ-2 | **Écran d'animation jamais vu en conditions réelles** — les données sont testées, le rendu non | 🟡 |
-| HQ-3 | Corriger « Lundi 27 juillet 2026 a 18h00 » (accent manquant, valeur par défaut) | ⬜ |
 
 ---
 
@@ -174,12 +179,6 @@ d'emploi détaillé dans `POUR_LA_DIRECTION.md`.
 | DIR-11 | **En continu** — entretenir « Quoi de neuf » à chaque livraison. Les mises à jour partent automatiquement, parfois plusieurs fois par jour : sans cette page, les professionnels voient l'application changer sans savoir quoi. Quatre entrées sont déjà rédigées pour donner le ton — écrire pour un utilisateur d'atelier, pas pour un développeur |
 | DIR-15 | Fournir les clés externes le jour d'une campagne payante (GA4, Pixel Meta, Clarity, Search Console). **Facultatif** : l'analytique interne tourne déjà et `/admin/analytique` est alimenté |
 
-## HerboQuiz — échéance proche
-
-| ID | Sujet | Échéance |
-|---|---|---|
-| HQ-D1 | **Diffuser le lien d'inscription** dans le groupe — bloque tout le reste | clôture **samedi 25/07 à 20h** |
-| HQ-D2 | **Préparer les questions** (format `question \| réponse`, une par ligne) — la banque est vide | avant **lundi 27/07, 18h** |
 
 ---
 
