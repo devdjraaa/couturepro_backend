@@ -33,7 +33,7 @@ class EssaiGratuitTest extends TestCase
     private function inscrire(string $type = 'artisan'): Atelier
     {
         // Les niveaux d'essai doivent exister, sinon l'abonnement part sans config.
-        foreach (['standard_mensuel', 'master_mensuel'] as $cle) {
+        foreach (['atelier_mensuel', 'master_mensuel'] as $cle) {
             NiveauConfig::firstOrCreate(['cle' => $cle], [
                 'label'       => ucfirst($cle),
                 'prix_xof'    => 2500,
@@ -101,6 +101,37 @@ class EssaiGratuitTest extends TestCase
 
         $this->assertGreaterThanOrEqual(1, (int) $abonnement->jours_restants);
         $this->assertTrue($atelier->essai_expire_at->isFuture());
+    }
+
+    /**
+     * Le cœur du signalement de la direction : « on ne peut modifier que les
+     * plans designer ». L'artisan recevait `standard_mensuel`, un plan LEGACY
+     * DÉSACTIVÉ — donc absent de l'administration. Modifier le plan « Atelier »
+     * ne changeait rien pour un seul artisan, puisqu'aucun n'y était rattaché.
+     */
+    public function test_un_artisan_ne_tombe_jamais_sur_un_plan_desactive(): void
+    {
+        // Le plan legacy existe encore ici : s'il était choisi, le test le voit.
+        NiveauConfig::firstOrCreate(['cle' => 'standard_mensuel'], [
+            'label' => 'Standard Mensuel', 'prix_xof' => 3500,
+            'duree_jours' => 31, 'config' => [], 'is_actif' => false,
+        ]);
+
+        $atelier    = $this->inscrire('artisan');
+        $abonnement = Abonnement::where('atelier_id', $atelier->id)->firstOrFail();
+        $niveau     = NiveauConfig::where('cle', $abonnement->niveau_cle)->firstOrFail();
+
+        $this->assertNotSame('standard_mensuel', $abonnement->niveau_cle);
+        $this->assertTrue((bool) $niveau->is_actif, 'Un artisan a été rattaché à un plan désactivé.');
+    }
+
+    public function test_chaque_type_de_compte_recoit_le_plan_correspondant(): void
+    {
+        $artisan  = Abonnement::where('atelier_id', $this->inscrire('artisan')->id)->firstOrFail();
+        $designer = Abonnement::where('atelier_id', $this->inscrire('designer')->id)->firstOrFail();
+
+        $this->assertSame('atelier_mensuel', $artisan->niveau_cle);
+        $this->assertSame('master_mensuel',  $designer->niveau_cle);
     }
 
     public function test_la_page_publique_expose_la_duree_et_le_texte(): void

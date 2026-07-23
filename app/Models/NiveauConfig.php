@@ -42,12 +42,19 @@ class NiveauConfig extends Model
 
     /**
      * Plan servi pendant la période d'essai selon le type d'atelier.
-     * L'essai promet un « accès complet » : un designer doit donc avoir le niveau
-     * Studio (cle historique master_mensuel), un artisan le niveau standard.
+     * L'essai promet un « accès complet » : un designer a le niveau Studio (clé
+     * historique master_mensuel), un artisan le niveau Atelier.
+     *
+     * L'artisan recevait `standard_mensuel` — un plan LEGACY DÉSACTIVÉ. Effet
+     * de bord invisible mais lourd : la direction pouvait modifier le plan
+     * « Atelier » dans l'administration sans que cela change quoi que ce soit
+     * pour un seul artisan, puisqu'aucun n'y était rattaché. Côté designer tout
+     * marchait, d'où le diagnostic « on ne peut modifier que les plans
+     * designer ».
      */
     public static function cleEssaiPour(?string $typeAtelier): string
     {
-        return $typeAtelier === 'designer' ? 'master_mensuel' : 'standard_mensuel';
+        return $typeAtelier === 'designer' ? 'master_mensuel' : 'atelier_mensuel';
     }
 
     /** Plan facturé à l'année (échéance de date à date : +1 an). */

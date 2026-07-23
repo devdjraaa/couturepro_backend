@@ -295,7 +295,10 @@ class AtelierController extends Controller
                 ['atelier_id' => $target->id],
                 [
                     'statut'               => 'essai',
-                    'niveau_cle'           => $target->abonnement?->niveau_cle ?? 'standard_mensuel',
+                    // Repli aligné sur le type de l'atelier, plus sur un plan
+                    // legacy désactivé qui n'existe même plus.
+                    'niveau_cle'           => $target->abonnement?->niveau_cle
+                        ?? \App\Models\NiveauConfig::cleEssaiPour($target->type),
                     'jours_restants'       => $dureeJours,
                     'timestamp_debut'      => now(),
                     'timestamp_expiration' => $expire,
