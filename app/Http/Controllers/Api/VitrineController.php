@@ -653,6 +653,21 @@ class VitrineController extends Controller
             'packs_bouton.fr'         => $texte,
             'packs_bouton.en'         => $texte,
             'packs_lien'              => ['nullable', 'string', 'max:200'],
+
+            // Essai offert.
+            'essai_actif'             => ['nullable', 'boolean'],
+            'essai_jours'             => ['nullable', 'integer', 'min:1', 'max:365'],
+            'essai_titre.fr'          => $texte,
+            'essai_titre.en'          => $texte,
+            'essai_texte.fr'          => $texte,
+            'essai_texte.en'          => $texte,
+
+            // Libellés des lignes de fonctionnalité, servis à la vitrine ET à
+            // l'application. Clés libres : une fonctionnalité ajoutée plus tard
+            // doit pouvoir être nommée sans repasser par ici.
+            'libelles'                => ['nullable', 'array'],
+            'libelles.*.fr'           => ['nullable', 'string', 'max:200'],
+            'libelles.*.en'           => ['nullable', 'string', 'max:200'],
         ]);
 
         // Un plan mis en avant qui n'existe pas ferait disparaître le badge
@@ -670,7 +685,15 @@ class VitrineController extends Controller
             }
         }
 
-        $s = VitrineSetting::updateOrCreate(['cle' => 'tarification'], ['valeur' => $data]);
+        // FUSION, jamais remplacement. `validate()` ne rend que les clés
+        // déclarées ci-dessus : enregistrer depuis un écran qui n'en édite
+        // qu'une partie EFFAÇAIT tout le reste — l'essai offert et les libellés
+        // des fonctionnalités auraient disparu au premier enregistrement du
+        // badge. Un bloc ajouté demain survit désormais sans qu'on y pense.
+        $existant = VitrineSetting::where('cle', 'tarification')->value('valeur');
+        $valeur   = array_replace_recursive(is_array($existant) ? $existant : [], $data);
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'tarification'], ['valeur' => $valeur]);
 
         return response()->json($s->valeur);
     }

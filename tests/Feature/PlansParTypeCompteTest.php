@@ -115,6 +115,35 @@ class PlansParTypeCompteTest extends TestCase
         $this->assertNotContains('vitrine_seulement', $appli);
     }
 
+    /**
+     * Piège évité de justesse : `validate()` ne rend que les clés déclarées, et
+     * l'enregistrement écrasait tout le bloc. Un écran qui n'édite que le badge
+     * aurait effacé l'essai offert et les libellés au premier enregistrement.
+     */
+    public function test_enregistrer_une_partie_des_reglages_n_efface_pas_le_reste(): void
+    {
+        $admin = \App\Models\Admin::create([
+            'nom' => 'Admin', 'prenom' => 'Tarifs',
+            'email' => Str::uuid() . '@test.local',
+            'password' => bcrypt('motdepasse'),
+            'role' => 'super_admin', 'is_active' => true,
+        ]);
+
+        $this->actingAs($admin, 'admin')
+             ->putJson('/api/admin/vitrine/tarification', [
+                 'types_actif' => true, 'note_actif' => true, 'packs_actif' => true,
+                 'badge_populaire' => ['fr' => 'Le plus choisi', 'en' => 'Most chosen'],
+             ])->assertOk();
+
+        $apres = \App\Models\VitrineSetting::tarification();
+
+        $this->assertSame('Le plus choisi', $apres['badge_populaire']['fr']);
+        // Ce qui n'était pas dans la requête doit avoir survécu.
+        $this->assertArrayHasKey('libelles', $apres);
+        $this->assertNotEmpty($apres['libelles']['multi_quota']['fr'] ?? null);
+        $this->assertGreaterThan(0, (int) ($apres['essai_jours'] ?? 0));
+    }
+
     public function test_les_libelles_des_fonctionnalites_sont_servis_et_editables(): void
     {
         $r = $this->getJson('/api/vitrine/tarification')->assertOk();
