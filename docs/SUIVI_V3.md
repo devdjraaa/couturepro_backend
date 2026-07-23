@@ -107,11 +107,11 @@ Décisions prises avec la direction avant de commencer :
 |---|---|---|
 | NF-1 | `novafriq_backend` — Laravel 13, Sanctum, PostgreSQL, UUID, suppressions douces | ✅ 23/07 |
 | NF-2 | Reprise **intégrale** du contenu actuel en base — rien ne doit se perdre | ✅ 23/07 |
-| NF-3 | API publique (contenu, articles, messages) + API d'administration | ⬜ |
+| NF-3 | API publique (contenu, articles, messages) + API d'administration | ✅ 23/07 |
 | NF-4 | Kit d'administration déclaratif — une ressource se **déclare**, ses écrans en découlent | ⬜ |
-| NF-5 | Ressources : produits, membres, postes, partenaires, FAQ, listes, articles, messages, réglages | ⬜ |
+| NF-5 | Ressources déclarées : produits, membres, postes, partenaires, FAQ, listes, articles, catégories, messages, comptes | ✅ 23/07 *(côté serveur)* |
 | NF-6 | Site public branché sur l'API, avec copie de secours | ⬜ |
-| NF-7 | Formulaire de contact réparé → boîte de réception du back-office | ⬜ = **P2** |
+| NF-7 | Formulaire de contact réparé → boîte de réception du back-office | 🟡 serveur fait, reste à brancher le site = **P2** |
 | NF-8 | Blog / actualités réel (la page en annonce un qui n'existe pas) | ⬜ |
 | NF-9 | Déploiement : base, `.env`, vhost `/api`, CI/CD, certificat | ⬜ |
 | NF-10 | Reliquats sur le serveur : `/var/www/novafriq_new` et un `pari-finale.conf` vide dans `sites-enabled` | ⬜ |
@@ -129,6 +129,25 @@ liste, 3 produits, 4 membres, 4 postes, 9 questions, 3 rubriques d'articles. La 
 JSX, toutes sont retrouvées en base sauf trois oublis réels, comblés dans la foulée — la
 page « introuvable », les libellés du formulaire de contact, et l'indice du champ message.
 Le reste des écarts signalés étaient des tracés SVG et des coupures de mon extraction.
+
+**API — 21 tests, sous PostgreSQL (NF-3).** Le site reçoit tout son contenu en **un
+seul appel**, mis en cache et purgé à chaque écriture : sans cette purge, l'éditeur
+verrait le back-office confirmer sa modification pendant que le site sert encore
+l'ancienne, et il la referait en croyant s'être trompé.
+
+La route publique d'écriture — le formulaire de contact — porte trois garde-fous, chacun
+contre un abus différent : cadence limitée, champ piège pour les robots, et empreinte du
+contenu pour qu'un visiteur impatient qui clique trois fois ne produise pas trois lignes.
+C'est la classe de faille déjà rencontrée deux fois sur Gextimo.
+
+Les tests tournent **sous PostgreSQL, jamais SQLite** : le code utilise `ilike`, qui
+n'existe pas ailleurs, et un test vert sous un autre moteur donnerait une fausse
+assurance — le piège exact déjà payé sur Gextimo avec MySQL en développement.
+
+Deux vérifications valent d'être citées, parce qu'elles visent des bugs déjà vécus :
+la **suppression est confrontée à la base**, pas à son code de retour (une route mal
+déclarée a déjà répondu « supprimé » sans rien supprimer) ; et le **cloisonnement des
+rôles est testé côté serveur**, pas en constatant qu'un bouton est masqué.
 
 Trois écarts **volontaires**, à ne pas prendre pour des oublis :
 
