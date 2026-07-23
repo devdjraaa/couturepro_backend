@@ -78,10 +78,11 @@ avaient survécu si longtemps.
 | GX-3 | Ordre des rubriques Paramètres | ⬜ | Jamais vérifié à l'écran faute de spec assez précise. |
 | GX-4 | Mention « Bientôt » sur les modules non prêts | ⬜ | Idem. |
 | GX-5 | Recommandation par catégorie | ⬜ | La reco v1 (créateurs favoris en tête) tourne. La version par catégorie suppose de **catégoriser les créations** — chantier de données, pas d'affichage. |
-| GX-6 | Facturation : prévisualisation et gabarits avancés | 🟡 | Le module et la normalisation DGI sont livrés. Restent l'aperçu avant émission et les gabarits par atelier. |
+| GX-6 | Facturation : prévisualisation et gabarits avancés | ✅ 23/07 | Aperçu avant émission livré et **vérifié à l'écran** : l'overlay rend le document fidèlement (en-tête atelier, client, tableau, totaux, gabarit). Il a même montré son utilité en affichant un net à payer négatif quand l'acompte dépassait le total. |
 | GX-7 | Export des mesures en CSV | ✅ 23/07 | Individuel corrigé : le bouton pointait vers un `<a download>` sans jeton (401) et l'URL venait d'une méthode `async` (`[object Promise]`) → récupération via client authentifié. 4 tests serveur. |
 | GX-8 | Bulle Makila « hors ligne » plantée en bas à droite | ✅ 23/07 | Aucun minuteur : elle restait plantée en permanence et chevauchait le bandeau d'install. Désormais auto-disparition (6 s) + croix + mémoire de session. Vérifié à l'écran. |
 | GX-9 | Mention « Une solution NovafriQ » absente du widget Makila | ✅ 23/07 | Le pied de page vitrine la portait, pas le widget Makila (présent sur chaque page). Ligne d'attribution ajoutée en bas du chat, cliquable vers novafriq.africa. Textes fr/en + URL éditables (zéro hardcoding). Vérifié à l'écran. |
+| GX-10 | L'app avalait TOUS les messages du serveur | ✅ 23/07 | **Trouvé en faisant le QA-7 sur le téléphone.** Les intercepteurs rejettent un objet normalisé `{code, message}` (plus de `.response`) alors que **18 écrans** lisaient encore `err.response.data.message` → toujours vide → message générique. Quotas, motifs de refus et erreurs de validation étaient perdus **partout**. Deux dégâts cachés : le retour visuel des problèmes de qualité (réalisations) ne s'affichait jamais, et deux écrans testaient un `403` toujours faux. Corrigé à la source + 18 écrans. Vérifié contre l'API de production. |
 
 ## 2.2 Gextimo — à re-tester sur appareil
 
@@ -91,10 +92,10 @@ travers l'application réelle, pas en relisant le code.
 
 | ID | Sujet | Statut |
 |---|---|---|
-| QA-5 | Bouton « déjà inscrit » sur l'écran d'inscription | 🟡 |
-| QA-6 | Repli de la barre latérale en icônes seules (grand écran) | 🟡 |
-| QA-7 | Quotas des plans annuels — assistants, sous-ateliers, cumul d'essai | 🟡 |
-| QA-8 | Événements dynamiques : campagne réelle de 3-4 jours | 🟡 |
+| QA-5 | Bouton « déjà inscrit » sur l'écran d'inscription | ✅ 23/07 — vérifié sur le téléphone : « Déjà inscrit ? Se connecter » présent, mène bien à la connexion |
+| QA-6 | Repli de la barre latérale en icônes seules (grand écran) | ✅ 23/07 — vérifié à l'écran : 256 px → 64 px, 18 libellés → icônes seules, préférence conservée au rechargement |
+| QA-7 | Quotas des plans annuels — assistants, sous-ateliers, cumul d'essai | ✅ 23/07 — compte réellement en plan annuel : quotas **appliqués** (4ᵉ membre refusé 403). 2 défauts trouvés et corrigés (voir GX-10 + bouton d'ajout proposé à 3/3) |
+| QA-8 | Événements dynamiques : campagne réelle de 3-4 jours | 🟣 **bloqué** — fonction de la *vitrine*, le téléphone n'y change rien ; et **aucune campagne n'est configurée** (l'API renvoie une liste vide). Il faut une campagne programmée par la direction, puis 3-4 jours d'observation |
 
 ## 2.3 NovafriQ — back-office de contenu *(chantier ouvert le 23/07)*
 
