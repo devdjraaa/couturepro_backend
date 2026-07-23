@@ -60,12 +60,14 @@ class NiveauConfigController extends Controller
         $data = $request->validate([
             'cle'                          => ['required', 'string', 'max:50', 'unique:niveaux_config,cle'],
             'label'                        => ['required', 'string', 'max:100'],
+            'label_en'                     => ['nullable', 'string', 'max:120'],
             'duree_jours'                  => ['required', 'integer', 'min:1'],
             'prix_xof'                     => ['required', 'numeric', 'min:0'],
             'prix_mensuel_equivalent_xof'  => ['nullable', 'numeric', 'min:0'],
             'config'                       => ['required', 'array'],
             'ordre_affichage'              => ['nullable', 'integer'],
             'description_courte'           => ['nullable', 'string', 'max:255'],
+            'description_courte_en'        => ['nullable', 'string', 'max:255'],
         ]);
 
         $data['updated_by'] = $admin->id;
@@ -84,12 +86,14 @@ class NiveauConfigController extends Controller
 
         $data = $request->validate([
             'label'                        => ['sometimes', 'string', 'max:100'],
+            'label_en'                     => ['nullable', 'string', 'max:120'],
             'duree_jours'                  => ['sometimes', 'integer', 'min:1'],
             'prix_xof'                     => ['sometimes', 'numeric', 'min:0'],
             'prix_mensuel_equivalent_xof'  => ['nullable', 'numeric', 'min:0'],
             'config'                       => ['sometimes', 'array'],
             'ordre_affichage'              => ['nullable', 'integer'],
             'description_courte'           => ['nullable', 'string', 'max:255'],
+            'description_courte_en'        => ['nullable', 'string', 'max:255'],
         ]);
 
         $data['updated_by'] = $admin->id;

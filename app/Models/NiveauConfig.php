@@ -19,6 +19,7 @@ class NiveauConfig extends Model
     protected $fillable = [
         'cle',
         'label',
+        'label_en',
         'duree_jours',
         'prix_xof',
         'prix_mensuel_equivalent_xof',
@@ -26,6 +27,7 @@ class NiveauConfig extends Model
         'is_actif',
         'ordre_affichage',
         'description_courte',
+        'description_courte_en',
         'updated_by',
     ];
 

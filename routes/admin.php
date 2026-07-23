@@ -71,6 +71,12 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/sponsorisation', [VitrineController::class, 'sponsorisation']);
     Route::put('vitrine/sponsorisation', [VitrineController::class, 'setSponsorisation']);
 
+    // Presentation de la page de tarifs : plan mis en avant, note de bas de
+    // grille, encart des options complementaires. Aucun prix ici — les tarifs
+    // restent dans les plans.
+    Route::get('vitrine/tarification', [VitrineController::class, 'tarification']);
+    Route::put('vitrine/tarification', [VitrineController::class, 'setTarification']);
+
     // Brief 16/07 (pt 6) : périodes d'habillage saisonnier (splash local, config-driven)
     Route::get('vitrine/splash-themes', [VitrineController::class, 'getSplashThemes']);
     Route::put('vitrine/splash-themes', [VitrineController::class, 'setSplashThemes']);

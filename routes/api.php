@@ -121,6 +121,7 @@ Route::get('vitrine/pages/{cle}', [\App\Http\Controllers\Api\PageLegaleControlle
 // Coordonnées officielles (marque, site, téléphone) : source unique pour les
 // documents et partages sortants — le front ne doit rien figer en dur.
 Route::get('vitrine/coordonnees', fn () => response()->json(\App\Models\VitrineSetting::coordonnees()));
+Route::get('vitrine/tarification', [\App\Http\Controllers\Api\VitrineController::class, 'tarification']);
 Route::get('vitrine/types-document', fn () => response()->json(['types' => \App\Models\VitrineSetting::typesDocumentVerification()]));
 
 // Identité légale (RCCM, IFU, délibération APDP, dates d'entrée en vigueur) :

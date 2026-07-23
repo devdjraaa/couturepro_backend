@@ -129,6 +129,57 @@ class VitrineSetting extends Model
      * partages sortants (PDF de mesures, message WhatsApp). Éditables en admin :
      * un changement de numéro ne doit pas demander un redéploiement.
      */
+    /**
+     * Presentation de la page de tarifs.
+     *
+     * Tout ce qui est texte ou choix editorial vit ici, jamais dans le code :
+     * quel plan porte le badge, la note de bas de grille, l'encart des options
+     * complementaires. La direction change un mot ou deplace le badge sans
+     * developpeur ni deploiement.
+     *
+     * Les textes sont bilingues. Une traduction vide retombe sur le francais —
+     * mieux vaut un mot en francais qu'un blanc sur une page de tarifs.
+     */
+    public static function tarification(): array
+    {
+        $cfg = static::where('cle', 'tarification')->value('valeur');
+
+        return array_replace_recursive([
+            // Le plan mis en avant. Vide = aucun badge. La cle correspond au
+            // palier (« atelier », « master »), pas a la variante mensuelle.
+            'plan_populaire' => 'atelier',
+            'badge_populaire' => ['fr' => 'Plan populaire', 'en' => 'Most popular'],
+
+            // Le selecteur artisan / designer.
+            'types_actif' => true,
+            'type_artisan' => [
+                'libelle' => ['fr' => 'Artisan', 'en' => 'Artisan'],
+                'texte'   => ['fr' => 'Pour gérer votre atelier au quotidien.', 'en' => 'To run your workshop day to day.'],
+            ],
+            'type_designer' => [
+                'libelle' => ['fr' => 'Designer', 'en' => 'Designer'],
+                'texte'   => ['fr' => 'Pour exposer vos créations et vendre en ligne.', 'en' => 'To showcase your creations and sell online.'],
+            ],
+
+            // La note sous la grille.
+            'note_actif' => true,
+            'note' => [
+                'fr' => 'Les caractéristiques et limites des plans peuvent être modifiées à tout moment sans préavis.',
+                'en' => 'Plan features and limits may change at any time without notice.',
+            ],
+
+            // L'encart des options complementaires.
+            'packs_actif' => true,
+            'packs_titre' => ['fr' => 'Besoin de plus ?', 'en' => 'Need more?'],
+            'packs_texte' => [
+                'fr' => 'Des options complémentaires peuvent compléter votre offre : membres supplémentaires, quotas augmentés, extensions. Écrivez-nous pour en discuter.',
+                'en' => 'Add-ons can extend your plan: extra team members, higher quotas, additional options. Get in touch to discuss.',
+            ],
+            'packs_bouton' => ['fr' => 'Contacter le service', 'en' => 'Contact us'],
+            'packs_lien'   => '/support',
+        ], is_array($cfg) ? $cfg : []);
+    }
+
     public static function coordonnees(): array
     {
         $cfg = static::where('cle', 'coordonnees')->value('valeur');

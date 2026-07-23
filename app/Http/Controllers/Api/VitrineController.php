@@ -601,10 +601,74 @@ class VitrineController extends Controller
     {
         return response()->json(
             NiveauConfig::actif()->get([
-                'cle', 'label', 'duree_jours', 'prix_xof',
-                'prix_mensuel_equivalent_xof', 'description_courte', 'config',
+                'cle', 'label', 'label_en', 'duree_jours', 'prix_xof',
+                'prix_mensuel_equivalent_xof', 'description_courte',
+                'description_courte_en', 'config',
             ])
         );
+    }
+
+    /** GET /api/vitrine/tarification — présentation de la page de tarifs (publique). */
+    public function tarification(): JsonResponse
+    {
+        return response()->json(VitrineSetting::tarification());
+    }
+
+    /**
+     * PUT /api/admin/vitrine/tarification — édition de la présentation (admin).
+     *
+     * Aucun prix ici : les tarifs restent dans les plans. Cet écran ne pilote
+     * que la mise en scène — quel plan est mis en avant, et les textes autour
+     * de la grille.
+     */
+    public function setTarification(Request $request): JsonResponse
+    {
+        $texte = ['nullable', 'string', 'max:600'];
+
+        $data = $request->validate([
+            'plan_populaire'          => ['nullable', 'string', 'max:60'],
+            'badge_populaire.fr'      => $texte,
+            'badge_populaire.en'      => $texte,
+            'types_actif'             => ['required', 'boolean'],
+            'type_artisan.libelle.fr' => $texte,
+            'type_artisan.libelle.en' => $texte,
+            'type_artisan.texte.fr'   => $texte,
+            'type_artisan.texte.en'   => $texte,
+            'type_designer.libelle.fr' => $texte,
+            'type_designer.libelle.en' => $texte,
+            'type_designer.texte.fr'  => $texte,
+            'type_designer.texte.en'  => $texte,
+            'note_actif'              => ['required', 'boolean'],
+            'note.fr'                 => $texte,
+            'note.en'                 => $texte,
+            'packs_actif'             => ['required', 'boolean'],
+            'packs_titre.fr'          => $texte,
+            'packs_titre.en'          => $texte,
+            'packs_texte.fr'          => $texte,
+            'packs_texte.en'          => $texte,
+            'packs_bouton.fr'         => $texte,
+            'packs_bouton.en'         => $texte,
+            'packs_lien'              => ['nullable', 'string', 'max:200'],
+        ]);
+
+        // Un plan mis en avant qui n'existe pas ferait disparaître le badge
+        // sans que personne ne comprenne pourquoi : on refuse plutôt.
+        if (! empty($data['plan_populaire'])) {
+            $paliers = NiveauConfig::actif()->pluck('cle')
+                ->map(fn ($c) => preg_replace('/_(mensuel|annuel)$/', '', $c))
+                ->unique()->all();
+
+            if (! in_array($data['plan_populaire'], $paliers, true)) {
+                return response()->json([
+                    'message'  => 'Ce plan n\'existe pas.',
+                    'attendus' => array_values($paliers),
+                ], 422);
+            }
+        }
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'tarification'], ['valeur' => $data]);
+
+        return response()->json($s->valeur);
     }
 
     /** PUT /api/admin/vitrine/sponsorisation — édition des offres (admin). */
