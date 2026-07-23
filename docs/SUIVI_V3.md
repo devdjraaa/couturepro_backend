@@ -86,6 +86,8 @@ avaient survécu si longtemps.
 
 | GX-11 | Tarifs : essai offert invisible, libellés obscurs, bande transparente | ✅ 23/07 | Retours du chef. **L'essai offert n'était annoncé nulle part** alors que tout nouveau compte reçoit d'emblée un plan **payant** 14 jours — encart ajouté, et la durée (écrite en dur à 3 endroits) vient désormais du back-office et alimente aussi la page, 4 tests verrouillent le lien. « illimité créations » : le mot était interpolé à la place du **nombre** → phrases dédiées. Libellés renommés (« Photos VIP » → « 15 photos mises en avant par mois », « Module Caisse » → « Caisse : encaissements et suivi du solde »). Un seul nom pour le plan gratuit (la FAQ disait « Free »). Carte bancaire → **mobile money via FedaPay**. Et la **bande d'annonces était transparente** (fond à 6 % d'opacité, collante : tout défilait au travers) → fond plein, vérifié à l'écran. |
 
+| GX-12 | Factures : date invalide, heure absente, mauvaise identité, lignes vides | ✅ 23/07 | Le point que le chef a qualifié de **grave**. La date était passée **déjà formatée** puis reconvertie → le PDF imprimait littéralement **« Invalid Date »** (prouvé avant correction). **Heure** ajoutée. L'en-tête retombait sur **« Gextimo » en dur** quand l'atelier n'était pas chargé : le client recevait une facture de la **mauvaise entreprise**. **Téléphone de l'atelier remonté en haut**. Et trouvé en vérifiant : l'aperçu affichait **toutes les lignes vides à 0 FCFA** alors que le total restait juste — document crédible et entièrement faux (deux vocabulaires de lignes, l'aperçu ne traduisait pas). Vérifié à l'écran sur une facture réelle. |
+
 ## 2.2 Gextimo — à re-tester sur appareil
 
 Ces points sont **codés et probablement bons**. Ils ne sont pas fermés parce qu'ils n'ont
