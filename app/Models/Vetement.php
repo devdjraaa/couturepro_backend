@@ -24,6 +24,8 @@ class Vetement extends Model
         'is_systeme',
         'is_archived',
         'publie_vitrine',
+        'categorie',
+        'vues',
         'collection_id',
         'created_by',
         'created_by_role',
@@ -36,6 +38,7 @@ class Vetement extends Model
         'is_systeme'       => 'boolean',
         'is_archived'      => 'boolean',
         'publie_vitrine'   => 'boolean',
+        'vues'             => 'integer',
         'images'           => 'array',
         // Colonne json : sans ce cast, un tableau envoyé par la sync (offline)
         // provoque « Array to string conversion » à l'insert et le record est perdu.
@@ -72,6 +75,17 @@ class Vetement extends Model
     public function commandes(): HasMany
     {
         return $this->hasMany(Commande::class, 'vetement_id');
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(CreationLike::class, 'vetement_id');
+    }
+
+    /** Créations réellement exposées dans la galerie publique. */
+    public function scopePubliee($query)
+    {
+        return $query->where('is_archived', false)->where('publie_vitrine', true);
     }
 
     public function scopeSysteme($query)

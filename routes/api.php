@@ -70,8 +70,12 @@ Route::prefix('vitrine')->group(function () {
     Route::get('createurs/{atelier}',  [VitrineController::class, 'show']);
     // Catalogue public (galerie de l'accueil vitrine) — alimente getCreations() côté front.
     Route::get('creations',            [VitrineController::class, 'creations']);
+    // Taxonomie éditable des catégories de la galerie publique.
+    Route::get('categories-creations', [VitrineController::class, 'categories']);
     // P159-160 : like public d'une création (anonyme, dé-doublonné par visitor_key).
     Route::post('creations/{vetement}/like', [VitrineController::class, 'toggleLike'])->middleware('throttle:20,60');
+    // Vue d'une création : compteur dédupliqué par session (fenêtre 30 min).
+    Route::post('creations/{vetement}/vue', [VitrineController::class, 'vue'])->middleware('throttle:60,1');
     // P173 : s'abonner / se désabonner d'un créateur (anonyme).
     Route::post('createurs/{atelier}/abonnement', [VitrineController::class, 'toggleAbonnement']);
     // P161-163 : patrons payants — achat (→ paiement), récupération par code, téléchargement.

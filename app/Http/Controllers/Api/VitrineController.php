@@ -99,9 +99,10 @@ class VitrineController extends Controller
             'image_url' => $v->image_url,
             'images'    => $v->images_urls,
             'prix'          => null,        // pas de prix en base -> « Sur devis » côté front
-            'categorie'     => null,
+            'categorie'     => $v->categorie,
             'type'          => 'Sur mesure',
             'collection_id' => $v->collection_id,
+            'vues'      => (int) $v->vues,
             'likes'     => (int) ($likeCounts[$v->id] ?? 0),          // P159
             'liked'     => $likedByMe->has($v->id),                    // like du visiteur courant
             'patron'    => isset($patrons[$v->id]) ? [                 // P161 : contenu payant
@@ -713,12 +714,41 @@ class VitrineController extends Controller
         return response()->json($s->valeur);
     }
 
+    /** GET /api/admin/vitrine/categories-creations — taxonomie complète (admin, y compris inactives). */
+    public function getCategoriesCreations(): JsonResponse
+    {
+        return response()->json(VitrineSetting::categoriesCreations());
+    }
+
+    /** PUT /api/admin/vitrine/categories-creations — édition de la taxonomie (admin). */
+    public function setCategoriesCreations(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'categories'             => ['required', 'array', 'min:1'],
+            'categories.*.cle'       => ['required', 'string', 'max:40', 'regex:/^[a-z0-9_]+$/'],
+            'categories.*.actif'     => ['nullable', 'boolean'],
+            'categories.*.label.fr'  => ['required', 'string', 'max:60'],
+            'categories.*.label.en'  => ['nullable', 'string', 'max:60'],
+        ]);
+
+        // Les clés doivent rester uniques : deux catégories de même clé rendraient
+        // le filtre ambigu et écraseraient l'une des deux à la lecture.
+        $cles = array_column($data['categories'], 'cle');
+        if (count($cles) !== count(array_unique($cles))) {
+            return response()->json(['message' => 'Deux catégories ont la même clé.'], 422);
+        }
+
+        $s = VitrineSetting::updateOrCreate(['cle' => 'categories_creations'], ['valeur' => $data['categories']]);
+
+        return response()->json($s->valeur);
+    }
+
     /**
      * Catalogue public de la vitrine : créations publiées de tous les designers
      * (galerie de la page d'accueil). Alimente getCreations() côté front — sinon
      * la vitrine retombe sur des modèles de démonstration.
      */
-    public function creations(): JsonResponse
+    public function creations(Request $request): JsonResponse
     {
         // Reco v1 (brief 16/07 point 4) : si un client vitrine est connecté, ses designers
         // « favoris » (déduits de SES événements : vues, likes, paniers, commandes) remontent
@@ -737,23 +767,42 @@ class VitrineController extends Controller
                 ->all();
         }
 
-        $creations = Vetement::query()
-            ->where('is_archived', false)
-            ->where('publie_vitrine', true)
+        // Filtre par catégorie (les filtres de la galerie s'appuient dessus).
+        $categorie = $request->query('categorie');
+        $categoriesValides = collect(VitrineSetting::categoriesCreations())->pluck('cle')->all();
+
+        $query = Vetement::query()
+            ->publiee()
             ->whereHas('atelier', fn ($q) => $q->where('is_demo', false)->where('type', 'designer'))
-            ->with('atelier:id,nom')
+            ->with('atelier:id,nom,sponsor_jusqu_a')
+            ->withCount('likes')
             ->latest()
-            ->limit(24)
-            ->get()
-            ->sortBy(fn ($v) => [array_search($v->atelier_id, $ateliersFavoris) === false ? 99 : array_search($v->atelier_id, $ateliersFavoris), 0])
+            ->limit(60);
+
+        if ($categorie && in_array($categorie, $categoriesValides, true)) {
+            $query->where('categorie', $categorie);
+        }
+
+        $rangFavori = fn ($v) => ($i = array_search($v->atelier_id, $ateliersFavoris, true)) === false ? 99 : $i;
+
+        $creations = $query->get()
+            // Bonnes pratiques marketplace (modèle Etsy) : le contenu MIS EN AVANT
+            // remonte en tête, mais reste CLAIREMENT identifié par un badge côté
+            // front (transparence obligatoire). Ensuite viennent les favoris du
+            // visiteur, puis l'ordre chronologique.
+            ->sortBy(fn ($v) => [$v->atelier?->sponsorise ? 0 : 1, $rangFavori($v), 0])
             ->values()
             ->map(fn ($v) => [
                 'id'          => (string) $v->id,
                 'titre'       => $v->nom,
+                'atelier_id'  => (string) $v->atelier_id,
                 'atelier_nom' => $v->atelier?->nom,
                 'prix'        => null,          // pas de prix en base → « Sur devis » côté front
-                'categorie'   => null,
+                'categorie'   => $v->categorie,
                 'type'        => 'Sur mesure',
+                'sponsorise'  => (bool) $v->atelier?->sponsorise,
+                'vues'        => (int) $v->vues,
+                'likes'       => (int) $v->likes_count,
                 'gradient'    => $this->gradient((int) abs(crc32((string) $v->atelier_id))),
                 'image_url'   => $v->image_url,
                 'images_urls' => $v->images_urls,
@@ -761,6 +810,42 @@ class VitrineController extends Controller
             ->values();
 
         return response()->json($creations);
+    }
+
+    /** GET /api/vitrine/categories — taxonomie éditable de la galerie (publique). */
+    public function categories(): JsonResponse
+    {
+        $actives = collect(VitrineSetting::categoriesCreations())
+            ->filter(fn ($c) => ($c['actif'] ?? true) !== false)
+            ->values();
+
+        return response()->json($actives);
+    }
+
+    /**
+     * POST /api/vitrine/creations/{vetement}/vue  { visitor_key }
+     *
+     * Incrémente le compteur de vues, DÉDUPLIQUÉ par visiteur sur une fenêtre de
+     * 30 minutes (bonne pratique : un rechargement ou un aller-retour ne doit
+     * pas gonfler le compteur). Le cache sert de minuteur : si la clé existe
+     * déjà, on ne compte pas.
+     */
+    public function vue(Request $request, Vetement $vetement): JsonResponse
+    {
+        if ($vetement->is_archived || ! $vetement->publie_vitrine) {
+            return response()->json(['message' => 'Création introuvable'], 404);
+        }
+
+        $data = $request->validate(['visitor_key' => ['required', 'string', 'max:64']]);
+        $cle  = "vue_creation:{$vetement->id}:{$data['visitor_key']}";
+
+        // add() ne pose la clé que si elle n'existe pas : renvoie false si une vue
+        // récente du même visiteur est déjà enregistrée.
+        if (\Illuminate\Support\Facades\Cache::add($cle, 1, now()->addMinutes(30))) {
+            $vetement->increment('vues');
+        }
+
+        return response()->json(['vues' => (int) $vetement->fresh()->vues]);
     }
 
     /**

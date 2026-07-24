@@ -35,6 +35,39 @@ class VitrineSetting extends Model
     }
 
     /**
+     * Catégories de la galerie publique — ÉDITABLES depuis l'administration.
+     *
+     * Défauts issus d'une recherche des bonnes pratiques (marketplace ANKA,
+     * référence de la mode africaine, + contexte couture sur mesure au Bénin),
+     * pas inventés « au feeling ». La direction ajoute, renomme ou retire depuis
+     * le back-office : chaque création porte alors la clé d'une de ces
+     * catégories, et les filtres de la galerie s'appuient dessus.
+     *
+     * Une catégorie = { cle, actif, label:{fr,en} }. L'ordre du tableau est
+     * l'ordre d'affichage des filtres.
+     */
+    public static function categoriesCreations(): array
+    {
+        $cfg = static::where('cle', 'categories_creations')->value('valeur');
+        if (is_array($cfg) && $cfg !== []) {
+            return $cfg;
+        }
+
+        return [
+            ['cle' => 'robes',        'actif' => true, 'label' => ['fr' => 'Robes',                    'en' => 'Dresses']],
+            ['cle' => 'ensembles',    'actif' => true, 'label' => ['fr' => 'Ensembles & tailleurs',    'en' => 'Sets & suits']],
+            ['cle' => 'traditionnel', 'actif' => true, 'label' => ['fr' => 'Tenues traditionnelles',   'en' => 'Traditional wear']],
+            ['cle' => 'ceremonie',    'actif' => true, 'label' => ['fr' => 'Cérémonie & mariage',       'en' => 'Ceremony & wedding']],
+            ['cle' => 'hauts',        'actif' => true, 'label' => ['fr' => 'Hauts & chemises',          'en' => 'Tops & shirts']],
+            ['cle' => 'bas',          'actif' => true, 'label' => ['fr' => 'Bas (jupes, pantalons)',    'en' => 'Bottoms']],
+            ['cle' => 'vestes',       'actif' => true, 'label' => ['fr' => 'Vestes & manteaux',         'en' => 'Jackets & coats']],
+            ['cle' => 'combinaisons', 'actif' => true, 'label' => ['fr' => 'Combinaisons',              'en' => 'Jumpsuits']],
+            ['cle' => 'enfant',       'actif' => true, 'label' => ['fr' => 'Enfant',                    'en' => 'Kids']],
+            ['cle' => 'accessoires',  'actif' => true, 'label' => ['fr' => 'Accessoires',               'en' => 'Accessories']],
+        ];
+    }
+
+    /**
      * Paliers du programme de fidélité (Bronze / Argent / Or / Platine).
      *
      * Étaient CODÉS EN DUR dans le contrôleur : impossible de recalibrer sans

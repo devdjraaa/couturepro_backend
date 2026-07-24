@@ -53,10 +53,26 @@ class VetementController extends Controller
                   ->orWhere('is_systeme', true);
             })
             ->actif()
+            // Le designer doit voir l'audience de CHACUNE de ses créations : les
+            // vues (colonne dénormalisée) et le total de likes. Sans ça, il
+            // publie sans jamais savoir ce qui marche.
+            ->withCount('likes')
             ->orderBy('nom') // pt 66 : catalogue classé alphabétiquement (recherche facilitée)
             ->get();
 
         return response()->json($vetements);
+    }
+
+    /** Clé de catégorie valide (dans la taxonomie éditable) ou null. */
+    private function categorieValide($valeur): ?string
+    {
+        $valeur = is_string($valeur) ? trim($valeur) : null;
+        if (! $valeur) {
+            return null;
+        }
+        $cles = collect(\App\Models\VitrineSetting::categoriesCreations())->pluck('cle')->all();
+
+        return in_array($valeur, $cles, true) ? $valeur : null;
     }
 
     public function store(StoreVetementRequest $request): JsonResponse
@@ -90,6 +106,7 @@ class VetementController extends Controller
         $vetement = Vetement::create([
             'atelier_id'      => $atelier->id,
             'nom'             => $request->nom,
+            'categorie'       => $this->categorieValide($request->input('categorie')),
             'libelles_mesures' => $libelles ?: null,
             'image_path'      => $imagePaths[0] ?? null,
             'images'          => $imagePaths ?: null,
@@ -107,6 +124,12 @@ class VetementController extends Controller
         $this->authorize('update', $vetement);
 
         $data = ['nom' => $request->nom ?? $vetement->nom];
+
+        // La catégorie n'est touchée que si elle est explicitement envoyée, pour
+        // ne pas l'effacer sur une modification qui ne la concerne pas (photo).
+        if ($request->has('categorie')) {
+            $data['categorie'] = $this->categorieValide($request->input('categorie'));
+        }
 
         // Pts 68-69 : liste des mesures attendues, modifiable après coup.
         if ($request->has('libelles_mesures')) {

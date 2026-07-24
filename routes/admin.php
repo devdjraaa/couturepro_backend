@@ -71,6 +71,10 @@ Route::middleware(['auth:admin', 'admin.auth'])->group(function () {
     Route::get('vitrine/sponsorisation', [VitrineController::class, 'sponsorisation']);
     Route::put('vitrine/sponsorisation', [VitrineController::class, 'setSponsorisation']);
 
+    // Catégories de la galerie publique (taxonomie éditable).
+    Route::get('vitrine/categories-creations', [VitrineController::class, 'getCategoriesCreations']);
+    Route::put('vitrine/categories-creations', [VitrineController::class, 'setCategoriesCreations']);
+
     // Presentation de la page de tarifs : plan mis en avant, note de bas de
     // grille, encart des options complementaires. Aucun prix ici — les tarifs
     // restent dans les plans.
