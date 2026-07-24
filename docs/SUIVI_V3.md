@@ -77,7 +77,7 @@ avaient survécu si longtemps.
 | GX-2 | Bouton « S'inscrire » invisible sous 1024 px | ⬜ | Le lien existe dans le menu déroulant mobile ; le bouton de la barre du haut porte `hidden lg:inline-flex`. Le remonter est un choix visuel à confirmer. |
 | GX-3 | Ordre des rubriques Paramètres | ⬜ | Jamais vérifié à l'écran faute de spec assez précise. |
 | GX-4 | Mention « Bientôt » sur les modules non prêts | ⬜ | Idem. |
-| GX-5 | Recommandation par catégorie | ⬜ | La reco v1 (créateurs favoris en tête) tourne. La version par catégorie suppose de **catégoriser les créations** — chantier de données, pas d'affichage. |
+| GX-5 | Recommandation par catégorie | ✅ 24/07 | **Débloqué** (voir GX-18) : les créations sont désormais catégorisées via une taxonomie éditable. La reco par catégorie a enfin sa donnée. |
 | GX-6 | Facturation : prévisualisation et gabarits avancés | ✅ 23/07 | Aperçu avant émission livré et **vérifié à l'écran** : l'overlay rend le document fidèlement (en-tête atelier, client, tableau, totaux, gabarit). Il a même montré son utilité en affichant un net à payer négatif quand l'acompte dépassait le total. |
 | GX-7 | Export des mesures en CSV | ✅ 23/07 | Individuel corrigé : le bouton pointait vers un `<a download>` sans jeton (401) et l'URL venait d'une méthode `async` (`[object Promise]`) → récupération via client authentifié. 4 tests serveur. |
 | GX-8 | Bulle Makila « hors ligne » plantée en bas à droite | ✅ 23/07 | Aucun minuteur : elle restait plantée en permanence et chevauchait le bandeau d'install. Désormais auto-disparition (6 s) + croix + mémoire de session. Vérifié à l'écran. |
@@ -95,6 +95,10 @@ avaient survécu si longtemps.
 
 | GX-16 | Écran d'édition des textes des plans | ✅ 23/07 | « Je ne vois pas les champs pour gérer les textes » — il avait raison : **j'avais rendu les libellés éditables dans la donnée sans créer l'écran**, le défaut même que je signale ailleurs. Panneau ajouté sur la page des plans. **Piège évité au passage** : l'enregistrement remplaçait tout le bloc — un écran n'éditant que le badge aurait effacé l'essai offert et tous les libellés. Fusion au lieu de remplacement, + test. Le champ muet du modal (« nouvelle clé ») porte enfin son titre : c'est une trappe technique. |
 | GX-17 | **Dette** : branche mobile à 165 commits de retard | ⬜ | Constaté en voulant compiler l'APK admin : un APK compilé aujourd'hui ne contiendrait **aucun** correctif du jour. Fusion = 31 fichiers, ~115 zones de conflit (env, dépendances, config mobile) — mal résolue, elle casse la couche mobile. Fusion **lancée puis annulée proprement**, rien modifié. Décision : on utilise l'**admin web**, déjà en ligne avec tout, et la fusion se fera dans une passe dédiée avec vérification sur appareil. **À ne pas laisser traîner** : l'écart se paie. |
+
+| GX-18 | Galerie « Pinterest » : catégories éditables (débloque GX-5) | ✅ 24/07 | La galerie renvoyait `categorie = null` en dur — filtres inertes, **c'était le blocage GX-5/DIR-21**. Résolu par une **taxonomie éditable** (défauts recherchés : ANKA + contexte Bénin), branchée à la galerie et au studio, avec écran admin. Vérifié à l'écran. |
+| GX-19 | Vues + interactions par création | ✅ 24/07 | « On ne sait pas le nombre de vues/interactions » — vrai. **Compteur de vues** (dédupliqué par session, fenêtre 30 min) + likes, affichés sur la galerie **et** au designer sur ses créations. Vérifié à l'écran. |
+| GX-20 | Sponsoring impeccable | ✅ 24/07 | Ne touchait que le classement des créateurs ; /mise-en-avant renvoyait vers /aide. Désormais : créations sponsorisées **en tête** avec **badge « Mis en avant »** (transparence, modèle Etsy), et **vrai CTA** vers l'achat FedaPay. 7 tests. |
 
 ## 2.2 Gextimo — à re-tester sur appareil
 
