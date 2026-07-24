@@ -347,6 +347,10 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::get('caisse/stats',   [CaisseController::class, 'stats']);
     Route::get('caisse/clients', [CaisseController::class, 'clients']);
     Route::get('caisse/rapport-mensuel', [CaisseController::class, 'rapportMensuel']); // PL-3
+    // Journal de caisse : mouvements d'espèces réels + solde.
+    Route::get('caisse/operations',    [CaisseController::class, 'operations']);
+    Route::post('caisse/operations',   [CaisseController::class, 'enregistrerOperation']);
+    Route::delete('caisse/operations/{operation}', [CaisseController::class, 'supprimerOperation']);
     // Paiements de commande
     Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index'])->middleware('equipe.permission:paiements.view');
     Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store'])->middleware('equipe.permission:paiements.create');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Commande;
 use App\Models\CommandePaiement;
+use App\Models\OperationCaisse;
 use App\Traits\ChecksPlanFeature;
 use App\Traits\ResolvesAtelier;
 use Carbon\Carbon;
@@ -15,6 +16,87 @@ use Illuminate\Http\Request;
 class CaisseController extends Controller
 {
     use ResolvesAtelier, ChecksPlanFeature;
+
+    /**
+     * GET /caisse/operations — journal de caisse : solde d'espèces et mouvements.
+     *
+     * Le solde est all-time (entrées − sorties) : c'est l'argent réellement dans
+     * la caisse. Les mouvements sont paginés par mois pour la lisibilité.
+     */
+    public function operations(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        if ($gate = $this->planGate($atelier, 'module_caisse')) {
+            return $gate;
+        }
+
+        $mois = $request->input('mois', now()->format('Y-m'));
+        [$annee, $num] = array_map('intval', explode('-', $mois));
+        $debut = Carbon::create($annee, $num, 1)->startOfMonth();
+        $fin   = $debut->copy()->endOfMonth();
+
+        // Solde réel de la caisse : toutes les entrées moins toutes les sorties.
+        $soldeExpr = "COALESCE(SUM(CASE WHEN type = 'sortie' THEN -montant ELSE montant END), 0)";
+        $solde = (float) OperationCaisse::where('atelier_id', $atelier->id)->selectRaw("$soldeExpr as s")->value('s');
+
+        $duMois = OperationCaisse::where('atelier_id', $atelier->id)
+            ->whereBetween('created_at', [$debut, $fin])
+            ->latest()
+            ->get(['id', 'type', 'montant', 'motif', 'mode', 'created_at']);
+
+        $entrees = (float) $duMois->where('type', 'entree')->sum('montant');
+        $sorties = (float) $duMois->where('type', 'sortie')->sum('montant');
+
+        return response()->json([
+            'mois'          => $mois,
+            'solde'         => $solde,
+            'entrees_mois'  => $entrees,
+            'sorties_mois'  => $sorties,
+            'operations'    => $duMois,
+        ]);
+    }
+
+    /** POST /caisse/operations — enregistre une entrée ou une sortie d'espèces. */
+    public function enregistrerOperation(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        if ($gate = $this->planGate($atelier, 'module_caisse')) {
+            return $gate;
+        }
+
+        $data = $request->validate([
+            'type'   => ['required', 'in:entree,sortie'],
+            'montant'=> ['required', 'numeric', 'min:0.01', 'max:999999999'],
+            'motif'  => ['required', 'string', 'max:200'],
+            'mode'   => ['nullable', 'in:especes,mobile_money,virement,autre'],
+        ]);
+
+        $user = $request->user();
+        $op = OperationCaisse::create([
+            'atelier_id'      => $atelier->id,
+            'type'            => $data['type'],
+            'montant'         => $data['montant'],
+            'motif'           => trim($data['motif']),
+            'mode'            => $data['mode'] ?? 'especes',
+            'created_by'      => $user?->id,
+            'created_by_role' => $user instanceof \App\Models\Proprietaire ? 'proprietaire' : 'membre',
+        ]);
+
+        return response()->json($op, 201);
+    }
+
+    /** DELETE /caisse/operations/{operation} — corrige une saisie erronée. */
+    public function supprimerOperation(Request $request, OperationCaisse $operation): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        // Isolation : on ne supprime que dans SON atelier (pas d'IDOR).
+        if ($operation->atelier_id !== $atelier->id) {
+            return response()->json(['message' => 'Opération introuvable.'], 404);
+        }
+        $operation->delete();
+
+        return response()->json(['message' => 'Opération supprimée.']);
+    }
 
     public function stats(Request $request): JsonResponse
     {
