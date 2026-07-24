@@ -56,6 +56,45 @@ class CaisseController extends Controller
         ]);
     }
 
+    /**
+     * GET /caisse/analytique — niveau supérieur de la caisse (plans avancés).
+     *
+     * Évolution des entrées / sorties / solde net sur les 6 derniers mois, pour
+     * un graphe. Gaté par `caisse_analytique` : c'est une fonction réservée aux
+     * plans qui l'incluent (échelonnement par abonnement).
+     */
+    public function analytique(Request $request): JsonResponse
+    {
+        $atelier = $this->getAtelier($request);
+        if ($gate = $this->planGate($atelier, 'caisse_analytique')) {
+            return $gate;
+        }
+
+        $mois = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $ref   = now()->startOfMonth()->subMonths($i);
+            $debut = $ref->copy()->startOfMonth();
+            $fin   = $ref->copy()->endOfMonth();
+
+            $ops = OperationCaisse::where('atelier_id', $atelier->id)
+                ->whereBetween('created_at', [$debut, $fin])
+                ->get(['type', 'montant']);
+
+            $entrees = (float) $ops->where('type', 'entree')->sum('montant');
+            $sorties = (float) $ops->where('type', 'sortie')->sum('montant');
+
+            $mois[] = [
+                'cle'     => $ref->format('Y-m'),
+                'label'   => $ref->locale('fr')->isoFormat('MMM'),
+                'entrees' => $entrees,
+                'sorties' => $sorties,
+                'net'     => $entrees - $sorties,
+            ];
+        }
+
+        return response()->json(['mois' => $mois]);
+    }
+
     /** POST /caisse/operations — enregistre une entrée ou une sortie d'espèces. */
     public function enregistrerOperation(Request $request): JsonResponse
     {

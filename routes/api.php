@@ -351,6 +351,8 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::get('caisse/operations',    [CaisseController::class, 'operations']);
     Route::post('caisse/operations',   [CaisseController::class, 'enregistrerOperation']);
     Route::delete('caisse/operations/{operation}', [CaisseController::class, 'supprimerOperation']);
+    // Niveau supérieur : graphe analytique (gaté par caisse_analytique).
+    Route::get('caisse/analytique',    [CaisseController::class, 'analytique']);
     // Paiements de commande
     Route::get('commandes/{commande}/paiements',  [CommandePaiementController::class, 'index'])->middleware('equipe.permission:paiements.view');
     Route::post('commandes/{commande}/paiements', [CommandePaiementController::class, 'store'])->middleware('equipe.permission:paiements.create');

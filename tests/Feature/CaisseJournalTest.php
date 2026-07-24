@@ -96,4 +96,18 @@ class CaisseJournalTest extends TestCase
              ->postJson('/api/caisse/operations', ['type' => 'entree', 'montant' => 0, 'motif' => 'x'])
              ->assertStatus(422);
     }
+
+    public function test_l_analytique_est_reservee_a_son_niveau_de_plan(): void
+    {
+        // Le plan a la caisse (journal) mais PAS l'analytique : accès refusé.
+        [$pSansAnalytique] = $this->atelierAvecCaisse();
+        $this->actingAs($pSansAnalytique, 'sanctum')
+             ->getJson('/api/caisse/analytique')->assertStatus(403);
+
+        // Un plan avec caisse_analytique : accès autorisé, 6 mois renvoyés.
+        [$p2, $a2] = $this->atelierAvecCaisse();
+        $a2->abonnement->update(['config_snapshot' => ['module_caisse' => true, 'caisse_analytique' => true]]);
+        $this->actingAs($p2, 'sanctum')
+             ->getJson('/api/caisse/analytique')->assertOk()->assertJsonCount(6, 'mois');
+    }
 }

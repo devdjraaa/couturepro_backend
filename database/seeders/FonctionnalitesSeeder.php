@@ -101,6 +101,16 @@ class FonctionnalitesSeeder extends Seeder
                 'ordre_affichage' => 9,
             ],
             [
+                'cle'             => 'caisse_analytique',
+                'label'           => 'Caisse — graphes analytiques',
+                'description'     => 'Évolution des entrées/sorties sur 6 mois (niveau supérieur de la caisse)',
+                'type'            => 'booleen',
+                'unite'           => null,
+                'categorie'       => 'module',
+                'valeur_defaut'   => 'false',
+                'ordre_affichage' => 10,
+            ],
+            [
                 'cle'             => 'multi_ateliers',
                 'label'           => 'Mode Multi-Ateliers',
                 'description'     => "Gérer jusqu'à 7 ateliers depuis un seul compte",
