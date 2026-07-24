@@ -26,7 +26,10 @@ use App\Http\Controllers\Api\VitrineController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth admin (publique) ────────────────────────────────────────────────────
-Route::post('auth/login', [AuthController::class, 'login']);
+// Limite de débit : sans elle, le panneau d'administration — l'accès le plus
+// sensible — était brute-forçable (le login de l'app, lui, était déjà limité).
+// 5 tentatives par minute et par IP, puis 429.
+Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 // ─── Routes protégées admin ───────────────────────────────────────────────────
 Route::middleware(['auth:admin', 'admin.auth'])->group(function () {

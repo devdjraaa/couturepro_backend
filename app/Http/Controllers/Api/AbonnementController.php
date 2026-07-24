@@ -198,6 +198,17 @@ class AbonnementController extends Controller
             ]
             : null;
 
+        // Nouveaux clients créés ce mois (le quota du plan gratuit porte là-dessus,
+        // pas sur le total). Exposé pour que l'écran Clients affiche une jauge et
+        // prévienne AVANT le mur — la règle serveur existait, la jauge manquait.
+        $maxClientsMois = $config['max_clients_par_mois'] ?? null;
+        $quotaClients = ($maxClientsMois !== null && (int) $maxClientsMois !== -1)
+            ? [
+                'utilise' => QuotaMensuel::courant($atelier->id)->nb_clients_crees,
+                'max'     => (int) $maxClientsMois,
+            ]
+            : null;
+
         return response()->json([
             'niveau_cle'           => $abonnement->niveau_cle,
             'niveau_label'         => $abonnement->niveau?->label,
@@ -216,6 +227,7 @@ class AbonnementController extends Controller
             'quota_factures'       => $quotaFactures,
             'quota_publications'      => $quotaPublications,
             'quota_clients_factures'  => $quotaClientsFactures,
+            'quota_clients'           => $quotaClients,
             // PL-10 : date de la dernière sauvegarde cloud de l'atelier (si le plan l'inclut).
             'derniere_sauvegarde_cloud' => ! empty($config['backup_cloud'])
                 ? \Illuminate\Support\Facades\DB::table('atelier_backups')
