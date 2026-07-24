@@ -127,6 +127,26 @@ class GalerieCreationsTest extends TestCase
              ->assertOk()->assertJson(['vues' => 2]);
     }
 
+    public function test_le_sitemap_priorise_les_ateliers_sponsorises(): void
+    {
+        $ordinaire = $this->designer(sponsorise: false);
+        $sponso    = $this->designer(sponsorise: true);
+
+        $xml = $this->get('/api/sitemap/createurs.xml')->assertOk()->getContent();
+
+        // Le sponsorisé est signalé prioritaire et à rafraîchir chaque jour ;
+        // l'ordinaire garde la priorité de base et une fréquence hebdomadaire.
+        // Le <lastmod> optionnel peut s'intercaler entre </loc> et <changefreq>.
+        $this->assertMatchesRegularExpression(
+            "#/createurs/{$sponso->id}</loc>(?:<lastmod>[^<]*</lastmod>)?<changefreq>daily</changefreq><priority>1\.0</priority>#",
+            $xml,
+        );
+        $this->assertMatchesRegularExpression(
+            "#/createurs/{$ordinaire->id}</loc>(?:<lastmod>[^<]*</lastmod>)?<changefreq>weekly</changefreq><priority>0\.7</priority>#",
+            $xml,
+        );
+    }
+
     public function test_l_admin_edite_la_taxonomie_et_refuse_les_cles_doublons(): void
     {
         $admin = Admin::create([

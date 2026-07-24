@@ -17,14 +17,24 @@ class SitemapController extends Controller
         $ateliers = Atelier::where('type', 'designer')
             ->whereIn('statut', ['actif', 'essai'])
             ->orderBy('updated_at', 'desc')
-            ->get(['id', 'updated_at']);
+            ->get(['id', 'updated_at', 'sponsor_jusqu_a']);
 
         $urls = $ateliers->map(function ($a) {
             $loc  = self::BASE . '/createurs/' . $a->id;
             $last = optional($a->updated_at)->toDateString();
+
+            // SEO inclus dans la mise en avant : un atelier sponsorisé est
+            // signalé au robot comme prioritaire (priorité maximale) et à
+            // rafraîchir quotidiennement — il est donc exploré et réindexé plus
+            // souvent que les profils ordinaires (0.7 / hebdomadaire). C'est le
+            // volet technique du sponsoring, pas une simple promesse.
+            $sponso    = $a->sponsorise;
+            $priority  = $sponso ? '1.0' : '0.7';
+            $changefreq = $sponso ? 'daily' : 'weekly';
+
             return "  <url><loc>{$loc}</loc>"
                 . ($last ? "<lastmod>{$last}</lastmod>" : '')
-                . "<changefreq>weekly</changefreq><priority>0.7</priority></url>";
+                . "<changefreq>{$changefreq}</changefreq><priority>{$priority}</priority></url>";
         })->implode("\n");
 
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
