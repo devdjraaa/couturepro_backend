@@ -562,18 +562,24 @@ class PaymentService
         \Carbon\CarbonInterface $expiration,
         int $joursRestants,
     ): void {
-        $maxSous = $configSnapshot['max_sous_ateliers'] ?? 0;
+        $maxSous = (int) ($configSnapshot['max_sous_ateliers'] ?? 0);
         if (! $source->proprietaire_id) {
             return;
         }
 
-        $autres = Atelier::where('proprietaire_id', $source->proprietaire_id)
+        $tous = Atelier::where('proprietaire_id', $source->proprietaire_id)
             ->where('id', '!=', $source->id)
             ->orderBy('created_at')
-            ->take((int) $maxSous)
             ->get();
 
-        foreach ($autres as $sous) {
+        // Les premiers ateliers (dans la limite du plan) reçoivent le plan actif ;
+        // ceux au-delà sont verrouillés. Sans ça, après une BAISSE de plan, un
+        // sous-atelier que le plan ne couvre plus restait « actif » et accessible.
+        // Le propriétaire les rouvre un à un via « Déverrouiller » après une montée.
+        $autorises = $tous->take($maxSous);
+        $excedent  = $tous->slice($maxSous);
+
+        foreach ($autorises as $sous) {
             Abonnement::updateOrCreate(
                 ['atelier_id' => $sous->id],
                 [
@@ -586,6 +592,20 @@ class PaymentService
                 ]
             );
             $sous->update(['statut' => 'actif']);
+        }
+
+        foreach ($excedent as $sous) {
+            if ($sous->statut === 'verrouille') {
+                continue;
+            }
+            $sous->update(['statut' => 'verrouille']);
+            \App\Models\NotificationSysteme::create([
+                'atelier_id' => $source->id,
+                'titre'      => "Atelier verrouillé : {$sous->nom}",
+                'contenu'    => "Votre plan permet {$maxSous} sous-atelier(s). « {$sous->nom} » a été verrouillé. Montez votre plan pour le rouvrir.",
+                'type'       => 'atelier_verrouille',
+                'is_read'    => false,
+            ]);
         }
     }
 

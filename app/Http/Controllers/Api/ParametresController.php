@@ -326,20 +326,6 @@ class ParametresController extends Controller
         return response()->json($data);
     }
 
-    // Préférences complètes (devise + mesure + langue) en un seul appel
-    public function getPreferencesComplet(Request $request): JsonResponse
-    {
-        $atelier = $this->getAtelier($request);
-        $prefs   = ParametresAtelier::firstOrNew(['atelier_id' => $atelier->id]);
-
-        return response()->json([
-            'devise'       => $prefs->devise       ?? 'XOF',
-            'unite_mesure' => $prefs->unite_mesure ?? 'cm',
-            'langue'       => $prefs->langue       ?? 'fr',
-            'theme'        => $prefs->theme        ?? 'light',
-        ]);
-    }
-
     // Paramètres de facturation (standard / personnalisée)
     public function getFacture(Request $request): JsonResponse
     {

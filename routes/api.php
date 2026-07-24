@@ -282,8 +282,6 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::get('ateliers/mes-ateliers',                    [AtelierProprietaireController::class, 'mesAteliers']);
     Route::post('ateliers',                                [AtelierProprietaireController::class, 'store']);
     Route::get('ateliers/{atelierIdParam}/stats',          [AtelierProprietaireController::class, 'stats']);
-    Route::post('ateliers/sync-config',                    [AtelierProprietaireController::class, 'syncConfig']);
-    Route::post('ateliers/downgrade-check',                [AtelierProprietaireController::class, 'downgradeCheck']);
     Route::post('ateliers/{atelierIdParam}/deverrouiller', [AtelierProprietaireController::class, 'deverrouiller']);
 
     // Clients
@@ -310,8 +308,6 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('mesures/{mesure}/desarchiver',          [MesureController::class, 'desarchiver'])->middleware('equipe.permission:mesures.archive');
     Route::delete('mesures/{mesure}',                    [MesureController::class, 'destroy'])->middleware('equipe.permission:mesures.archive');
 
-    // Clients — recherche globale cross-ateliers
-    Route::get('clients/search-global', [ClientController::class, 'searchGlobal'])->middleware('equipe.permission:clients.view');
 
     // Commandes
     Route::get('commandes',                               [CommandeController::class, 'index'])->middleware('equipe.permission:commandes.view');
@@ -388,9 +384,6 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::post('devis/{devis}/traiter',  [DevisController::class, 'traiter']);
 
     // Équipe
-    // Ce que chaque rôle peut faire, dans CET atelier : le patron choisissait
-    // un rôle sans savoir ce qu'il accordait.
-    Route::get('equipe/roles', [EquipeMembreController::class, 'roles']);
     Route::get('equipe',                    [EquipeMembreController::class, 'index']);
     Route::post('equipe',                   [EquipeMembreController::class, 'store']);
     Route::delete('equipe/{membre}',        [EquipeMembreController::class, 'destroy']);
@@ -470,7 +463,6 @@ Route::middleware(['auth:sanctum', 'account:app'])->group(function () {
     Route::put('parametres/mot-de-passe',        [ParametresController::class, 'changerMotDePasse']);
     Route::get('parametres/preferences',         [ParametresController::class, 'getPreferences']);
     Route::put('parametres/preferences',         [ParametresController::class, 'updatePreferences']);
-    Route::get('parametres/preferences/complet', [ParametresController::class, 'getPreferencesComplet']);
     Route::get('parametres/langue',              [ParametresController::class, 'getLangue']);
     Route::put('parametres/langue',              [ParametresController::class, 'updateLangue']);
     Route::get('parametres/facture',             [ParametresController::class, 'getFacture']);

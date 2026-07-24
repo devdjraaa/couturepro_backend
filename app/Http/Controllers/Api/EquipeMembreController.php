@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ResolvesAtelier;
-use App\Models\Atelier;
 use App\Models\EquipeMembre;
-use App\Models\PermissionEquipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -43,27 +41,6 @@ class EquipeMembreController extends Controller
      * est ce qui décide un patron à confier un rôle plutôt qu'un autre. On
      * renvoie donc les deux listes.
      */
-    public function roles(Request $request): JsonResponse
-    {
-        $atelier = $this->getAtelier($request);
-        $toutes  = PermissionEquipe::ALL_PERMISSIONS;
-
-        $roles = [];
-        foreach (['assistant', 'membre'] as $role) {
-            $accordees = PermissionEquipe::getForAtelier((string) $atelier->id, $role);
-            $roles[] = [
-                'role'     => $role,
-                'accorde'  => array_values(array_intersect($toutes, $accordees)),
-                'refuse'   => array_values(array_diff($toutes, $accordees)),
-            ];
-        }
-
-        return response()->json([
-            'roles'       => $roles,
-            'permissions' => $toutes,
-        ]);
-    }
-
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
